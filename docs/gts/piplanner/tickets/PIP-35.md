@@ -34,18 +34,19 @@ cd PiPlanner
 swift test
 ```
 
-macOS with Xcode (unit + UI tests):
+**Verified on this branch (Swift 6.4 / Linux):** `Executed 37 tests, with 0 failures` (includes 4× `AppLaunchRouterTests`).
+
+macOS with Xcode (unit + ViewModel + UI tests):
 
 ```bash
 cd PiPlanner
 xcodebuild -scheme PiPlanner -destination 'platform=iOS Simulator,name=iPhone 16' test
 ```
 
-UI tests launch with `-reset-demo` so the app always starts on Welcome.
+UI tests (`PiPlannerUITests`) launch with `-reset-demo` so the app always starts on Welcome. They require Xcode / iOS Simulator and were not executed on Linux.
 
 ## Notes
 
-- This Linux Cloud Agent host has no Swift/Xcode toolchain; UI tests are authored for Xcode and cannot be executed here.
 - Loading state intentionally omitted (not designed / out of scope).
 - Setup-complete (locked Opening balance) still routes to Goals placeholder so later screens are not broken.
 
