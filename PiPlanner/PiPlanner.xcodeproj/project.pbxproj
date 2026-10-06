@@ -34,7 +34,6 @@
 		A11C0012BD814941ABD3C921 /* AccountsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11C0013EEA24F56B29EBB6A /* AccountsViewModel.swift */; };
 		A11C0014BD814941ABD3C921 /* AccountsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11C0015EEA24F56B29EBB6A /* AccountsView.swift */; };
 		A11C0016BD814941ABD3C921 /* AccountsFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11C0017EEA24F56B29EBB6A /* AccountsFlowView.swift */; };
-		A11C0018BD814941ABD3C921 /* ConsentPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11C0019EEA24F56B29EBB6A /* ConsentPlaceholderView.swift */; };
 		A11C001ABD814941ABD3C921 /* AccountsServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11C001BEEA24F56B29EBB6A /* AccountsServiceTests.swift */; };
 		A11C001CBD814941ABD3C921 /* AccountsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11C001DEEA24F56B29EBB6A /* AccountsViewModelTests.swift */; };
 		A827E2F873CA4E2AB8A029D6 /* AppLaunchRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 391854E68EAC46CDA39D0B3B /* AppLaunchRouter.swift */; };
@@ -44,6 +43,13 @@
 		F13572D6AE9A4323879B80E5 /* AppLaunchRouterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF49BE600E2449DEAAFDE202 /* AppLaunchRouterTests.swift */; };
 		5F6188E2699E40068E8AF2D0 /* WelcomeViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D8786C6E2CF42CB842FED32 /* WelcomeViewModelTests.swift */; };
 		0762A7393A06489AA35C9A8F /* WelcomeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648FE7AD42B2471E947DD9DD /* WelcomeUITests.swift */; };
+		B39A0010BD814941ABD3C921 /* BalanceSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39A0011EEA24F56B29EBB6A /* BalanceSyncService.swift */; };
+		B39A0012BD814941ABD3C921 /* ConsentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39A0013EEA24F56B29EBB6A /* ConsentViewModel.swift */; };
+		B39A0014BD814941ABD3C921 /* ConsentSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39A0015EEA24F56B29EBB6A /* ConsentSheet.swift */; };
+		B39A0016BD814941ABD3C921 /* ManualBalanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39A0017EEA24F56B29EBB6A /* ManualBalanceView.swift */; };
+		B39A0018BD814941ABD3C921 /* UPIPinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39A0019EEA24F56B29EBB6A /* UPIPinView.swift */; };
+		B39A001ABD814941ABD3C921 /* BalanceSyncServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39A001BEEA24F56B29EBB6A /* BalanceSyncServiceTests.swift */; };
+		B39A001CBD814941ABD3C921 /* ConsentViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39A001DEEA24F56B29EBB6A /* ConsentViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -76,7 +82,6 @@
 		A11C0013EEA24F56B29EBB6A /* AccountsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsViewModel.swift; sourceTree = "<group>"; };
 		A11C0015EEA24F56B29EBB6A /* AccountsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsView.swift; sourceTree = "<group>"; };
 		A11C0017EEA24F56B29EBB6A /* AccountsFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsFlowView.swift; sourceTree = "<group>"; };
-		A11C0019EEA24F56B29EBB6A /* ConsentPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsentPlaceholderView.swift; sourceTree = "<group>"; };
 		A11C001BEEA24F56B29EBB6A /* AccountsServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsServiceTests.swift; sourceTree = "<group>"; };
 		A11C001DEEA24F56B29EBB6A /* AccountsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsViewModelTests.swift; sourceTree = "<group>"; };
 		391854E68EAC46CDA39D0B3B /* AppLaunchRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchRouter.swift; sourceTree = "<group>"; };
@@ -87,6 +92,13 @@
 		5D8786C6E2CF42CB842FED32 /* WelcomeViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewModelTests.swift; sourceTree = "<group>"; };
 		648FE7AD42B2471E947DD9DD /* WelcomeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeUITests.swift; sourceTree = "<group>"; };
 		8410F99D1749426EB531CC14 /* PiPlannerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PiPlannerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B39A0011EEA24F56B29EBB6A /* BalanceSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceSyncService.swift; sourceTree = "<group>"; };
+		B39A0013EEA24F56B29EBB6A /* ConsentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsentViewModel.swift; sourceTree = "<group>"; };
+		B39A0015EEA24F56B29EBB6A /* ConsentSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsentSheet.swift; sourceTree = "<group>"; };
+		B39A0017EEA24F56B29EBB6A /* ManualBalanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualBalanceView.swift; sourceTree = "<group>"; };
+		B39A0019EEA24F56B29EBB6A /* UPIPinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UPIPinView.swift; sourceTree = "<group>"; };
+		B39A001BEEA24F56B29EBB6A /* BalanceSyncServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceSyncServiceTests.swift; sourceTree = "<group>"; };
+		B39A001DEEA24F56B29EBB6A /* ConsentViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsentViewModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -178,6 +190,7 @@
 				1631379D5741444D9B38E865 /* PersistenceService.swift */,
 				E356D619EEA24F56B29EBB6A /* OpeningSplitService.swift */,
 				A11C0011EEA24F56B29EBB6A /* AccountsService.swift */,
+				B39A0011EEA24F56B29EBB6A /* BalanceSyncService.swift */,
 				391854E68EAC46CDA39D0B3B /* AppLaunchRouter.swift */,
 			);
 			path = Services;
@@ -188,6 +201,7 @@
 			children = (
 				E90291FF624F492F96D5DEBB /* OpeningSplitViewModel.swift */,
 				A11C0013EEA24F56B29EBB6A /* AccountsViewModel.swift */,
+				B39A0013EEA24F56B29EBB6A /* ConsentViewModel.swift */,
 				DED0C70FB32642E2B1F5D5B7 /* WelcomeViewModel.swift */,
 			);
 			path = ViewModels;
@@ -209,7 +223,9 @@
 				C3D5DA0FD5AF48D6BA156E3E /* WelcomeFlowView.swift */,
 				A11C0015EEA24F56B29EBB6A /* AccountsView.swift */,
 				A11C0017EEA24F56B29EBB6A /* AccountsFlowView.swift */,
-				A11C0019EEA24F56B29EBB6A /* ConsentPlaceholderView.swift */,
+				B39A0015EEA24F56B29EBB6A /* ConsentSheet.swift */,
+				B39A0017EEA24F56B29EBB6A /* ManualBalanceView.swift */,
+				B39A0019EEA24F56B29EBB6A /* UPIPinView.swift */,
 				159C2C5B70024F90A3628219 /* OpeningSplitView.swift */,
 				8D62F79434E5467CABBA0C58 /* OpeningSplitFlowView.swift */,
 			);
@@ -248,6 +264,8 @@
 				442B1016E1AC4C9BB48B1357 /* OpeningSplitViewModelTests.swift */,
 				A11C001BEEA24F56B29EBB6A /* AccountsServiceTests.swift */,
 				A11C001DEEA24F56B29EBB6A /* AccountsViewModelTests.swift */,
+				B39A001BEEA24F56B29EBB6A /* BalanceSyncServiceTests.swift */,
+				B39A001DEEA24F56B29EBB6A /* ConsentViewModelTests.swift */,
 				EF49BE600E2449DEAAFDE202 /* AppLaunchRouterTests.swift */,
 				5D8786C6E2CF42CB842FED32 /* WelcomeViewModelTests.swift */,
 				4AC30C1DBBFF4793A642AE40 /* PiPlannerTests.swift */,
@@ -411,11 +429,15 @@
 				A11C0012BD814941ABD3C921 /* AccountsViewModel.swift in Sources */,
 				A11C0014BD814941ABD3C921 /* AccountsView.swift in Sources */,
 				A11C0016BD814941ABD3C921 /* AccountsFlowView.swift in Sources */,
-				A11C0018BD814941ABD3C921 /* ConsentPlaceholderView.swift in Sources */,
 				A827E2F873CA4E2AB8A029D6 /* AppLaunchRouter.swift in Sources */,
 				423A5096BCAD46EC90311933 /* WelcomeViewModel.swift in Sources */,
 				84194582E8D840E6A12F3A0A /* WelcomeView.swift in Sources */,
 				A96DD71BE5B642908C414C87 /* WelcomeFlowView.swift in Sources */,
+				B39A0010BD814941ABD3C921 /* BalanceSyncService.swift in Sources */,
+				B39A0012BD814941ABD3C921 /* ConsentViewModel.swift in Sources */,
+				B39A0014BD814941ABD3C921 /* ConsentSheet.swift in Sources */,
+				B39A0016BD814941ABD3C921 /* ManualBalanceView.swift in Sources */,
+				B39A0018BD814941ABD3C921 /* UPIPinView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -433,6 +455,8 @@
 				AFFB71B888804486BDCBBCC6 /* PiPlannerTests.swift in Sources */,
 				F13572D6AE9A4323879B80E5 /* AppLaunchRouterTests.swift in Sources */,
 				5F6188E2699E40068E8AF2D0 /* WelcomeViewModelTests.swift in Sources */,
+				B39A001ABD814941ABD3C921 /* BalanceSyncServiceTests.swift in Sources */,
+				B39A001CBD814941ABD3C921 /* ConsentViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

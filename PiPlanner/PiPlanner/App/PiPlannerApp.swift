@@ -13,6 +13,7 @@ struct PiPlannerApp: App {
 struct ContentView: View {
     @State private var destination: AppLaunchDestination?
     @State private var accountsViewModel: AccountsViewModel?
+    @State private var persistence: PersistenceService?
     @State private var loadError: String?
 
     var body: some View {
@@ -20,10 +21,13 @@ struct ContentView: View {
             if let loadError {
                 Text(loadError)
                     .padding()
-            } else if let destination, let accountsViewModel {
+            } else if let destination, let accountsViewModel, let persistence {
                 switch destination {
                 case .welcome:
-                    WelcomeFlowView(accountsViewModel: accountsViewModel)
+                    WelcomeFlowView(
+                        accountsViewModel: accountsViewModel,
+                        persistence: persistence
+                    )
                 case .goals:
                     NavigationStack {
                         GoalsTabPlaceholderView()
@@ -42,6 +46,7 @@ struct ContentView: View {
                 }
                 let state = try await persistence.loadState()
                 destination = AppLaunchRouter.destination(for: state)
+                self.persistence = persistence
                 accountsViewModel = AccountsViewModel(
                     accounts: DemoSeed.sampleAccounts,
                     persistence: persistence
