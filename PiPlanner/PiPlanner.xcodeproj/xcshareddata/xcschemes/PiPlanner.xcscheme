@@ -40,6 +40,17 @@
                ReferencedContainer = "container:PiPlanner.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "F29343FDD22C4EEAA764DF03"
+               BuildableName = "PiPlannerUITests.xctest"
+               BlueprintName = "PiPlannerUITests"
+               ReferencedContainer = "container:PiPlanner.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

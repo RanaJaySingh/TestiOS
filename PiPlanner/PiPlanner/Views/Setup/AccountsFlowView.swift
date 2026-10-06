@@ -1,6 +1,7 @@
 import SwiftUI
 
 /// Hosts Accounts and navigates to Consent (placeholder) after Continue.
+/// Production first-run entry is `WelcomeFlowView` (PIP-35); kept for Accounts-only previews/tests.
 struct AccountsFlowView: View {
     @StateObject private var viewModel: AccountsViewModel
     @State private var path = NavigationPath()

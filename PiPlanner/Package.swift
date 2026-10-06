@@ -37,7 +37,8 @@ let package = Package(
                 // Xcode-host test scaffold + ViewModel tests (Combine / SwiftUI host).
                 "PiPlannerTests.swift",
                 "OpeningSplitViewModelTests.swift",
-                "AccountsViewModelTests.swift"
+                "AccountsViewModelTests.swift",
+                "WelcomeViewModelTests.swift"
             ]
         )
     ]
