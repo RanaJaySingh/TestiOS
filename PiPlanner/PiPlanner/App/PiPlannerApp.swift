@@ -9,26 +9,39 @@ struct PiPlannerApp: App {
     }
 }
 
-/// Root host. Until Welcome lands, Accounts (frame 2) is reachable for PIP-37 demos.
+/// Root host. First-run / post–Reset → Welcome (PIP-35); setup complete → Goals placeholder.
 struct ContentView: View {
+    @State private var destination: AppLaunchDestination?
     @State private var accountsViewModel: AccountsViewModel?
     @State private var loadError: String?
 
     var body: some View {
         Group {
-            if let accountsViewModel {
-                AccountsFlowView(viewModel: accountsViewModel)
-            } else if let loadError {
+            if let loadError {
                 Text(loadError)
                     .padding()
+            } else if let destination, let accountsViewModel {
+                switch destination {
+                case .welcome:
+                    WelcomeFlowView(accountsViewModel: accountsViewModel)
+                case .goals:
+                    NavigationStack {
+                        GoalsTabPlaceholderView()
+                    }
+                }
             } else {
                 ProgressView("Loading…")
             }
         }
         .task {
-            guard accountsViewModel == nil else { return }
+            guard destination == nil else { return }
             do {
                 let persistence = try PersistenceService.makeDefault()
+                if ProcessInfo.processInfo.arguments.contains("-reset-demo") {
+                    try await persistence.resetDemo()
+                }
+                let state = try await persistence.loadState()
+                destination = AppLaunchRouter.destination(for: state)
                 accountsViewModel = AccountsViewModel(
                     accounts: DemoSeed.sampleAccounts,
                     persistence: persistence
