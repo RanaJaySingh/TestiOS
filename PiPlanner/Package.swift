@@ -21,7 +21,8 @@ let package = Package(
                 "Views",
                 "ViewModels",
                 "Components",
-                "Resources"
+                "Resources",
+                "Assets.xcassets"
             ],
             sources: [
                 "Models",
@@ -33,7 +34,9 @@ let package = Package(
             dependencies: ["PiPlannerCore"],
             path: "PiPlannerTests",
             exclude: [
-                "PiPlannerTests.swift"
+                // Xcode-host test scaffold + ViewModel tests (Combine / SwiftUI host).
+                "PiPlannerTests.swift",
+                "OpeningSplitViewModelTests.swift"
             ]
         )
     ]
