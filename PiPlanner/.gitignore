@@ -1,0 +1,19 @@
+# Swift / Xcode
+.build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+.swiftpm/
+Package.resolved
+
+# macOS
+.DS_Store
+
+# IDE
+*.swp
+*~

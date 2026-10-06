@@ -1,0 +1,477 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1318D194AA484098BD165D58 /* PiPlannerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 656B4AAB996D4CB283413E05 /* PiPlannerApp.swift */; };
+		142F0FC7D4894F32A7F74E7B /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = C670521930484E588DEE0188 /* Account.swift */; };
+		1C65A48285EC416D828D2976 /* Goal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 349DD80CB6684362B4613EB4 /* Goal.swift */; };
+		A793547EB4B74E14B2DD17AA /* HistoryEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB7B9D64AF14990B555634F /* HistoryEntry.swift */; };
+		ED4F38A8B7334BC7838962C1 /* StandingSplit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9452E46E33A542F791986FF1 /* StandingSplit.swift */; };
+		7763E11C5B074AABACD9799F /* PersistedAppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1814C236925440EFA253DFA8 /* PersistedAppState.swift */; };
+		409665F0BBB14EE4A32F8556 /* AppErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3CC5C73DA64AC088672737 /* AppErrors.swift */; };
+		E3FB4AF5E1DD480B8AB95808 /* AnalyticsEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D32EDB2E05E4F0FAB65DC53 /* AnalyticsEvent.swift */; };
+		C02A7AB59EA74FD48DA6285E /* FormattingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6A8D1E227234A47AFC6AA76 /* FormattingService.swift */; };
+		8375943D645B49D0863EEBD3 /* PersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1631379D5741444D9B38E865 /* PersistenceService.swift */; };
+		08EA68393BA94CA89A5EE93E /* FormattingServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E95FBCBC4A41B7993C130A /* FormattingServiceTests.swift */; };
+		AC1C20FB804F47A9A093BE79 /* ModelSerializationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB1FF2A2773D47A2A2B2B50D /* ModelSerializationTests.swift */; };
+		55A271B3A9AD4E509F89E78C /* PersistenceServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99B5A5E93DC14F1EB79CF38A /* PersistenceServiceTests.swift */; };
+		AFFB71B888804486BDCBBCC6 /* PiPlannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AC30C1DBBFF4793A642AE40 /* PiPlannerTests.swift */; };
+		5500093B47DB4442AE0BDAE7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 516CFC6EE35C4D688EC16F13 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		656B4AAB996D4CB283413E05 /* PiPlannerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiPlannerApp.swift; sourceTree = "<group>"; };
+		C670521930484E588DEE0188 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
+		349DD80CB6684362B4613EB4 /* Goal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Goal.swift; sourceTree = "<group>"; };
+		DBB7B9D64AF14990B555634F /* HistoryEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryEntry.swift; sourceTree = "<group>"; };
+		9452E46E33A542F791986FF1 /* StandingSplit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandingSplit.swift; sourceTree = "<group>"; };
+		1814C236925440EFA253DFA8 /* PersistedAppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistedAppState.swift; sourceTree = "<group>"; };
+		8A3CC5C73DA64AC088672737 /* AppErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppErrors.swift; sourceTree = "<group>"; };
+		6D32EDB2E05E4F0FAB65DC53 /* AnalyticsEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsEvent.swift; sourceTree = "<group>"; };
+		D6A8D1E227234A47AFC6AA76 /* FormattingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormattingService.swift; sourceTree = "<group>"; };
+		1631379D5741444D9B38E865 /* PersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceService.swift; sourceTree = "<group>"; };
+		B6E95FBCBC4A41B7993C130A /* FormattingServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormattingServiceTests.swift; sourceTree = "<group>"; };
+		CB1FF2A2773D47A2A2B2B50D /* ModelSerializationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelSerializationTests.swift; sourceTree = "<group>"; };
+		99B5A5E93DC14F1EB79CF38A /* PersistenceServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceServiceTests.swift; sourceTree = "<group>"; };
+		4AC30C1DBBFF4793A642AE40 /* PiPlannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiPlannerTests.swift; sourceTree = "<group>"; };
+		5E30C13C767C4A099356785D /* PiPlanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PiPlanner.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		36DFD0A484664F5C9ED2552C /* PiPlannerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PiPlannerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		516CFC6EE35C4D688EC16F13 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		100CFD0961AD4FAC9F01C405 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		25D9DD767D9B4A48876810C6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		B17BECEA664D494594224742 = {
+			isa = PBXGroup;
+			children = (
+				8799A11EEA214253810C2CF5 /* PiPlanner */,
+				F52D444208AF44249CFFEC39 /* PiPlannerTests */,
+				1B4A92531F3B4459A5B9B6EE /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1B4A92531F3B4459A5B9B6EE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5E30C13C767C4A099356785D /* PiPlanner.app */,
+				36DFD0A484664F5C9ED2552C /* PiPlannerTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8799A11EEA214253810C2CF5 /* PiPlanner */ = {
+			isa = PBXGroup;
+			children = (
+				5F41A72E4F0C4BE8A596B3AF /* App */,
+				42D730D4115640B592F541FF /* Models */,
+				78F08922B0484E3FAD8736A2 /* Services */,
+				157666E0AF2B4DDE9C80C295 /* ViewModels */,
+				D214C0DD37DD4230A10E8BA8 /* Views */,
+				FAA719A723F14AD19856F4AF /* Components */,
+				AC6FBA1EF52E42E48C233339 /* Resources */,
+				516CFC6EE35C4D688EC16F13 /* Assets.xcassets */,
+			);
+			path = PiPlanner;
+			sourceTree = "<group>";
+		};
+		5F41A72E4F0C4BE8A596B3AF /* App */ = {
+			isa = PBXGroup;
+			children = (
+				656B4AAB996D4CB283413E05 /* PiPlannerApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		42D730D4115640B592F541FF /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				C670521930484E588DEE0188 /* Account.swift */,
+				349DD80CB6684362B4613EB4 /* Goal.swift */,
+				DBB7B9D64AF14990B555634F /* HistoryEntry.swift */,
+				9452E46E33A542F791986FF1 /* StandingSplit.swift */,
+				1814C236925440EFA253DFA8 /* PersistedAppState.swift */,
+				8A3CC5C73DA64AC088672737 /* AppErrors.swift */,
+				6D32EDB2E05E4F0FAB65DC53 /* AnalyticsEvent.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		78F08922B0484E3FAD8736A2 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				D6A8D1E227234A47AFC6AA76 /* FormattingService.swift */,
+				1631379D5741444D9B38E865 /* PersistenceService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		157666E0AF2B4DDE9C80C295 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		D214C0DD37DD4230A10E8BA8 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		FAA719A723F14AD19856F4AF /* Components */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		AC6FBA1EF52E42E48C233339 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		F52D444208AF44249CFFEC39 /* PiPlannerTests */ = {
+			isa = PBXGroup;
+			children = (
+				B6E95FBCBC4A41B7993C130A /* FormattingServiceTests.swift */,
+				CB1FF2A2773D47A2A2B2B50D /* ModelSerializationTests.swift */,
+				99B5A5E93DC14F1EB79CF38A /* PersistenceServiceTests.swift */,
+				4AC30C1DBBFF4793A642AE40 /* PiPlannerTests.swift */,
+			);
+			path = PiPlannerTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C4CB85D333DC419D8A6B8CDD /* PiPlanner */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 89505C776B7D48088155A716 /* Build configuration list for PBXNativeTarget "PiPlanner" */;
+			buildPhases = (
+				37FF2FEDEB05421DBD2E4A9C /* Sources */,
+				100CFD0961AD4FAC9F01C405 /* Frameworks */,
+				76648C834EBD40D9A191269F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PiPlanner;
+			productName = PiPlanner;
+			productReference = 5E30C13C767C4A099356785D /* PiPlanner.app */;
+			productType = "com.apple.product-type.application";
+		};
+		96A6486F230249F5BF0CA26D /* PiPlannerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 03784C8680D94E95913B1DE6 /* Build configuration list for PBXNativeTarget "PiPlannerTests" */;
+			buildPhases = (
+				9773939DCCCB4D208D391C5F /* Sources */,
+				25D9DD767D9B4A48876810C6 /* Frameworks */,
+				953D41AF718C470698F0B3DF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C7D1F2EDF20B49959E9500FB /* PBXTargetDependency */,
+			);
+			name = PiPlannerTests;
+			productName = PiPlannerTests;
+			productReference = 36DFD0A484664F5C9ED2552C /* PiPlannerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		3003353BE783430EB7C0AAD0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					C4CB85D333DC419D8A6B8CDD = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					96A6486F230249F5BF0CA26D = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = C4CB85D333DC419D8A6B8CDD;
+					};
+				};
+			};
+			buildConfigurationList = 96FF86300990401BABD4F060 /* Build configuration list for PBXProject "PiPlanner" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = B17BECEA664D494594224742;
+			productRefGroup = 1B4A92531F3B4459A5B9B6EE /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C4CB85D333DC419D8A6B8CDD /* PiPlanner */,
+				96A6486F230249F5BF0CA26D /* PiPlannerTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		76648C834EBD40D9A191269F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5500093B47DB4442AE0BDAE7 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		953D41AF718C470698F0B3DF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		37FF2FEDEB05421DBD2E4A9C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1318D194AA484098BD165D58 /* PiPlannerApp.swift in Sources */,
+				142F0FC7D4894F32A7F74E7B /* Account.swift in Sources */,
+				1C65A48285EC416D828D2976 /* Goal.swift in Sources */,
+				A793547EB4B74E14B2DD17AA /* HistoryEntry.swift in Sources */,
+				ED4F38A8B7334BC7838962C1 /* StandingSplit.swift in Sources */,
+				7763E11C5B074AABACD9799F /* PersistedAppState.swift in Sources */,
+				409665F0BBB14EE4A32F8556 /* AppErrors.swift in Sources */,
+				E3FB4AF5E1DD480B8AB95808 /* AnalyticsEvent.swift in Sources */,
+				C02A7AB59EA74FD48DA6285E /* FormattingService.swift in Sources */,
+				8375943D645B49D0863EEBD3 /* PersistenceService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9773939DCCCB4D208D391C5F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				08EA68393BA94CA89A5EE93E /* FormattingServiceTests.swift in Sources */,
+				AC1C20FB804F47A9A093BE79 /* ModelSerializationTests.swift in Sources */,
+				55A271B3A9AD4E509F89E78C /* PersistenceServiceTests.swift in Sources */,
+				AFFB71B888804486BDCBBCC6 /* PiPlannerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+
+/* Begin PBXContainerItemProxy section */
+		B09E564E294B42C5B565E07D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3003353BE783430EB7C0AAD0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C4CB85D333DC419D8A6B8CDD;
+			remoteInfo = PiPlanner;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXTargetDependency section */
+		C7D1F2EDF20B49959E9500FB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C4CB85D333DC419D8A6B8CDD /* PiPlanner */;
+			targetProxy = B09E564E294B42C5B565E07D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		A50B6806E17E47BF9E6C6C51 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		25672CA6D4434107AE53D7B4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		91432715D8FF4DE9B39EC9A4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = PiPlanner;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.piplanner.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		0BC1E46554FD4C289691A64E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = PiPlanner;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.piplanner.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		F7D2A8640D0D4220B3DDA3C7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.piplanner.app.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PiPlanner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PiPlanner";
+			};
+			name = Debug;
+		};
+		8D04A5F5204442158925F074 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.piplanner.app.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PiPlanner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PiPlanner";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		96FF86300990401BABD4F060 /* Build configuration list for PBXProject "PiPlanner" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A50B6806E17E47BF9E6C6C51 /* Debug */,
+				25672CA6D4434107AE53D7B4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		89505C776B7D48088155A716 /* Build configuration list for PBXNativeTarget "PiPlanner" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				91432715D8FF4DE9B39EC9A4 /* Debug */,
+				0BC1E46554FD4C289691A64E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		03784C8680D94E95913B1DE6 /* Build configuration list for PBXNativeTarget "PiPlannerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F7D2A8640D0D4220B3DDA3C7 /* Debug */,
+				8D04A5F5204442158925F074 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 3003353BE783430EB7C0AAD0 /* Project object */;
+}
