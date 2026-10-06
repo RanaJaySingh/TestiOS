@@ -30,6 +30,13 @@
 		CA4CE2F2B8D64B74AD142955 /* GoalsTabPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76598D4183EB4D5B85C52851 /* GoalsTabPlaceholderView.swift */; };
 		8138935DBAFA4B7490CBA7E6 /* OpeningSplitServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40BC3302B98D49298CC4A151 /* OpeningSplitServiceTests.swift */; };
 		E80E407F8D7D466F96CC8E4E /* OpeningSplitViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 442B1016E1AC4C9BB48B1357 /* OpeningSplitViewModelTests.swift */; };
+		A11C0010BD814941ABD3C921 /* AccountsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11C0011EEA24F56B29EBB6A /* AccountsService.swift */; };
+		A11C0012BD814941ABD3C921 /* AccountsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11C0013EEA24F56B29EBB6A /* AccountsViewModel.swift */; };
+		A11C0014BD814941ABD3C921 /* AccountsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11C0015EEA24F56B29EBB6A /* AccountsView.swift */; };
+		A11C0016BD814941ABD3C921 /* AccountsFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11C0017EEA24F56B29EBB6A /* AccountsFlowView.swift */; };
+		A11C0018BD814941ABD3C921 /* ConsentPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11C0019EEA24F56B29EBB6A /* ConsentPlaceholderView.swift */; };
+		A11C001ABD814941ABD3C921 /* AccountsServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11C001BEEA24F56B29EBB6A /* AccountsServiceTests.swift */; };
+		A11C001CBD814941ABD3C921 /* AccountsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11C001DEEA24F56B29EBB6A /* AccountsViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -58,6 +65,13 @@
 		76598D4183EB4D5B85C52851 /* GoalsTabPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsTabPlaceholderView.swift; sourceTree = "<group>"; };
 		40BC3302B98D49298CC4A151 /* OpeningSplitServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpeningSplitServiceTests.swift; sourceTree = "<group>"; };
 		442B1016E1AC4C9BB48B1357 /* OpeningSplitViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpeningSplitViewModelTests.swift; sourceTree = "<group>"; };
+		A11C0011EEA24F56B29EBB6A /* AccountsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsService.swift; sourceTree = "<group>"; };
+		A11C0013EEA24F56B29EBB6A /* AccountsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsViewModel.swift; sourceTree = "<group>"; };
+		A11C0015EEA24F56B29EBB6A /* AccountsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsView.swift; sourceTree = "<group>"; };
+		A11C0017EEA24F56B29EBB6A /* AccountsFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsFlowView.swift; sourceTree = "<group>"; };
+		A11C0019EEA24F56B29EBB6A /* ConsentPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsentPlaceholderView.swift; sourceTree = "<group>"; };
+		A11C001BEEA24F56B29EBB6A /* AccountsServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsServiceTests.swift; sourceTree = "<group>"; };
+		A11C001DEEA24F56B29EBB6A /* AccountsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsViewModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -139,6 +153,7 @@
 				D6A8D1E227234A47AFC6AA76 /* FormattingService.swift */,
 				1631379D5741444D9B38E865 /* PersistenceService.swift */,
 				E356D619EEA24F56B29EBB6A /* OpeningSplitService.swift */,
+				A11C0011EEA24F56B29EBB6A /* AccountsService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -147,6 +162,7 @@
 			isa = PBXGroup;
 			children = (
 				E90291FF624F492F96D5DEBB /* OpeningSplitViewModel.swift */,
+				A11C0013EEA24F56B29EBB6A /* AccountsViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -163,6 +179,9 @@
 		A29113C5FD5D401A8AE05A97 /* Setup */ = {
 			isa = PBXGroup;
 			children = (
+				A11C0015EEA24F56B29EBB6A /* AccountsView.swift */,
+				A11C0017EEA24F56B29EBB6A /* AccountsFlowView.swift */,
+				A11C0019EEA24F56B29EBB6A /* ConsentPlaceholderView.swift */,
 				159C2C5B70024F90A3628219 /* OpeningSplitView.swift */,
 				8D62F79434E5467CABBA0C58 /* OpeningSplitFlowView.swift */,
 			);
@@ -199,6 +218,8 @@
 				99B5A5E93DC14F1EB79CF38A /* PersistenceServiceTests.swift */,
 				40BC3302B98D49298CC4A151 /* OpeningSplitServiceTests.swift */,
 				442B1016E1AC4C9BB48B1357 /* OpeningSplitViewModelTests.swift */,
+				A11C001BEEA24F56B29EBB6A /* AccountsServiceTests.swift */,
+				A11C001DEEA24F56B29EBB6A /* AccountsViewModelTests.swift */,
 				4AC30C1DBBFF4793A642AE40 /* PiPlannerTests.swift */,
 			);
 			path = PiPlannerTests;
@@ -318,6 +339,11 @@
 				625CA2888D9F46D499FDFA74 /* OpeningSplitView.swift in Sources */,
 				BEE8DE33B42E4134B8B88EBA /* OpeningSplitFlowView.swift in Sources */,
 				CA4CE2F2B8D64B74AD142955 /* GoalsTabPlaceholderView.swift in Sources */,
+				A11C0010BD814941ABD3C921 /* AccountsService.swift in Sources */,
+				A11C0012BD814941ABD3C921 /* AccountsViewModel.swift in Sources */,
+				A11C0014BD814941ABD3C921 /* AccountsView.swift in Sources */,
+				A11C0016BD814941ABD3C921 /* AccountsFlowView.swift in Sources */,
+				A11C0018BD814941ABD3C921 /* ConsentPlaceholderView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -330,6 +356,8 @@
 				55A271B3A9AD4E509F89E78C /* PersistenceServiceTests.swift in Sources */,
 				8138935DBAFA4B7490CBA7E6 /* OpeningSplitServiceTests.swift in Sources */,
 				E80E407F8D7D466F96CC8E4E /* OpeningSplitViewModelTests.swift in Sources */,
+				A11C001ABD814941ABD3C921 /* AccountsServiceTests.swift in Sources */,
+				A11C001CBD814941ABD3C921 /* AccountsViewModelTests.swift in Sources */,
 				AFFB71B888804486BDCBBCC6 /* PiPlannerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

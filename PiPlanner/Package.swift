@@ -36,7 +36,8 @@ let package = Package(
             exclude: [
                 // Xcode-host test scaffold + ViewModel tests (Combine / SwiftUI host).
                 "PiPlannerTests.swift",
-                "OpeningSplitViewModelTests.swift"
+                "OpeningSplitViewModelTests.swift",
+                "AccountsViewModelTests.swift"
             ]
         )
     ]
