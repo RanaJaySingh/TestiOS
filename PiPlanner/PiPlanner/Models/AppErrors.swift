@@ -40,9 +40,22 @@ enum GrokError: Error, Equatable, Sendable {
 }
 
 /// Spec §3.4 — AppError
-enum AppError: Error, Equatable, Sendable {
+enum AppError: Error, Equatable, Sendable, LocalizedError {
     case validationError(ValidationError)
     case syncError(SyncError)
     case grokError(GrokError)
     case persistenceError(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .validationError(let error):
+            return error.message
+        case .syncError:
+            return "Sync failed."
+        case .grokError:
+            return "Assistant unavailable."
+        case .persistenceError(let message):
+            return message
+        }
+    }
 }
