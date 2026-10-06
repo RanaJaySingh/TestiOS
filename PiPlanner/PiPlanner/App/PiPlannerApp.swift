@@ -9,15 +9,15 @@ struct PiPlannerApp: App {
     }
 }
 
-/// Root host. Until earlier setup screens land, Opening split is reachable for PIP-43 demos.
+/// Root host. Until Welcome lands, Accounts (frame 2) is reachable for PIP-37 demos.
 struct ContentView: View {
-    @State private var openingSplitViewModel: OpeningSplitViewModel?
+    @State private var accountsViewModel: AccountsViewModel?
     @State private var loadError: String?
 
     var body: some View {
         Group {
-            if let openingSplitViewModel {
-                OpeningSplitFlowView(viewModel: openingSplitViewModel)
+            if let accountsViewModel {
+                AccountsFlowView(viewModel: accountsViewModel)
             } else if let loadError {
                 Text(loadError)
                     .padding()
@@ -26,12 +26,11 @@ struct ContentView: View {
             }
         }
         .task {
-            guard openingSplitViewModel == nil else { return }
+            guard accountsViewModel == nil else { return }
             do {
                 let persistence = try PersistenceService.makeDefault()
-                openingSplitViewModel = OpeningSplitViewModel(
-                    goals: DemoSeed.sampleGoals,
-                    openingBalance: DemoSeed.openingBalancePaisa,
+                accountsViewModel = AccountsViewModel(
+                    accounts: DemoSeed.sampleAccounts,
                     persistence: persistence
                 )
             } catch {
@@ -41,9 +40,32 @@ struct ContentView: View {
     }
 }
 
-/// Minimal seed so Opening split can be exercised before Welcome → Goals setup exists.
+/// Demo persona seed — Spec persona / PRD demo setup.
 enum DemoSeed {
     static let openingBalancePaisa: Paisa = 10_000_000 // ₹1,00,000
+
+    static var sampleAccounts: [Account] {
+        [
+            Account(
+                id: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!,
+                bankName: "HDFC",
+                maskedNumber: "••4821",
+                balance: 10_000_000,
+                isDedicated: false,
+                isPaytmLinked: true,
+                consentAutoUpdate: false
+            ),
+            Account(
+                id: UUID(uuidString: "22222222-2222-2222-2222-222222222222")!,
+                bankName: "SBI",
+                maskedNumber: "••7730",
+                balance: 7_200_000,
+                isDedicated: false,
+                isPaytmLinked: true,
+                consentAutoUpdate: false
+            )
+        ]
+    }
 
     static var sampleGoals: [Goal] {
         let start = Date()
