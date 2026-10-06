@@ -38,7 +38,8 @@ let package = Package(
                 "PiPlannerTests.swift",
                 "OpeningSplitViewModelTests.swift",
                 "AccountsViewModelTests.swift",
-                "WelcomeViewModelTests.swift"
+                "WelcomeViewModelTests.swift",
+                "ConsentViewModelTests.swift"
             ]
         )
     ]
