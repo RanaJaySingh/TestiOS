@@ -37,7 +37,9 @@ final class GoalsViewModel: ObservableObject {
     let persistence: any PersistenceServicing
     let formatting: any FormattingServicing
     let balanceSync: any BalanceSyncServicing
-    /// Owned credit-flow sheets (PIP-47).
+    /// Goals Sync/Update ledger (PIP-102 `StubLedgerEngine`); distinct from PIP-99 `LedgerFacade` setup stub.
+    let ledger: any LedgerEngine
+    /// Owned credit-flow sheets (PIP-47 / PIP-102).
     let creditSyncViewModel: CreditSyncViewModel
     let creditUpdateViewModel: CreditUpdateBalanceViewModel
 
@@ -47,20 +49,24 @@ final class GoalsViewModel: ObservableObject {
         balanceSync: any BalanceSyncServicing = MockBalanceSyncService(
             fetchedBalancePaisa: MockBalanceSyncService.demoHigherBalancePaisa
         ),
+        ledger: any LedgerEngine = StubLedgerEngine(),
         initialState: PersistedAppState? = nil
     ) {
         self.persistence = persistence
         self.formatting = formatting
         self.balanceSync = balanceSync
+        self.ledger = ledger
         self.creditSyncViewModel = CreditSyncViewModel(
             persistence: persistence,
             balanceSync: balanceSync,
-            formatting: formatting
+            formatting: formatting,
+            ledger: ledger
         )
         self.creditUpdateViewModel = CreditUpdateBalanceViewModel(
             persistence: persistence,
             balanceSync: balanceSync,
-            formatting: formatting
+            formatting: formatting,
+            ledger: ledger
         )
         if let initialState {
             apply(initialState)
@@ -103,7 +109,7 @@ final class GoalsViewModel: ObservableObject {
 
     /// BR-6 / R9 — Sync / Update blocked while an open credit exists.
     var isSyncOrUpdateBlocked: Bool {
-        CreditEntryService.isSyncOrUpdateBlocked(history: history)
+        ledger.isSyncOrUpdateBlocked(history: history)
     }
 
     var canTapBalanceAction: Bool {
@@ -261,7 +267,7 @@ final class GoalsViewModel: ObservableObject {
         history = state.history
         heldGoalChanges = state.heldGoalChanges
         standingSplits = state.standingSplits
-        if let entry = CreditEntryService.openCreditEntry(in: state.history) {
+        if let entry = ledger.openCreditEntry(in: state.history) {
             openEntry = entry
             openEntryBannerMessage = CreditEntryService.openEntryBannerMessage(
                 for: entry,
