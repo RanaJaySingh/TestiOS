@@ -73,7 +73,7 @@ final class HistoryEntryOpenSaveTests: XCTestCase {
         )
         XCTAssertEqual(suggested[carID], Decimal(string: "0.60")!)
 
-        state = try LedgerEngine.saveAndLockCredit(
+        state = try ledger.saveAndLockCredit(
             state: state,
             entryID: entryID,
             percentages: [
@@ -91,7 +91,7 @@ final class HistoryEntryOpenSaveTests: XCTestCase {
 
     func testSaveClearsCustomSplitWhenMatchingSuggestedStanding() throws {
         var state = try openCreditState()
-        state = try LedgerEngine.saveAndLockCredit(
+        state = try ledger.saveAndLockCredit(
             state: state,
             entryID: entryID,
             percentages: [
@@ -111,7 +111,7 @@ final class HistoryEntryOpenSaveTests: XCTestCase {
         let carBefore = try XCTUnwrap(before.goals.first { $0.id == carID }?.savedAmount)
         let emergencyBefore = try XCTUnwrap(before.goals.first { $0.id == emergencyID }?.savedAmount)
 
-        let opened = try LedgerEngine.openCreditFromFetchedBalance(
+        let opened = try ledger.openCreditFromFetchedBalance(
             state: before,
             fetchedBalance: 11_000_000,
             dedicatedAccountID: hdfcID,
@@ -125,7 +125,7 @@ final class HistoryEntryOpenSaveTests: XCTestCase {
         XCTAssertEqual(withOpen.goals.first { $0.id == carID }?.savedAmount, carBefore)
         XCTAssertEqual(withOpen.goals.first { $0.id == emergencyID }?.savedAmount, emergencyBefore)
 
-        let lockedState = try LedgerEngine.saveAndLockCredit(
+        let lockedState = try ledger.saveAndLockCredit(
             state: withOpen,
             entryID: entryID,
             percentages: [
@@ -181,7 +181,7 @@ final class HistoryEntryOpenSaveTests: XCTestCase {
             now: createdAt
         )
 
-        state = try LedgerEngine.saveAndLockCredit(
+        state = try ledger.saveAndLockCredit(
             state: state,
             entryID: entryID,
             percentages: [
@@ -232,7 +232,7 @@ final class HistoryEntryOpenSaveTests: XCTestCase {
     // MARK: - Fixtures
 
     private func openCreditState() throws -> PersistedAppState {
-        let outcome = try LedgerEngine.openCreditFromFetchedBalance(
+        let outcome = try ledger.openCreditFromFetchedBalance(
             state: samplePostSetupState(),
             fetchedBalance: 11_000_000,
             dedicatedAccountID: hdfcID,

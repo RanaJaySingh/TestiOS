@@ -1,10 +1,12 @@
 import Foundation
 
-/// PIP-99 stub until PIP-98 `LedgerEngine` merges.
+/// PIP-99 stub for Consent / opening-balance until PIP-98 merges.
 ///
-/// Setup Consent / opening-balance paths call this instead of inventing ledger
-/// mutations inline. When PIP-98 lands, replace bodies with `LedgerEngine`
-/// snapshot / typed-delta APIs — call sites stay stable.
+/// Setup Consent paths call this instead of inventing ledger mutations inline.
+/// Goals Sync/Update + History open→save use PIP-102/103 `StubLedgerEngine`
+/// (`LedgerEngine` protocol) — coexist until PIP-98 unifies setup + Goals.
+/// When PIP-98 lands, replace bodies with real snapshot / typed-delta APIs —
+/// call sites stay stable.
 enum LedgerFacade {
     /// How the opening balance was obtained (reserved for PIP-98 History / delta).
     enum BalanceSource: Equatable, Sendable {
