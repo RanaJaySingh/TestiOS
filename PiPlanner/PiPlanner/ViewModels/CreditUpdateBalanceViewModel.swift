@@ -5,9 +5,11 @@ enum CreditUpdatePath: Equatable, Sendable {
     case choice
     case manual
     case pin
+    case otherApp
+    case wrongPin
 }
 
-/// View model for Update balance (frames 11a–11c / typed 13t) — PRD R7; Spec BR-6.
+/// View model for Update balance (frames 11a–11c / typed 13t) — PRD R7; Spec BR-6; PIP-100 routes.
 /// Named `CreditUpdateBalance*` to avoid colliding with PIP-45 `GoalsUpdateBalanceSheet`.
 @MainActor
 final class CreditUpdateBalanceViewModel: ObservableObject {
@@ -22,6 +24,8 @@ final class CreditUpdateBalanceViewModel: ObservableObject {
     @Published private(set) var withdrawalShortfall: Paisa?
     @Published private(set) var isBlockedByOpenEntry = false
     @Published private(set) var pinError: PinError?
+    @Published private(set) var dedicatedIsPaytmLinked = true
+    @Published private(set) var dedicatedBankTitle: String?
 
     private let persistence: any PersistenceServicing
     private let balanceSync: any BalanceSyncServicing
@@ -64,7 +68,10 @@ final class CreditUpdateBalanceViewModel: ObservableObject {
     func loadAndPrepare() async {
         do {
             let state = try await persistence.loadState()
-            previousBalance = AccountsService.dedicatedAccount(in: state.accounts)?.balance ?? 0
+            let dedicated = AccountsService.dedicatedAccount(in: state.accounts)
+            previousBalance = dedicated?.balance ?? 0
+            dedicatedIsPaytmLinked = dedicated?.isPaytmLinked ?? false
+            dedicatedBankTitle = dedicated.map { AccountsService.displayTitle(for: $0) }
             isBlockedByOpenEntry = CreditEntryService.isSyncOrUpdateBlocked(history: state.history)
             if isBlockedByOpenEntry {
                 infoMessage = "Assign the open credit before Update."
@@ -80,11 +87,29 @@ final class CreditUpdateBalanceViewModel: ObservableObject {
         errorMessage = nil
     }
 
+    /// Balance sync: Paytm-linked → UPI PIN mock; Other UPI app → Manual amount only (PIP-100).
     func chooseBalanceSync() {
         guard !isBlockedByOpenEntry else { return }
-        path = .pin
-        pinDigits = ""
-        pinError = nil
+        switch UpdateBalanceRoutingService.route(
+            after: .balanceSync,
+            dedicatedIsPaytmLinked: dedicatedIsPaytmLinked
+        ) {
+        case .upiPinMock:
+            path = .pin
+            pinDigits = ""
+            pinError = nil
+            errorMessage = nil
+        case .otherUPIApp:
+            path = .otherApp
+            errorMessage = nil
+        default:
+            path = .manual
+            errorMessage = nil
+        }
+    }
+
+    func continueFromOtherApp() {
+        path = .manual
         errorMessage = nil
     }
 
@@ -94,13 +119,27 @@ final class CreditUpdateBalanceViewModel: ObservableObject {
         pinError = nil
     }
 
-    /// Typed balance path (frame 11b → 13t).
+    func retryPIN() {
+        pinDigits = ""
+        pinError = nil
+        path = .pin
+        errorMessage = nil
+    }
+
+    func enterManuallyAfterWrongPin() {
+        pinDigits = ""
+        pinError = nil
+        path = .manual
+        errorMessage = nil
+    }
+
+    /// Typed balance path (frame 11b → 13t). Same History shape as PIN; `isTyped = true`.
     func applyTypedBalance() async {
         guard canContinueManual else { return }
         await processNewBalance(typedPaisa, isTyped: true)
     }
 
-    /// Demo UPI PIN path (frame 11c → 10 → 13).
+    /// Demo UPI PIN path (frame 11c → 10 → 13). Same History shape as Manual; `isTyped = false`.
     func submitPIN() async {
         guard canSubmitPIN else { return }
         isWorking = true
@@ -113,6 +152,8 @@ final class CreditUpdateBalanceViewModel: ObservableObject {
             pinError = error
             if error == .wrongPin {
                 pinDigits = ""
+                path = .wrongPin
+                errorMessage = "Incorrect PIN. Try again or enter the balance manually."
             }
         case .success(let fetched):
             await processNewBalance(fetched, isTyped: false)

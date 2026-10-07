@@ -9,18 +9,33 @@ enum UPIPinCheckOutcome: Equatable, Sendable {
     case otherApp
 }
 
-    /// View model for Consent + balance entry (frames 3–4e) — PRD R3 / R4; Spec §3.3 / PIP-99.
+/// View model for Consent + balance entry (frames 3–4e) — PRD R3 / R4; Spec §3.3 / PIP-99 / PIP-100.
 @MainActor
 final class ConsentViewModel: ObservableObject {
     @Published private(set) var accounts: [Account]
     @Published private(set) var isWorking = false
     @Published private(set) var errorMessage: String?
     @Published private(set) var resolvedBalance: Paisa?
+    /// `true` when opening balance came from Manual (incl. Other→Manual); `false` for PIN/Yes fetch.
+    @Published private(set) var resolvedIsTyped: Bool?
     @Published private(set) var consentAutoUpdate = false
     @Published private(set) var pinDigits = ""
     @Published private(set) var lastPinOutcome: UPIPinCheckOutcome?
     /// Digit-only rupee amount typed on Manual (4a).
     @Published var manualRupeeDigits = ""
+
+    /// Dedicated account is linked in Paytm → Balance sync may use UPI PIN mock.
+    var dedicatedIsPaytmLinked: Bool {
+        dedicatedAccount?.isPaytmLinked == true
+    }
+
+    /// Consent No sheet: next route for Manually / Balance sync (PIP-100).
+    func route(after choice: UpdateBalanceChoice) -> UpdateBalanceRoute {
+        UpdateBalanceRoutingService.route(
+            after: choice,
+            dedicatedIsPaytmLinked: dedicatedIsPaytmLinked
+        )
+    }
 
     private let persistence: any PersistenceServicing
     private let balanceSync: any BalanceSyncServicing
@@ -104,6 +119,7 @@ final class ConsentViewModel: ObservableObject {
         consentAutoUpdate = false
         errorMessage = nil
         resolvedBalance = nil
+        resolvedIsTyped = nil
         Task { await persistConsentFlag(autoUpdate: false) }
     }
 
@@ -200,7 +216,7 @@ final class ConsentViewModel: ObservableObject {
         clearPIN()
     }
 
-    // MARK: - Persistence
+    // MARK: - Persistence (LedgerFacade stub until PIP-98)
 
     private func persistConsentFlag(autoUpdate: Bool) async {
         // Setup path: only Consent No uses this (autoUpdate false). Settings On uses confirmConsentOn.
@@ -219,7 +235,10 @@ final class ConsentViewModel: ObservableObject {
     }
 
     private func persistConsentAndBalance(paisa: Paisa, autoUpdate: Bool, isTyped: Bool) async {
-        let source: LedgerFacade.BalanceSource = isTyped ? .typedManual : .snapshotFetch
+        // PIP-100: track typed vs fetch for Opening History shape.
+        resolvedIsTyped = isTyped
+        // PIP-99: LedgerFacade BalanceSource (snapshot vs typed) until PIP-98 engine.
+        let source = UpdateBalanceRoutingService.balanceSource(isTyped: isTyped)
         do {
             var state = try await persistence.loadState()
             let updated = LedgerFacade.applySetupOpeningBalance(

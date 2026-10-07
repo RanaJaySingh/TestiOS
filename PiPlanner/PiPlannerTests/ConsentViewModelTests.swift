@@ -51,6 +51,7 @@ final class ConsentViewModelTests: XCTestCase {
         XCTAssertTrue(viewModel.canContinueManual)
         let paisa = await viewModel.continueManual()
         XCTAssertEqual(paisa, 250_000)
+        XCTAssertEqual(viewModel.resolvedIsTyped, true)
     }
 
     func testPINSuccessAndFailure() async {
@@ -61,6 +62,7 @@ final class ConsentViewModelTests: XCTestCase {
         viewModel.appendPINDigit("4")
         let success = await viewModel.checkBalanceWithPIN()
         XCTAssertEqual(success, .success(10_000_000))
+        XCTAssertEqual(viewModel.resolvedIsTyped, false)
 
         viewModel.clearPIN()
         viewModel.appendPINDigit("0")
@@ -77,6 +79,23 @@ final class ConsentViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.accountOnOtherUPIApp(), .otherApp)
         XCTAssertEqual(viewModel.lastPinOutcome, .otherApp)
         XCTAssertEqual(viewModel.pinDigits, "")
+    }
+
+    func testBalanceSyncRoutingUsesPaytmLink() {
+        let paytm = makeViewModel()
+        XCTAssertTrue(paytm.dedicatedIsPaytmLinked)
+        XCTAssertEqual(paytm.route(after: .balanceSync), .upiPinMock)
+        XCTAssertEqual(paytm.route(after: .manually), .manualAmount)
+
+        var accounts = paytm.accounts
+        accounts = accounts.map { account in
+            var copy = account
+            if copy.isDedicated { copy.isPaytmLinked = false }
+            return copy
+        }
+        paytm.updateAccounts(accounts)
+        XCTAssertFalse(paytm.dedicatedIsPaytmLinked)
+        XCTAssertEqual(paytm.route(after: .balanceSync), .otherUPIApp)
     }
 
     private func makeViewModel() -> ConsentViewModel {

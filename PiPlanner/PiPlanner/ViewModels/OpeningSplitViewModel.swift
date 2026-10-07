@@ -16,6 +16,8 @@ final class OpeningSplitViewModel: ObservableObject {
 
     let goals: [Goal]
     let openingBalance: Paisa
+    /// Propagated into Opening balance History (`isTyped`) — Manual vs PIN/Yes fetch (PIP-100).
+    let openingBalanceIsTyped: Bool
     private let persistence: any PersistenceServicing
     private let formatting: any FormattingServicing
     private let clock: () -> Date
@@ -64,6 +66,7 @@ final class OpeningSplitViewModel: ObservableObject {
     init(
         goals: [Goal],
         openingBalance: Paisa,
+        openingBalanceIsTyped: Bool = true,
         persistence: any PersistenceServicing,
         formatting: any FormattingServicing = FormattingService(),
         initialPercents: [UUID: Int]? = nil,
@@ -73,6 +76,7 @@ final class OpeningSplitViewModel: ObservableObject {
     ) {
         self.goals = goals
         self.openingBalance = openingBalance
+        self.openingBalanceIsTyped = openingBalanceIsTyped
         self.persistence = persistence
         self.formatting = formatting
         self.clock = clock
@@ -129,6 +133,7 @@ final class OpeningSplitViewModel: ObservableObject {
                 }
                 : goals,
             openingBalance: balance,
+            openingBalanceIsTyped: entry.isTyped ?? true,
             persistence: persistence,
             formatting: formatting,
             initialPercents: percents,
@@ -171,10 +176,11 @@ final class OpeningSplitViewModel: ObservableObject {
         defer { isLocking = false }
 
         do {
-            let entry = try OpeningSplitService.createLockedOpeningEntry(
+            let entry = try UpdateBalanceRoutingService.makeOpeningHistoryEntry(
                 goals: goals,
                 openingBalance: openingBalance,
                 percentages: fractionMap,
+                isTyped: openingBalanceIsTyped,
                 id: makeID(),
                 createdAt: clock()
             )

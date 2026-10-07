@@ -47,8 +47,16 @@ struct WelcomeFlowView: View {
                     UpdateBalanceSheet(
                         onManually: { path.append(WelcomeRoute.manualBalance) },
                         onBalanceSync: {
-                            consentViewModel.clearPIN()
-                            path.append(WelcomeRoute.upiPin)
+                            // PIP-100: Paytm-linked → UPI PIN mock; Other UPI app → Manual only.
+                            switch consentViewModel.route(after: .balanceSync) {
+                            case .upiPinMock:
+                                consentViewModel.clearPIN()
+                                path.append(WelcomeRoute.upiPin)
+                            case .otherUPIApp:
+                                path.append(WelcomeRoute.otherApp)
+                            default:
+                                path.append(WelcomeRoute.manualBalance)
+                            }
                         }
                     )
                 case .manualBalance:
@@ -120,9 +128,13 @@ struct WelcomeFlowView: View {
     private func continueToOpeningSplit(goals: [Goal]) {
         let balance = consentViewModel.resolvedBalance ?? DemoSeed.openingBalancePaisa
         let resolvedGoals = goals.isEmpty ? DemoSeed.sampleGoals : goals
+        // Manual / Other→Manual → typed; PIN / Consent Yes fetch → not typed (same History shape).
+        let isTyped = consentViewModel.resolvedIsTyped
+            ?? UpdateBalanceRoutingService.isTypedBalance(resolvedFrom: .manualAmount)
         openingSplitViewModel = OpeningSplitViewModel(
             goals: resolvedGoals,
             openingBalance: balance,
+            openingBalanceIsTyped: isTyped,
             persistence: persistence
         )
         path.append(WelcomeRoute.openingSplit)

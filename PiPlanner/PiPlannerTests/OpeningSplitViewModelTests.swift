@@ -92,7 +92,29 @@ final class OpeningSplitViewModelTests: XCTestCase {
         XCTAssertEqual(state.history.count, 1)
         XCTAssertTrue(state.history[0].isLocked)
         XCTAssertEqual(state.history[0].type, .openingBalance)
+        XCTAssertEqual(state.history[0].isTyped, true)
+        XCTAssertTrue(UpdateBalanceRoutingService.assertOpeningBalanceShape(state.history[0]))
         XCTAssertEqual(state.goals.map(\.savedAmount).reduce(0, +), 10_000_000)
+    }
+
+    func testConfirmLockPropagatesFetchedIsTypedFalse() async throws {
+        let goals = sampleGoals()
+        try await persistence.saveState(
+            PersistedAppState(accounts: [], goals: goals, history: [], standingSplits: [])
+        )
+        let viewModel = OpeningSplitViewModel(
+            goals: goals,
+            openingBalance: 10_000_000,
+            openingBalanceIsTyped: false,
+            persistence: persistence,
+            initialPercents: [
+                goals[0].id: 60,
+                goals[1].id: 40
+            ]
+        )
+        await viewModel.confirmLock()
+        XCTAssertEqual(viewModel.lockedEntry?.isTyped, false)
+        XCTAssertTrue(UpdateBalanceRoutingService.assertOpeningBalanceShape(viewModel.lockedEntry!))
     }
 
     func testReadOnlyFactoryExposesLockedCaption() throws {
