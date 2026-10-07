@@ -192,6 +192,25 @@ struct GoalEditDraft: Equatable, Sendable {
         shareOfNewCredits = goal.shareOfNewCredits
         savedAmount = goal.savedAmount
     }
+
+    /// Memberwise init for Goal form → held-edit conversion (PIP-105).
+    init(
+        name: String,
+        targetRupeeDigits: String,
+        startDate: Date,
+        endDate: Date,
+        inflationRate: Decimal,
+        shareOfNewCredits: Decimal,
+        savedAmount: Paisa
+    ) {
+        self.name = name
+        self.targetRupeeDigits = targetRupeeDigits
+        self.startDate = startDate
+        self.endDate = endDate
+        self.inflationRate = inflationRate
+        self.shareOfNewCredits = shareOfNewCredits
+        self.savedAmount = savedAmount
+    }
 }
 
 /// Result of committing a goal edit (BR-4).

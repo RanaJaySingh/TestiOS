@@ -1,10 +1,22 @@
 import SwiftUI
 
-/// Goal form · create / edit — design frame 6 (PRD R5 / R9).
+/// Goal form presentation mode — create (setup / New goal) vs held edit from Goal detail (PIP-105).
+enum GoalFormMode: Equatable, Sendable {
+    case create
+    /// Edit from Goal detail — save holds changes until the next credit.
+    case heldEdit
+}
+
+/// Goal form · create / edit — design frame 6 (PRD R5 / R9 / R11).
 /// Visual parity (PIP-79): field stack, inflation row, live targets, valid/invalid chrome.
 struct GoalFormView: View {
     @ObservedObject var viewModel: GoalChatViewModel
+    var mode: GoalFormMode = .create
     var onSaved: (() -> Void)? = nil
+    /// Held-edit path: parent persists via `LedgerEngineCore.updateGoalPending` (PIP-105).
+    var onHeldEditSave: ((GoalFormDraft) -> Void)? = nil
+    /// Create path that needs the draft (Goals → New goal → engine createGoal).
+    var onCreateSave: ((GoalFormDraft) -> Void)? = nil
 
     private var isFormValid: Bool { viewModel.formDraft.canSave }
 
@@ -22,7 +34,13 @@ struct GoalFormView: View {
                     SecondaryCTA(
                         title: "Cancel",
                         style: .text,
-                        action: { viewModel.cancelForm() }
+                        action: {
+                            if mode == .heldEdit {
+                                onSaved?()
+                            } else {
+                                viewModel.cancelForm()
+                            }
+                        }
                     )
                 }
             }
@@ -30,9 +48,10 @@ struct GoalFormView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .background(PiColors.backgroundApp.ignoresSafeArea())
-        .navigationTitle("Goal")
+        .navigationTitle(mode == .heldEdit ? "Edit goal" : "Goal")
         .navigationBarTitleDisplayMode(.inline)
         .piPlannerTheme()
+        .accessibilityIdentifier(mode == .heldEdit ? "goals.edit.form" : "goalForm.view")
         .sheet(isPresented: $viewModel.showInflationPopup) {
             InflationPopup(
                 inflationRate: Binding(
@@ -49,10 +68,14 @@ struct GoalFormView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
-            Text("Define a goal")
+            Text(mode == .heldEdit ? (viewModel.formDraft.name.isEmpty ? "Edit goal" : viewModel.formDraft.name) : "Define a goal")
                 .font(PiTypography.title())
                 .accessibilityAddTraits(.isHeader)
-            Text("Name, target, dates, and share of new credits. Inflation defaults to 7%.")
+            Text(
+                mode == .heldEdit
+                    ? "Edits apply at the next credit. Earlier history is unchanged."
+                    : "Name, target, dates, and share of new credits. Inflation defaults to 7%."
+            )
                 .font(PiTypography.body())
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -227,11 +250,16 @@ struct GoalFormView: View {
                 .fontWeight(.semibold)
                 .foregroundStyle(.secondary)
                 .monospacedDigit()
-            Text("Locked at ₹0 while creating a goal in setup.")
+            Text(
+                mode == .heldEdit
+                    ? "Saved amount is locked. Edits apply at the next credit."
+                    : "Locked at ₹0 while creating a goal in setup."
+            )
                 .font(PiTypography.caption())
                 .foregroundStyle(.secondary)
         }
         .accessibilityElement(children: .combine)
+        .accessibilityIdentifier(mode == .heldEdit ? "goals.edit.savedLocked" : "goalForm.saved")
     }
 
     private var metrics: some View {
@@ -267,16 +295,28 @@ struct GoalFormView: View {
         PrimaryCTA(
             title: "Save",
             isEnabled: isFormValid,
+            accessibilityIdentifier: mode == .heldEdit ? "goals.edit.save" : "goalForm.save",
             action: {
-                if viewModel.saveForm() {
-                    onSaved?()
+                guard viewModel.formDraft.canSave else { return }
+                let draft = viewModel.formDraft
+                switch mode {
+                case .heldEdit:
+                    onHeldEditSave?(draft)
+                case .create:
+                    if let onCreateSave {
+                        onCreateSave(draft)
+                    } else if viewModel.saveForm() {
+                        onSaved?()
+                    }
                 }
             }
         )
         .accessibilityLabel("Save goal")
         .accessibilityHint(
             isFormValid
-                ? "Saves this goal"
+                ? (mode == .heldEdit
+                    ? "Saves changes that apply at the next credit"
+                    : "Saves this goal")
                 : "Disabled until name, target, and dates are valid"
         )
     }

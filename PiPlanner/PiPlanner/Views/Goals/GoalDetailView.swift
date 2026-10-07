@@ -2,9 +2,10 @@ import SwiftUI
 
 /// Goal detail — design frame 14 (PRD R13 / R10 / R11).
 /// Visual parity via DesignTokens / Components / PiIcons. Init matches PIP-45 call site.
-/// Product behaviour (CRUD / transfer / delete / held edits) unchanged — chrome only.
+/// PIP-105: Edit → Goal form; held via `LedgerEngineCore.updateGoalPending`.
 struct GoalDetailView: View {
     @StateObject private var viewModel: GoalDetailViewModel
+    @StateObject private var editFormHost = GoalChatViewModel()
     private let persistence: (any PersistenceServicing)?
     private let formatting: any FormattingServicing
 
@@ -88,15 +89,11 @@ struct GoalDetailView: View {
             switch route {
             case .edit:
                 if let goal = viewModel.goal {
-                    GoalEditView(
+                    GoalDetailHeldEditForm(
                         goal: goal,
-                        history: viewModel.history,
-                        heldChanges: viewModel.heldChanges,
-                        standingSplits: viewModel.standingSplits,
-                        persistence: persistence,
-                        formatting: formatting,
-                        onSaved: { result in
-                            viewModel.applyEditResult(result)
+                        formHost: editFormHost,
+                        onSave: { draft in
+                            await viewModel.saveHeldEdit(formDraft: draft)
                         }
                     )
                 } else {
@@ -441,6 +438,33 @@ struct GoalDetailView: View {
             .clipShape(RoundedRectangle(cornerRadius: DesignTokens.Radius.card, style: .continuous))
             .accessibilityIdentifier("goals.detail.toast")
             .accessibilityLabel(viewModel.toastMessage)
+    }
+}
+
+/// Goal detail → Goal form (held edit) destination (PIP-105).
+private struct GoalDetailHeldEditForm: View {
+    let goal: Goal
+    @ObservedObject var formHost: GoalChatViewModel
+    var onSave: (GoalFormDraft) async -> GoalEditCommitResult?
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        GoalFormView(
+            viewModel: formHost,
+            mode: .heldEdit,
+            onSaved: { dismiss() },
+            onHeldEditSave: { draft in
+                Task {
+                    if await onSave(draft) != nil {
+                        dismiss()
+                    }
+                }
+            }
+        )
+        .onAppear {
+            formHost.reset()
+            formHost.editDefinedGoal(goal)
+        }
     }
 }
 

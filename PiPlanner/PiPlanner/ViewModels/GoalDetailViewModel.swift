@@ -172,6 +172,54 @@ final class GoalDetailViewModel: ObservableObject {
         showToast = true
     }
 
+    /// Goal form held save — engine pending path (`LedgerEngineCore.updateGoalPending`).
+    @discardableResult
+    func saveHeldEdit(formDraft: GoalFormDraft) async -> GoalEditCommitResult? {
+        guard let goal else { return nil }
+        let draft = GoalDetailStandingService.editDraft(
+            fromName: formDraft.name,
+            targetRupeeDigits: formDraft.targetRupeeDigits,
+            startDate: formDraft.startDate,
+            endDate: formDraft.endDate,
+            inflationRate: formDraft.inflationRate,
+            shareOfNewCredits: formDraft.shareOfNewCredits,
+            lockedSavedAmount: goal.savedAmount
+        )
+        guard draft.canSave else { return nil }
+
+        do {
+            var state: PersistedAppState
+            if let persistence {
+                state = try await persistence.loadState()
+            } else {
+                state = PersistedAppState(
+                    accounts: [],
+                    goals: allGoals.isEmpty ? [goal] : allGoals,
+                    history: history,
+                    standingSplits: standingSplits,
+                    heldGoalChanges: heldChanges
+                )
+            }
+
+            let held = try GoalDetailStandingService.commitHeldEdit(
+                to: state,
+                goalID: goal.id,
+                draft: draft
+            )
+
+            if let persistence {
+                try await persistence.saveState(held.state)
+            }
+
+            applyEditResult(held.commit)
+            allGoals = held.state.goals
+            return held.commit
+        } catch {
+            errorMessage = error.localizedDescription
+            return nil
+        }
+    }
+
     func dismissToast() {
         showToast = false
     }

@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		DB116BA205274A9BAC7D9303 /* HeldGoalChange.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4D2A46051C4405F889BBCAF /* HeldGoalChange.swift */; };
 		A6EA2641B4EE4968A1CD6742 /* GoalHeldChangeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF363595F0454DF3B16C9ED3 /* GoalHeldChangeService.swift */; };
+		P1050001BD814941ABD3C921 /* GoalDetailStandingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = P1050001EEA24F56B29EBB6A /* GoalDetailStandingService.swift */; };
+		P1050002BD814941ABD3C921 /* GoalDetailStandingServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = P1050002EEA24F56B29EBB6A /* GoalDetailStandingServiceTests.swift */; };
 		528CFB0745AC4D719C1FDA35 /* GoalDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC63753FEBA84656A97D790D /* GoalDetailViewModel.swift */; };
 		19EF97B1589A4F6191EA40AA /* GoalEditViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41600919E4B7471E8C7C04A3 /* GoalEditViewModel.swift */; };
 		31187E4D18C24AFD8E9EA360 /* GoalEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 951D3037C9B340B9AFD53951 /* GoalEditView.swift */; };
@@ -159,6 +161,8 @@
 /* Begin PBXFileReference section */
 		B4D2A46051C4405F889BBCAF /* HeldGoalChange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeldGoalChange.swift; sourceTree = "<group>"; };
 		EF363595F0454DF3B16C9ED3 /* GoalHeldChangeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalHeldChangeService.swift; sourceTree = "<group>"; };
+		P1050001EEA24F56B29EBB6A /* GoalDetailStandingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalDetailStandingService.swift; sourceTree = "<group>"; };
+		P1050002EEA24F56B29EBB6A /* GoalDetailStandingServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalDetailStandingServiceTests.swift; sourceTree = "<group>"; };
 		FC63753FEBA84656A97D790D /* GoalDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalDetailViewModel.swift; sourceTree = "<group>"; };
 		41600919E4B7471E8C7C04A3 /* GoalEditViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalEditViewModel.swift; sourceTree = "<group>"; };
 		951D3037C9B340B9AFD53951 /* GoalEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalEditView.swift; sourceTree = "<group>"; };
@@ -395,6 +399,7 @@
 			isa = PBXGroup;
 			children = (
 				EF363595F0454DF3B16C9ED3 /* GoalHeldChangeService.swift */,
+				P1050001EEA24F56B29EBB6A /* GoalDetailStandingService.swift */,
 				D53F0002EEA24F56B29EBB6A /* DeleteGoalService.swift */,
 				A57F0001EEA24F56B29EBB6A /* WithdrawalService.swift */,
 				T55F0001EEA24F56B29EBB6A /* TransferService.swift */,
@@ -575,6 +580,7 @@
 			isa = PBXGroup;
 			children = (
 				6B2C1E414EFC4F5081CE1EFF /* GoalHeldChangeServiceTests.swift */,
+				P1050002EEA24F56B29EBB6A /* GoalDetailStandingServiceTests.swift */,
 				D53F0006EEA24F56B29EBB6A /* DeleteGoalServiceTests.swift */,
 				A57F0004EEA24F56B29EBB6A /* WithdrawalServiceTests.swift */,
 				A57F0005EEA24F56B29EBB6A /* WithdrawalViewModelTests.swift */,
@@ -778,6 +784,7 @@
 				19EF97B1589A4F6191EA40AA /* GoalEditViewModel.swift in Sources */,
 				528CFB0745AC4D719C1FDA35 /* GoalDetailViewModel.swift in Sources */,
 				A6EA2641B4EE4968A1CD6742 /* GoalHeldChangeService.swift in Sources */,
+				P1050001BD814941ABD3C921 /* GoalDetailStandingService.swift in Sources */,
 				D53B0002BD814941ABD3C921 /* DeleteGoalService.swift in Sources */,
 				D53B0003BD814941ABD3C921 /* DeleteGoalViewModel.swift in Sources */,
 				D53B0004BD814941ABD3C921 /* DeleteGoalView.swift in Sources */,
@@ -885,6 +892,7 @@
 				C41A100EBD814941ABD3C921 /* GoalValidationServiceTests.swift in Sources */,
 				P97A0003BD814941ABD3C921 /* GoalInflationFormulasTests.swift in Sources */,
 				463C0C59C104488E8D765E95 /* GoalHeldChangeServiceTests.swift in Sources */,
+				P1050002BD814941ABD3C921 /* GoalDetailStandingServiceTests.swift in Sources */,
 				D53B0006BD814941ABD3C921 /* DeleteGoalServiceTests.swift in Sources */,
 				A57B0004BD814941ABD3C921 /* WithdrawalServiceTests.swift in Sources */,
 				A57B0005BD814941ABD3C921 /* WithdrawalViewModelTests.swift in Sources */,

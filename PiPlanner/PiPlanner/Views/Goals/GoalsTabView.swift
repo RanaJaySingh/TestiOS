@@ -15,6 +15,8 @@ struct GoalsTabView: View {
     var onOpenHistory: (() -> Void)?
 
     @State private var showNewGoalSheet = false
+    /// Present Standing split after New goal sheet dismisses (PIP-105; avoid dual sheets).
+    @State private var pendingStandingAfterNewGoal = false
     @StateObject private var newGoalHost = GoalChatViewModel()
 
     var body: some View {
@@ -224,12 +226,26 @@ struct GoalsTabView: View {
                 onDemoReset: onDemoReset
             )
         }
-        .sheet(isPresented: $showNewGoalSheet) {
+        .sheet(isPresented: $showNewGoalSheet, onDismiss: {
+            if pendingStandingAfterNewGoal {
+                pendingStandingAfterNewGoal = false
+                viewModel.presentStandingSplit()
+            } else {
+                Task { await viewModel.load() }
+            }
+        }) {
             NavigationStack {
-                GoalFormView(viewModel: newGoalHost) {
-                    showNewGoalSheet = false
-                    Task { await viewModel.load() }
-                }
+                GoalFormView(
+                    viewModel: newGoalHost,
+                    mode: .create,
+                    onCreateSave: { draft in
+                        Task {
+                            let presentStanding = await viewModel.createGoalFromForm(draft)
+                            pendingStandingAfterNewGoal = presentStanding
+                            showNewGoalSheet = false
+                        }
+                    }
+                )
                 .onAppear {
                     newGoalHost.reset()
                     newGoalHost.useFormPath()
@@ -240,6 +256,26 @@ struct GoalsTabView: View {
                     }
                 }
             }
+        }
+        .sheet(isPresented: $viewModel.showStandingSplit, onDismiss: {
+            viewModel.standingSplitFinished()
+        }) {
+            NavigationStack {
+                StandingSplitView(
+                    viewModel: StandingSplitViewModel(
+                        goals: viewModel.goals,
+                        persistence: viewModel.persistence,
+                        standingSplits: viewModel.standingSplits
+                    ),
+                    onDismiss: { viewModel.showStandingSplit = false }
+                )
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Close") { viewModel.showStandingSplit = false }
+                    }
+                }
+            }
+            .accessibilityIdentifier("goals.standingSplit.sheet")
         }
         .onChange(of: viewModel.showSettings) { isPresented in
             // Reload after Settings → Standing split save so shares stay current.
