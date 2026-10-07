@@ -16,15 +16,16 @@ Pure Swift `LedgerEngineCore` (Linux-testable) under `PiPlanner/Services`, with 
 
 `Goal` / `GoalValidationService` use tip `GoalInflationFormulas` directly. `LedgerEngineCore` formula helpers delegate to the same APIs (single source).
 
-## Keep-both with tip (PIP-102 / PIP-100 / PIP-99 / PIP-97)
+## Keep-both with tip (PIP-101 / PIP-102 / PIP-100 / PIP-99 / PIP-97)
 
-Rebased onto `main@e57088f1` (PIP-97 #36).
+Rebased onto `main@4f049bd4` (PIP-101 #41).
 
 | Surface | Owner |
 |---------|--------|
 | `GoalInflationFormulas` | Tip PIP-97 — shared inflation / required-savings formulas |
 | `protocol LedgerEngine` + `StubLedgerEngine` | Tip PIP-102 — Goals Sync/Update injection |
-| `LedgerEngineCore` + `LedgerEngineCoreTests` | PIP-98 — ledger mutations + formula facades |
+| `StubLedgerService` | Tip PIP-101 — Opening lock + one-goal skip (no duplicate Opening in Core) |
+| `LedgerEngineCore` + `LedgerEngineCoreTests` | PIP-98 — pure mutation engine + formula facades |
 | `LedgerFacade` → `LedgerEngineCore.BalanceSource` | Setup Accounts/Consent (PIP-99); maps fetched/typed |
 | `UpdateBalanceRoutingService` / `resolvedIsTyped` | Tip PIP-100 — Update balance routes / History shape |
 
@@ -39,7 +40,7 @@ Rebased onto `main@e57088f1` (PIP-97 #36).
 - [x] Formulas: adjusted target, required savings, on-track status (via `GoalInflationFormulas`)
 - [x] `cd PiPlanner && swift test` green
 - [x] No new screens; DesignTokens / Pi* components untouched
-- [x] Coexists with tip `StubLedgerEngine` + `LedgerFacade` + PIP-100 routing + PIP-97 formulas
+- [x] Coexists with tip Opening/`StubLedgerService` + `StubLedgerEngine` + `LedgerFacade` + PIP-100 + PIP-97
 
 ## Design refs
 
