@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// Standing split screen — design frame 15 (PRD R12, Spec BR-2 / BR-4).
+/// Standing split screen — design frame 15 (PRD R12 / R14, Spec BR-2 / BR-4 / §4.2 J3).
+/// Visual: PiSheet chrome, PiCard % rows, PrimaryCTA Save (disabled until 100%).
 struct StandingSplitView: View {
     @ObservedObject var viewModel: StandingSplitViewModel
     var onDismiss: () -> Void
@@ -13,8 +14,8 @@ struct StandingSplitView: View {
                 oneGoalSkipContent
             }
         }
-        .navigationTitle("Standing split")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(PiColors.backgroundApp, for: .navigationBar)
         .task {
             if !viewModel.shouldPresentEditor {
                 await viewModel.applySingleGoalSkipIfNeeded()
@@ -40,72 +41,74 @@ struct StandingSplitView: View {
     }
 
     private var multiGoalEditor: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                header
-                goalsSection
-                statusFooter
-                saveButton
+        PiSheet(
+            title: "Standing split",
+            helper: "Default split for new credits. Splits must total 100%."
+        ) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: DesignTokens.Space.s20) {
+                    savedMoneyCaption
+                    goalsSection
+                    statusFooter
+                    saveButton
+                }
+                .padding(.horizontal, DesignTokens.Space.s20)
+                .padding(.bottom, DesignTokens.Space.s28)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(PiColors.backgroundApp)
         }
     }
 
     private var oneGoalSkipContent: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text(StandingSplitService.savedMoneyStaysPutMessage)
-                .font(.body)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-                .accessibilityIdentifier("standingSplit.savedMoneyStaysPut")
+        PiSheet(
+            title: "Standing split",
+            helper: StandingSplitService.savedMoneyStaysPutMessage
+        ) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s16) {
+                if let goal = viewModel.goals.first {
+                    PiCard {
+                        VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
+                            Text(goal.name)
+                                .font(PiTypography.body())
+                                .fontWeight(.semibold)
+                            Text("100%")
+                                .font(PiTypography.title())
+                                .foregroundStyle(PiColors.navyPrimary)
+                                .accessibilityLabel("\(goal.name) automatically assigned 100 percent")
+                        }
+                    }
+                }
 
-            if let goal = viewModel.goals.first {
-                Text(goal.name)
-                    .font(.headline)
-                Text("100%")
-                    .font(.title3)
-                    .fontWeight(.medium)
-                    .accessibilityLabel("\(goal.name) automatically assigned 100 percent")
+                Text(viewModel.statusMessage)
+                    .font(PiTypography.caption())
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                if viewModel.isSaving {
+                    ProgressView()
+                }
+
+                Spacer(minLength: 0)
             }
-
-            Text(viewModel.statusMessage)
-                .font(.callout)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-
-            if viewModel.isSaving {
-                ProgressView()
-            }
-
-            Spacer()
+            .padding(.horizontal, DesignTokens.Space.s20)
+            .padding(.bottom, DesignTokens.Space.s28)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .background(PiColors.backgroundApp)
+            .accessibilityIdentifier("standingSplit.oneGoalSkip")
         }
-        .padding()
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .accessibilityIdentifier("standingSplit.oneGoalSkip")
     }
 
-    private var header: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Default split for new credits")
-                .font(.title2)
-                .fontWeight(.semibold)
-                .accessibilityAddTraits(.isHeader)
-            Text(StandingSplitService.savedMoneyStaysPutMessage)
-                .font(.body)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-                .accessibilityIdentifier("standingSplit.savedMoneyStaysPut")
-            Text("Every new credit uses these shares until you change them. Splits must total 100%.")
-                .font(.callout)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .accessibilityElement(children: .combine)
+    private var savedMoneyCaption: some View {
+        Text(StandingSplitService.savedMoneyStaysPutMessage)
+            .font(PiTypography.body())
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityIdentifier("standingSplit.savedMoneyStaysPut")
     }
 
     private var goalsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s12) {
             ForEach(viewModel.goals) { goal in
                 goalRow(goal)
             }
@@ -113,44 +116,48 @@ struct StandingSplitView: View {
     }
 
     private func goalRow(_ goal: Goal) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(goal.name)
-                .font(.headline)
-                .accessibilityAddTraits(.isHeader)
+        PiCard {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
+                Text(goal.name)
+                    .font(PiTypography.body())
+                    .fontWeight(.semibold)
+                    .accessibilityAddTraits(.isHeader)
 
-            HStack {
-                Text("Share")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                Spacer()
-                TextField(
-                    "%",
-                    value: Binding(
-                        get: { viewModel.displayPercents[goal.id] ?? 0 },
-                        set: { viewModel.setDisplayPercent(goalID: goal.id, percent: $0) }
-                    ),
-                    format: .number
-                )
-                .keyboardType(.numberPad)
-                .multilineTextAlignment(.trailing)
-                .font(.title3)
-                .frame(width: 64)
-                .accessibilityLabel("\(goal.name) percentage")
-                .accessibilityHint("Enter a whole percent so all goals total 100")
-                .accessibilityIdentifier("standingSplit.percent.\(goal.id.uuidString)")
-                Text("%")
-                    .font(.title3)
-                    .accessibilityHidden(true)
+                HStack {
+                    Text("Share")
+                        .font(PiTypography.caption())
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    TextField(
+                        "%",
+                        value: Binding(
+                            get: { viewModel.displayPercents[goal.id] ?? 0 },
+                            set: { viewModel.setDisplayPercent(goalID: goal.id, percent: $0) }
+                        ),
+                        format: .number
+                    )
+                    .keyboardType(.numberPad)
+                    .multilineTextAlignment(.trailing)
+                    .font(PiTypography.title())
+                    .foregroundStyle(PiColors.navyPrimary)
+                    .frame(width: 64)
+                    .accessibilityLabel("\(goal.name) percentage")
+                    .accessibilityHint("Enter a whole percent so all goals total 100")
+                    .accessibilityIdentifier("standingSplit.percent.\(goal.id.uuidString)")
+                    Text("%")
+                        .font(PiTypography.title())
+                        .foregroundStyle(PiColors.navyPrimary)
+                        .accessibilityHidden(true)
+                }
             }
         }
-        .padding(.vertical, 4)
         .accessibilityElement(children: .contain)
     }
 
     private var statusFooter: some View {
         Text(viewModel.statusMessage)
-            .font(.callout)
-            .foregroundStyle(viewModel.isValidTotal ? .secondary : .orange)
+            .font(PiTypography.caption())
+            .foregroundStyle(viewModel.isValidTotal ? Color.secondary : PiColors.behind)
             .fixedSize(horizontal: false, vertical: true)
             .accessibilityLabel(viewModel.statusMessage)
             .accessibilityAddTraits(.updatesFrequently)
@@ -158,30 +165,19 @@ struct StandingSplitView: View {
     }
 
     private var saveButton: some View {
-        Button {
+        PrimaryCTA(
+            title: viewModel.isSaving ? "Saving…" : "Save",
+            isEnabled: viewModel.canSave,
+            accessibilityIdentifier: "standingSplit.save"
+        ) {
             Task { await viewModel.save() }
-        } label: {
-            Group {
-                if viewModel.isSaving {
-                    ProgressView()
-                        .frame(maxWidth: .infinity)
-                } else {
-                    Text("Save")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                }
-            }
-            .padding(.vertical, 14)
         }
-        .buttonStyle(.borderedProminent)
-        .disabled(!viewModel.canSave)
         .accessibilityLabel("Save standing split")
         .accessibilityHint(
             viewModel.canSave
                 ? "Saves default shares for the next credit"
                 : "Enabled when percentages total 100 percent"
         )
-        .accessibilityIdentifier("standingSplit.save")
     }
 }
 
@@ -220,6 +216,7 @@ struct StandingSplitView: View {
             onDismiss: {}
         )
     }
+    .piPlannerTheme()
 }
 
 #Preview("One-goal skip") {
@@ -245,6 +242,7 @@ struct StandingSplitView: View {
             onDismiss: {}
         )
     }
+    .piPlannerTheme()
 }
 
 /// In-memory persistence for SwiftUI previews only.

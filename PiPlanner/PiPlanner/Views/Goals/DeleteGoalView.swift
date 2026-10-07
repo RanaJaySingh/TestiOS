@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// Delete goal flow — design frames 17 / 17a–17e (PRD R13, Spec BR-9).
+/// Delete goal flow — design frames 17 / 17a–17e (PRD R13 / R14, Spec BR-9 / §4.2 J3).
+/// Visual: PiSheet chrome, PiCard release amount + destination split, destructive confirm CTA.
 /// Prefer `DeleteGoalFlow(goal:…)` / this view from Goal detail Delete.
 struct DeleteGoalView: View {
     @StateObject private var viewModel: DeleteGoalViewModel
@@ -30,23 +31,32 @@ struct DeleteGoalView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                header
-                releasedCard
-                if viewModel.phase == .onlyGoalGate {
-                    onlyGoalGate
-                } else {
-                    reassignmentSection
-                    statusFooter
-                    actionButtons
+        PiSheet(
+            title: "Delete goal",
+            helper: viewModel.phase == .onlyGoalGate
+                ? DeleteGoalService.onlyGoalGateMessage
+                : DeleteGoalService.reassignCaption
+        ) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: DesignTokens.Space.s20) {
+                    headerTitle
+                    releasedCard
+                    if viewModel.phase == .onlyGoalGate {
+                        onlyGoalGate
+                    } else {
+                        reassignmentSection
+                        statusFooter
+                        actionButtons
+                    }
                 }
+                .padding(.horizontal, DesignTokens.Space.s20)
+                .padding(.bottom, DesignTokens.Space.s28)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(PiColors.backgroundApp)
         }
-        .navigationTitle("Delete goal")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(PiColors.backgroundApp, for: .navigationBar)
         .accessibilityIdentifier("goals.delete")
         .confirmationDialog(
             "Delete \(viewModel.deletingGoal.name)?",
@@ -83,74 +93,75 @@ struct DeleteGoalView: View {
         }
     }
 
-    private var header: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Delete \(viewModel.deletingGoal.name)")
-                .font(.title2)
-                .fontWeight(.semibold)
-                .accessibilityAddTraits(.isHeader)
-            Text(
-                viewModel.phase == .onlyGoalGate
-                    ? DeleteGoalService.onlyGoalGateMessage
-                    : DeleteGoalService.reassignCaption
-            )
-            .font(.body)
-            .foregroundStyle(.secondary)
-            .fixedSize(horizontal: false, vertical: true)
-        }
-        .accessibilityIdentifier("goals.delete.header")
+    private var headerTitle: some View {
+        Text("Delete \(viewModel.deletingGoal.name)")
+            .font(PiTypography.body())
+            .fontWeight(.semibold)
+            .foregroundStyle(PiColors.destructive)
+            .accessibilityAddTraits(.isHeader)
+            .accessibilityIdentifier("goals.delete.header")
     }
 
     private var releasedCard: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Saved to reassign")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            Text(viewModel.formattedReleasedAmount)
-                .font(.title)
-                .fontWeight(.bold)
-                .monospacedDigit()
+        PiCard {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
+                Text("Saved to reassign")
+                    .font(PiTypography.caption())
+                    .foregroundStyle(.secondary)
+                Text(viewModel.formattedReleasedAmount)
+                    .font(PiTypography.amountHero())
+                    .foregroundStyle(PiColors.navyPrimary)
+                    .monospacedDigit()
+            }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("goals.delete.released")
     }
 
     private var onlyGoalGate: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s16) {
             Text(viewModel.statusMessage)
-                .font(.subheadline)
+                .font(PiTypography.caption())
                 .foregroundStyle(.secondary)
                 .accessibilityIdentifier("goals.delete.onlyGate")
 
-            Button("Create replacement goal") {
+            PrimaryCTA(
+                title: "Create replacement goal",
+                accessibilityIdentifier: "goals.delete.createReplacement"
+            ) {
                 viewModel.openCreateReplacement()
             }
-            .buttonStyle(.borderedProminent)
-            .accessibilityIdentifier("goals.delete.createReplacement")
 
-            Button("Confirm delete") {}
-                .buttonStyle(.borderedProminent)
-                .disabled(true)
-                .accessibilityIdentifier("goals.delete.confirm")
+            destructiveCTA(
+                title: "Confirm delete",
+                isEnabled: false,
+                accessibilityIdentifier: "goals.delete.confirm"
+            ) {}
         }
     }
 
     private var reassignmentSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s12) {
             HStack {
                 Text("Move to")
-                    .font(.headline)
+                    .font(PiTypography.body())
+                    .fontWeight(.semibold)
                 Spacer()
                 if viewModel.canStartEdit {
                     Button("Edit") {
                         viewModel.beginEdit()
                     }
+                    .font(PiTypography.body())
+                    .foregroundStyle(PiColors.navyPrimary)
+                    .buttonStyle(.plain)
                     .accessibilityIdentifier("goals.delete.edit")
                 } else if viewModel.isEditing {
                     Button("Done") {
                         viewModel.finishEdit()
                     }
+                    .font(PiTypography.body())
+                    .foregroundStyle(PiColors.navyPrimary)
+                    .buttonStyle(.plain)
                     .accessibilityIdentifier("goals.delete.editDone")
                 }
             }
@@ -159,52 +170,59 @@ struct DeleteGoalView: View {
                 goalRow(goal)
             }
 
-            Button("Add another goal") {
+            SecondaryCTA(
+                title: "Add another goal",
+                style: .text,
+                accessibilityIdentifier: "goals.delete.addGoal"
+            ) {
                 viewModel.openCreateReplacement()
             }
-            .font(.subheadline)
-            .accessibilityIdentifier("goals.delete.addGoal")
         }
         .accessibilityIdentifier("goals.delete.reassign")
     }
 
     @ViewBuilder
     private func goalRow(_ goal: Goal) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text(goal.name)
-                    .font(.headline)
-                Spacer()
-                Text(viewModel.formattedAmount(for: goal.id))
-                    .font(.body)
-                    .fontWeight(.semibold)
-                    .monospacedDigit()
-            }
-
-            if viewModel.remainingGoals.count == 1 {
-                Text("100%")
-                    .font(.title3)
-                    .fontWeight(.medium)
-            } else if viewModel.isEditing {
+        PiCard {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
                 HStack {
-                    Slider(
-                        value: Binding(
-                            get: { Double(viewModel.displayPercents[goal.id] ?? 0) },
-                            set: { viewModel.setDisplayPercent(goalID: goal.id, percent: Int($0.rounded())) }
-                        ),
-                        in: 0...100,
-                        step: 1
-                    )
-                    .accessibilityIdentifier("goals.delete.slider.\(goal.id.uuidString)")
-                    Text("\(viewModel.displayPercents[goal.id] ?? 0)%")
-                        .font(.body)
+                    Text(goal.name)
+                        .font(PiTypography.body())
+                        .fontWeight(.semibold)
+                    Spacer()
+                    Text(viewModel.formattedAmount(for: goal.id))
+                        .font(PiTypography.body())
+                        .fontWeight(.semibold)
+                        .foregroundStyle(PiColors.navyPrimary)
                         .monospacedDigit()
-                        .frame(width: 48, alignment: .trailing)
                 }
-            } else {
-                Text("\(viewModel.displayPercents[goal.id] ?? 0)%")
-                    .font(.title3)
-                    .fontWeight(.medium)
+
+                if viewModel.remainingGoals.count == 1 {
+                    Text("100%")
+                        .font(PiTypography.title())
+                        .foregroundStyle(PiColors.navyPrimary)
+                } else if viewModel.isEditing {
+                    HStack {
+                        Slider(
+                            value: Binding(
+                                get: { Double(viewModel.displayPercents[goal.id] ?? 0) },
+                                set: { viewModel.setDisplayPercent(goalID: goal.id, percent: Int($0.rounded())) }
+                            ),
+                            in: 0...100,
+                            step: 1
+                        )
+                        .tint(PiColors.navyPrimary)
+                        .accessibilityIdentifier("goals.delete.slider.\(goal.id.uuidString)")
+                        Text("\(viewModel.displayPercents[goal.id] ?? 0)%")
+                            .font(PiTypography.body())
+                            .monospacedDigit()
+                            .frame(width: 48, alignment: .trailing)
+                    }
+                } else {
+                    Text("\(viewModel.displayPercents[goal.id] ?? 0)%")
+                        .font(PiTypography.title())
+                        .foregroundStyle(PiColors.navyPrimary)
+                }
             }
         }
         .accessibilityElement(children: .contain)
@@ -212,23 +230,46 @@ struct DeleteGoalView: View {
 
     private var statusFooter: some View {
         Text(viewModel.statusMessage)
-            .font(.subheadline)
-            .foregroundStyle(.secondary)
+            .font(PiTypography.caption())
+            .foregroundStyle(
+                viewModel.canConfirm ? Color.secondary : PiColors.behind
+            )
             .accessibilityIdentifier("goals.delete.status")
     }
 
     private var actionButtons: some View {
-        VStack(spacing: 12) {
-            Button {
+        VStack(spacing: DesignTokens.Space.s12) {
+            destructiveCTA(
+                title: viewModel.isConfirming ? "Deleting…" : "Confirm delete",
+                isEnabled: viewModel.canConfirm,
+                accessibilityIdentifier: "goals.delete.confirm"
+            ) {
                 viewModel.requestConfirm()
-            } label: {
-                Text(viewModel.isConfirming ? "Deleting…" : "Confirm delete")
-                    .frame(maxWidth: .infinity)
             }
-            .buttonStyle(.borderedProminent)
-            .disabled(!viewModel.canConfirm)
-            .accessibilityIdentifier("goals.delete.confirm")
         }
+    }
+
+    /// Destructive filled CTA matching PrimaryCTA geometry (navy PrimaryCTA is for non-destructive actions).
+    private func destructiveCTA(
+        title: String,
+        isEnabled: Bool,
+        accessibilityIdentifier: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(PiTypography.body())
+                .fontWeight(.semibold)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, DesignTokens.Space.s12)
+                .foregroundStyle(Color.white.opacity(isEnabled ? 1 : 0.85))
+                .background(PiColors.destructive.opacity(isEnabled ? 1 : 0.55))
+                .clipShape(RoundedRectangle(cornerRadius: DesignTokens.Radius.chip, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .disabled(!isEnabled)
+        .opacity(isEnabled ? 1 : 0.45)
+        .accessibilityIdentifier(accessibilityIdentifier)
     }
 
     private var createReplacementForm: some View {
@@ -246,7 +287,7 @@ struct DeleteGoalView: View {
             if let message = viewModel.errorMessage {
                 Section {
                     Text(message)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(PiColors.destructive)
                         .font(.footnote)
                 }
             }
