@@ -146,11 +146,51 @@ final class ModelSerializationTests: XCTestCase {
             ],
             goals: [],
             history: [],
-            standingSplits: []
+            standingSplits: [],
+            heldGoalChanges: []
         )
 
         let data = try encoder.encode(state)
         let decoded = try decoder.decode(PersistedAppState.self, from: data)
         XCTAssertEqual(decoded, state)
+    }
+
+    func testHeldGoalChangeRoundTrip() throws {
+        let start = ISO8601DateFormatter().date(from: "2026-01-01T00:00:00Z")!
+        let end = ISO8601DateFormatter().date(from: "2027-01-01T00:00:00Z")!
+        let savedAt = ISO8601DateFormatter().date(from: "2026-03-01T12:00:00Z")!
+        let original = HeldGoalChange(
+            id: UUID(uuidString: "77777777-7777-7777-7777-777777777777")!,
+            goalId: UUID(uuidString: "AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA")!,
+            savedAt: savedAt,
+            previousName: "Car",
+            pendingName: "SUV",
+            previousTargetAmount: 50_000_000,
+            pendingTargetAmount: 60_000_000,
+            previousShareOfNewCredits: Decimal(string: "0.6")!,
+            pendingShareOfNewCredits: Decimal(string: "0.55")!,
+            previousInflationRate: Decimal(string: "0.07")!,
+            pendingInflationRate: Decimal(string: "0.08")!,
+            previousStartDate: start,
+            pendingStartDate: start,
+            previousEndDate: end,
+            pendingEndDate: end
+        )
+        let data = try encoder.encode(original)
+        let decoded = try decoder.decode(HeldGoalChange.self, from: data)
+        XCTAssertEqual(decoded, original)
+    }
+
+    func testAppStateDecodesWhenHeldGoalChangesKeyMissing() throws {
+        let json = """
+        {
+          "accounts": [],
+          "goals": [],
+          "history": [],
+          "standingSplits": []
+        }
+        """
+        let decoded = try decoder.decode(PersistedAppState.self, from: Data(json.utf8))
+        XCTAssertEqual(decoded.heldGoalChanges, [])
     }
 }

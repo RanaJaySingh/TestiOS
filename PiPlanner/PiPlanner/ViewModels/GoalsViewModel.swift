@@ -1,11 +1,14 @@
 import Combine
 import Foundation
 
-/// View model for Goals tab (frames 9 / 9b / 9c / 11) — PIP-45.
+/// View model for Goals tab (frames 9 / 9b / 9c / 11) — PIP-45 / PIP-49 detail nav.
 @MainActor
 final class GoalsViewModel: ObservableObject {
     @Published private(set) var goals: [Goal] = []
     @Published private(set) var accounts: [Account] = []
+    @Published private(set) var history: [HistoryEntry] = []
+    @Published private(set) var heldGoalChanges: [HeldGoalChange] = []
+    @Published private(set) var standingSplits: [StandingSplit] = []
     @Published private(set) var isLoading = false
     @Published private(set) var isSyncing = false
     @Published private(set) var errorMessage: String?
@@ -15,7 +18,8 @@ final class GoalsViewModel: ObservableObject {
     /// Selected goal for navigation to GoalDetailView.
     @Published var selectedGoalID: UUID?
 
-    private let persistence: any PersistenceServicing
+    /// Shared persistence for Goal detail / edit (PIP-49).
+    let persistence: any PersistenceServicing
     private let formatting: any FormattingServicing
     private let balanceSync: any BalanceSyncServicing
 
@@ -155,5 +159,8 @@ final class GoalsViewModel: ObservableObject {
     private func apply(_ state: PersistedAppState) {
         accounts = state.accounts
         goals = state.goals
+        history = state.history
+        heldGoalChanges = state.heldGoalChanges
+        standingSplits = state.standingSplits
     }
 }

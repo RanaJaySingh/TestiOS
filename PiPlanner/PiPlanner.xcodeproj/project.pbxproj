@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DB116BA205274A9BAC7D9303 /* HeldGoalChange.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4D2A46051C4405F889BBCAF /* HeldGoalChange.swift */; };
+		A6EA2641B4EE4968A1CD6742 /* GoalHeldChangeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF363595F0454DF3B16C9ED3 /* GoalHeldChangeService.swift */; };
+		528CFB0745AC4D719C1FDA35 /* GoalDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC63753FEBA84656A97D790D /* GoalDetailViewModel.swift */; };
+		19EF97B1589A4F6191EA40AA /* GoalEditViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41600919E4B7471E8C7C04A3 /* GoalEditViewModel.swift */; };
+		31187E4D18C24AFD8E9EA360 /* GoalEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 951D3037C9B340B9AFD53951 /* GoalEditView.swift */; };
+		463C0C59C104488E8D765E95 /* GoalHeldChangeServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B2C1E414EFC4F5081CE1EFF /* GoalHeldChangeServiceTests.swift */; };
 		1318D194AA484098BD165D58 /* PiPlannerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 656B4AAB996D4CB283413E05 /* PiPlannerApp.swift */; };
 		142F0FC7D4894F32A7F74E7B /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = C670521930484E588DEE0188 /* Account.swift */; };
 		1C65A48285EC416D828D2976 /* Goal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 349DD80CB6684362B4613EB4 /* Goal.swift */; };
@@ -77,6 +83,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B4D2A46051C4405F889BBCAF /* HeldGoalChange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeldGoalChange.swift; sourceTree = "<group>"; };
+		EF363595F0454DF3B16C9ED3 /* GoalHeldChangeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalHeldChangeService.swift; sourceTree = "<group>"; };
+		FC63753FEBA84656A97D790D /* GoalDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalDetailViewModel.swift; sourceTree = "<group>"; };
+		41600919E4B7471E8C7C04A3 /* GoalEditViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalEditViewModel.swift; sourceTree = "<group>"; };
+		951D3037C9B340B9AFD53951 /* GoalEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalEditView.swift; sourceTree = "<group>"; };
+		6B2C1E414EFC4F5081CE1EFF /* GoalHeldChangeServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalHeldChangeServiceTests.swift; sourceTree = "<group>"; };
 		656B4AAB996D4CB283413E05 /* PiPlannerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiPlannerApp.swift; sourceTree = "<group>"; };
 		C670521930484E588DEE0188 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
 		349DD80CB6684362B4613EB4 /* Goal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Goal.swift; sourceTree = "<group>"; };
@@ -220,6 +232,7 @@
 		42D730D4115640B592F541FF /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				B4D2A46051C4405F889BBCAF /* HeldGoalChange.swift */,
 				C670521930484E588DEE0188 /* Account.swift */,
 				349DD80CB6684362B4613EB4 /* Goal.swift */,
 				DBB7B9D64AF14990B555634F /* HistoryEntry.swift */,
@@ -234,6 +247,7 @@
 		78F08922B0484E3FAD8736A2 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				EF363595F0454DF3B16C9ED3 /* GoalHeldChangeService.swift */,
 				D6A8D1E227234A47AFC6AA76 /* FormattingService.swift */,
 				1631379D5741444D9B38E865 /* PersistenceService.swift */,
 				E356D619EEA24F56B29EBB6A /* OpeningSplitService.swift */,
@@ -250,6 +264,8 @@
 		157666E0AF2B4DDE9C80C295 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				41600919E4B7471E8C7C04A3 /* GoalEditViewModel.swift */,
+				FC63753FEBA84656A97D790D /* GoalDetailViewModel.swift */,
 				E90291FF624F492F96D5DEBB /* OpeningSplitViewModel.swift */,
 				A11C0013EEA24F56B29EBB6A /* AccountsViewModel.swift */,
 				B39A0013EEA24F56B29EBB6A /* ConsentViewModel.swift */,
@@ -331,6 +347,7 @@
 				A45F0005EEA24F56B29EBB6A /* BalanceCard.swift */,
 				A45F0006EEA24F56B29EBB6A /* GoalCard.swift */,
 				A45F0007EEA24F56B29EBB6A /* GoalDetailView.swift */,
+				951D3037C9B340B9AFD53951 /* GoalEditView.swift */,
 				A45F0008EEA24F56B29EBB6A /* SyncSheet.swift */,
 				A45F0009EEA24F56B29EBB6A /* UpdateBalanceSheet.swift */,
 			);
@@ -354,6 +371,7 @@
 		F52D444208AF44249CFFEC39 /* PiPlannerTests */ = {
 			isa = PBXGroup;
 			children = (
+				6B2C1E414EFC4F5081CE1EFF /* GoalHeldChangeServiceTests.swift */,
 				B6E95FBCBC4A41B7993C130A /* FormattingServiceTests.swift */,
 				CB1FF2A2773D47A2A2B2B50D /* ModelSerializationTests.swift */,
 				99B5A5E93DC14F1EB79CF38A /* PersistenceServiceTests.swift */,
@@ -527,6 +545,11 @@
 				56F71F80590D4A27AAD43050 /* OpeningSplitViewModel.swift in Sources */,
 				625CA2888D9F46D499FDFA74 /* OpeningSplitView.swift in Sources */,
 				BEE8DE33B42E4134B8B88EBA /* OpeningSplitFlowView.swift in Sources */,
+				31187E4D18C24AFD8E9EA360 /* GoalEditView.swift in Sources */,
+				19EF97B1589A4F6191EA40AA /* GoalEditViewModel.swift in Sources */,
+				528CFB0745AC4D719C1FDA35 /* GoalDetailViewModel.swift in Sources */,
+				A6EA2641B4EE4968A1CD6742 /* GoalHeldChangeService.swift in Sources */,
+				DB116BA205274A9BAC7D9303 /* HeldGoalChange.swift in Sources */,
 				A11C0010BD814941ABD3C921 /* AccountsService.swift in Sources */,
 				A11C0012BD814941ABD3C921 /* AccountsViewModel.swift in Sources */,
 				A11C0014BD814941ABD3C921 /* AccountsView.swift in Sources */,
@@ -579,6 +602,7 @@
 				B39A001CBD814941ABD3C921 /* ConsentViewModelTests.swift in Sources */,
 				C41A100CBD814941ABD3C921 /* GrokServiceTests.swift in Sources */,
 				C41A100EBD814941ABD3C921 /* GoalValidationServiceTests.swift in Sources */,
+				463C0C59C104488E8D765E95 /* GoalHeldChangeServiceTests.swift in Sources */,
 				C41A1010BD814941ABD3C921 /* GoalChatViewModelTests.swift in Sources */,
 				A45B000DBD814941ABD3C921 /* GoalsTabServiceTests.swift in Sources */,
 				A45B000EBD814941ABD3C921 /* GoalsViewModelTests.swift in Sources */,
