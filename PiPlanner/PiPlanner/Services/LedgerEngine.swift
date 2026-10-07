@@ -5,6 +5,9 @@ import Foundation
 /// PIP-98 owns the full engine; until that lands, `StubLedgerEngine` adapts the
 /// existing pure services (`CreditEntryService`, `GoalHeldChangeService`) so
 /// Goals tab call sites stay engine-shaped and swap cleanly later.
+///
+/// Distinct from PIP-99 `LedgerFacade` (Accounts/Consent opening-balance setup).
+/// Both stubs coexist until PIP-98 unifies them.
 protocol LedgerEngine: Sendable {
     /// BR-6 — Sync / Update blocked while an open New credit History entry exists.
     func isSyncOrUpdateBlocked(history: [HistoryEntry]) -> Bool

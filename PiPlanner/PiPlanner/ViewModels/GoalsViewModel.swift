@@ -37,7 +37,7 @@ final class GoalsViewModel: ObservableObject {
     let persistence: any PersistenceServicing
     let formatting: any FormattingServicing
     let balanceSync: any BalanceSyncServicing
-    /// Ledger facade (PIP-102); defaults to `StubLedgerEngine` until PIP-98 merges.
+    /// Goals Sync/Update ledger (PIP-102 `StubLedgerEngine`); distinct from PIP-99 `LedgerFacade` setup stub.
     let ledger: any LedgerEngine
     /// Owned credit-flow sheets (PIP-47 / PIP-102).
     let creditSyncViewModel: CreditSyncViewModel
