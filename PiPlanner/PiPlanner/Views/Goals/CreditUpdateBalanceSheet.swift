@@ -1,7 +1,8 @@
 import SwiftUI
 
 /// Update balance sheet (frames 11a–11c). Named to avoid PIP-45 `GoalsUpdateBalanceSheet`.
-/// Visual parity (PIP-83 / PRD R11): Paytm-like PiSheet choice chrome, amount field, PIN pad CTAs.
+/// Visual parity: PIP-83 PiSheet / amount hierarchy (R11) + PIP-77 Update/UPI Demo chrome (R8).
+/// No ViewModel / product-behaviour change.
 struct CreditUpdateBalanceSheet: View {
     @ObservedObject var viewModel: CreditUpdateBalanceViewModel
     var onOpenCreditEntry: (HistoryEntry) -> Void
@@ -44,6 +45,7 @@ struct CreditUpdateBalanceSheet: View {
         .presentationDetents([.medium, .large])
         .background(PiColors.backgroundApp)
         .accessibilityIdentifier("credit.updateBalanceSheet")
+        .piPlannerTheme()
     }
 
     // MARK: - 11a Choice
@@ -91,24 +93,26 @@ struct CreditUpdateBalanceSheet: View {
         }
     }
 
+    /// PIP-77 Paytm-like choice rows (Manually / Balance sync) — not bordered CTAs.
     private var choiceRows: some View {
         VStack(spacing: DesignTokens.Space.s12) {
-            PrimaryCTA(
+            UpdateBalanceChoiceRow(
                 title: "Manually",
+                subtitle: "Type a new balance",
+                systemImage: "pencil",
                 isEnabled: !viewModel.isBlockedByOpenEntry,
-                accessibilityIdentifier: "creditUpdate.manual"
-            ) {
-                viewModel.chooseManual()
-            }
+                accessibilityIdentifier: "creditUpdate.manual",
+                action: { viewModel.chooseManual() }
+            )
 
-            SecondaryCTA(
+            UpdateBalanceChoiceRow(
                 title: "Balance sync",
-                style: .outline,
+                subtitle: "Check with demo UPI PIN",
+                systemImage: PiIcons.sync,
                 isEnabled: !viewModel.isBlockedByOpenEntry,
-                accessibilityIdentifier: "creditUpdate.pin"
-            ) {
-                viewModel.chooseBalanceSync()
-            }
+                accessibilityIdentifier: "creditUpdate.pin",
+                action: { viewModel.chooseBalanceSync() }
+            )
 
             if let onRecordWithdrawal {
                 SecondaryCTA(
@@ -148,13 +152,14 @@ struct CreditUpdateBalanceSheet: View {
                                 .foregroundStyle(.secondary)
                             HStack(alignment: .firstTextBaseline, spacing: DesignTokens.Space.s8) {
                                 Text("₹")
-                                    .font(PiTypography.title())
+                                    .font(PiTypography.amountHero())
                                     .fontWeight(.semibold)
                                     .foregroundStyle(PiColors.navyPrimary)
                                 TextField("0", text: $viewModel.rupeeDigits)
                                     .keyboardType(.numberPad)
-                                    .font(PiTypography.title())
+                                    .font(PiTypography.amountHero())
                                     .fontWeight(.semibold)
+                                    .foregroundStyle(PiColors.navyPrimary)
                                     .monospacedDigit()
                                     .accessibilityIdentifier("creditUpdate.digits")
                             }
@@ -175,12 +180,18 @@ struct CreditUpdateBalanceSheet: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
-                PrimaryCTA(
-                    title: "Continue",
-                    isEnabled: viewModel.canContinueManual && !viewModel.isWorking,
-                    accessibilityIdentifier: "creditUpdate.apply"
-                ) {
-                    Task { await viewModel.applyTypedBalance() }
+                if viewModel.isWorking {
+                    ProgressView()
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, DesignTokens.Space.s12)
+                } else {
+                    PrimaryCTA(
+                        title: "Continue",
+                        isEnabled: viewModel.canContinueManual && !viewModel.isWorking,
+                        accessibilityIdentifier: "creditUpdate.apply"
+                    ) {
+                        Task { await viewModel.applyTypedBalance() }
+                    }
                 }
 
                 SecondaryCTA(
@@ -211,22 +222,18 @@ struct CreditUpdateBalanceSheet: View {
             helper: "Demo UPI PIN — enter 1234 to fetch balance. No money is debited."
         ) {
             VStack(spacing: DesignTokens.Space.s20) {
-                HStack(spacing: DesignTokens.Space.s12) {
-                    ForEach(0..<4, id: \.self) { index in
-                        Circle()
-                            .fill(index < viewModel.pinDigits.count ? PiColors.navyPrimary : Color.clear)
-                            .overlay(
-                                Circle().strokeBorder(
-                                    PiColors.navyPrimary.opacity(0.45),
-                                    lineWidth: 1.5
-                                )
-                            )
-                            .frame(width: 14, height: 14)
-                    }
+                VStack(spacing: DesignTokens.Space.s12) {
+                    UPIDemoBadge()
+                    /// Design demo masked line (DemoSeed HDFC dedicated) — chrome only.
+                    UPIBankMaskedLine(title: "HDFC ••4821")
                 }
+
+                UPIPinDots(
+                    filledCount: viewModel.pinDigits.count,
+                    showsError: viewModel.pinError == .wrongPin
+                )
                 .frame(maxWidth: .infinity)
                 .padding(.top, DesignTokens.Space.s8)
-                .accessibilityLabel("PIN digits entered \(viewModel.pinDigits.count) of 4")
 
                 if let pinError = viewModel.pinError {
                     Text(pinError == .wrongPin ? "Incorrect PIN. Try again." : String(describing: pinError))
@@ -235,46 +242,29 @@ struct CreditUpdateBalanceSheet: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
 
-                LazyVGrid(
-                    columns: Array(repeating: GridItem(.flexible()), count: 3),
-                    spacing: DesignTokens.Space.s12
-                ) {
-                    ForEach(["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "⌫"], id: \.self) { key in
-                        Button {
-                            if key == "⌫" {
-                                viewModel.deletePINDigit()
-                            } else if !key.isEmpty {
-                                viewModel.appendPINDigit(key)
-                            }
-                        } label: {
-                            Text(key)
-                                .font(PiTypography.title())
-                                .foregroundStyle(PiColors.navyPrimary)
-                                .frame(maxWidth: .infinity, minHeight: 44)
-                                .background(
-                                    RoundedRectangle(
-                                        cornerRadius: DesignTokens.Radius.chip,
-                                        style: .continuous
-                                    )
-                                    .fill(key.isEmpty ? Color.clear : PiColors.chipLightBlue.opacity(0.55))
-                                )
-                        }
-                        .buttonStyle(.plain)
-                        .disabled(key.isEmpty)
-                    }
-                }
+                UPIMockPad(
+                    isEnabled: !viewModel.isWorking,
+                    onDigit: { viewModel.appendPINDigit($0) },
+                    onDelete: { viewModel.deletePINDigit() }
+                )
 
-                PrimaryCTA(
-                    title: "Check balance",
-                    isEnabled: viewModel.canSubmitPIN,
-                    accessibilityIdentifier: "creditUpdate.checkBalance"
-                ) {
-                    Task { await viewModel.submitPIN() }
+                if viewModel.isWorking {
+                    ProgressView()
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, DesignTokens.Space.s12)
+                } else {
+                    PrimaryCTA(
+                        title: "Check balance",
+                        isEnabled: viewModel.canSubmitPIN,
+                        accessibilityIdentifier: "creditUpdate.checkBalance"
+                    ) {
+                        Task { await viewModel.submitPIN() }
+                    }
                 }
 
                 SecondaryCTA(
                     title: "Back",
-                    style: .text,
+                    style: .outline,
                     accessibilityIdentifier: "creditUpdate.pinBack"
                 ) {
                     viewModel.backToChoice()

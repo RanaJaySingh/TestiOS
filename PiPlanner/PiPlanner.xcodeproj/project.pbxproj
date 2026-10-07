@@ -92,6 +92,7 @@
 		B39A0014BD814941ABD3C921 /* ConsentSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39A0015EEA24F56B29EBB6A /* ConsentSheet.swift */; };
 		B39A0016BD814941ABD3C921 /* ManualBalanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39A0017EEA24F56B29EBB6A /* ManualBalanceView.swift */; };
 		B39A0018BD814941ABD3C921 /* UPIPinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39A0019EEA24F56B29EBB6A /* UPIPinView.swift */; };
+		E77A0010BD814941ABD3C921 /* UpdateBalanceUPIChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = E77A0011EEA24F56B29EBB6A /* UpdateBalanceUPIChrome.swift */; };
 		B39A001ABD814941ABD3C921 /* BalanceSyncServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39A001BEEA24F56B29EBB6A /* BalanceSyncServiceTests.swift */; };
 		B39A001CBD814941ABD3C921 /* ConsentViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39A001DEEA24F56B29EBB6A /* ConsentViewModelTests.swift */; };
 		C41A1000BD814941ABD3C921 /* GrokService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41A1001EEA24F56B29EBB6A /* GrokService.swift */; };
@@ -229,6 +230,7 @@
 		B39A0015EEA24F56B29EBB6A /* ConsentSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsentSheet.swift; sourceTree = "<group>"; };
 		B39A0017EEA24F56B29EBB6A /* ManualBalanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualBalanceView.swift; sourceTree = "<group>"; };
 		B39A0019EEA24F56B29EBB6A /* UPIPinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UPIPinView.swift; sourceTree = "<group>"; };
+		E77A0011EEA24F56B29EBB6A /* UpdateBalanceUPIChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateBalanceUPIChrome.swift; sourceTree = "<group>"; };
 		B39A001BEEA24F56B29EBB6A /* BalanceSyncServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceSyncServiceTests.swift; sourceTree = "<group>"; };
 		B39A001DEEA24F56B29EBB6A /* ConsentViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsentViewModelTests.swift; sourceTree = "<group>"; };
 		C41A1001EEA24F56B29EBB6A /* GrokService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrokService.swift; sourceTree = "<group>"; };
@@ -469,6 +471,7 @@
 				B39A0015EEA24F56B29EBB6A /* ConsentSheet.swift */,
 				B39A0017EEA24F56B29EBB6A /* ManualBalanceView.swift */,
 				B39A0019EEA24F56B29EBB6A /* UPIPinView.swift */,
+				E77A0011EEA24F56B29EBB6A /* UpdateBalanceUPIChrome.swift */,
 				C41A1007EEA24F56B29EBB6A /* GoalChatView.swift */,
 				C41A1009EEA24F56B29EBB6A /* GoalFormView.swift */,
 				C41A100BEEA24F56B29EBB6A /* InflationPopup.swift */,
@@ -771,6 +774,7 @@
 				B39A0014BD814941ABD3C921 /* ConsentSheet.swift in Sources */,
 				B39A0016BD814941ABD3C921 /* ManualBalanceView.swift in Sources */,
 				B39A0018BD814941ABD3C921 /* UPIPinView.swift in Sources */,
+				E77A0010BD814941ABD3C921 /* UpdateBalanceUPIChrome.swift in Sources */,
 				C41A1000BD814941ABD3C921 /* GrokService.swift in Sources */,
 				C41A1002BD814941ABD3C921 /* GoalValidationService.swift in Sources */,
 				C41A1004BD814941ABD3C921 /* GoalChatViewModel.swift in Sources */,
