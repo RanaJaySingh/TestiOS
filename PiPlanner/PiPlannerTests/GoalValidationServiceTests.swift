@@ -86,6 +86,40 @@ final class GoalValidationServiceTests: XCTestCase {
         XCTAssertEqual(exact, Paisa((Double(target) * 1.07).rounded()))
     }
 
+    /// PIP-97 / PIP-101: adjusted = target × (1 + inflation) ^ (months / 12).
+    func testAdjustedTargetUsesMonthsOverTwelve() {
+        let calendar = Calendar(identifier: .gregorian)
+        let startDate = Date(timeIntervalSince1970: 1_700_000_000)
+        let endDate = calendar.date(byAdding: .month, value: 24, to: startDate)!
+        let target: Paisa = 10_000_000
+        let rate = Decimal(string: "0.07")!
+
+        let months = GoalValidationService.monthsBetween(start: startDate, end: endDate)
+        XCTAssertEqual(months, 24)
+
+        let expectedFactor = pow(1.07, 24.0 / 12.0)
+        let expected = Paisa((Double(target) * expectedFactor).rounded())
+        let actual = GoalValidationService.adjustedTargetPaisa(
+            targetPaisa: target,
+            inflationRate: rate,
+            startDate: startDate,
+            endDate: endDate
+        )
+        XCTAssertEqual(actual, expected)
+
+        // Goal.adjustedTarget shares the same formula.
+        let goal = GoalValidationService.makeGoal(
+            name: "Car",
+            targetPaisa: target,
+            startDate: startDate,
+            endDate: endDate,
+            inflationRate: rate,
+            shareOfNewCredits: 1,
+            now: startDate
+        )
+        XCTAssertEqual(goal.adjustedTarget, expected)
+    }
+
     func testContinueRequiresHundredPercentShares() {
         let goals = GoalValidationService.goals(from: StubGrokService.happyPathProposals, now: start)
         XCTAssertTrue(GoalValidationService.canContinueWithDefinedGoals(goals))

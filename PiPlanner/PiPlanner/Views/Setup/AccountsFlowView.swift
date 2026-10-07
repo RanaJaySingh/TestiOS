@@ -42,8 +42,16 @@ struct AccountsFlowView: View {
                     UpdateBalanceSheet(
                         onManually: { path.append(AccountsRoute.manualBalance) },
                         onBalanceSync: {
-                            consentViewModel.clearPIN()
-                            path.append(AccountsRoute.upiPin)
+                            // Tip PIP-100: Paytm-linked → UPI PIN mock; Other UPI app → Manual only.
+                            switch consentViewModel.route(after: .balanceSync) {
+                            case .upiPinMock:
+                                consentViewModel.clearPIN()
+                                path.append(AccountsRoute.upiPin)
+                            case .otherUPIApp:
+                                path.append(AccountsRoute.otherApp)
+                            default:
+                                path.append(AccountsRoute.manualBalance)
+                            }
                         }
                     )
                 case .manualBalance:
@@ -116,12 +124,21 @@ struct AccountsFlowView: View {
 
     private func continueToOpeningSplit(goals: [Goal]) {
         let balance = consentViewModel.resolvedBalance ?? DemoSeed.openingBalancePaisa
-        let resolvedGoals = goals.isEmpty ? DemoSeed.sampleGoals : goals
+        var resolvedGoals = goals.isEmpty ? DemoSeed.sampleGoals : goals
+        // One goal → 100% default before Opening lock / skip (PIP-101).
+        if resolvedGoals.count == 1 {
+            resolvedGoals[0].shareOfNewCredits = 1
+        }
+        // Manual / Other→Manual → typed; PIN / Consent Yes fetch → not typed (PIP-100).
+        let isTyped = consentViewModel.resolvedIsTyped
+            ?? UpdateBalanceRoutingService.isTypedBalance(resolvedFrom: .manualAmount)
         openingSplitViewModel = OpeningSplitViewModel(
             goals: resolvedGoals,
             openingBalance: balance,
+            openingBalanceIsTyped: isTyped,
             persistence: persistence
         )
+        // Single-goal still routes here; OpeningSplitView skips the editor and auto-locks.
         path.append(AccountsRoute.openingSplit)
     }
 }

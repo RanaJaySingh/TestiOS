@@ -222,6 +222,12 @@ enum OpeningSplitService {
         [goalID: hundredPercentFraction]
     }
 
+    /// Multi-goal Opening split UI only when two or more goals exist (PIP-101).
+    /// With one goal the split screen is skipped and share is automatically 100%.
+    static func shouldPresentEditor(goalCount: Int) -> Bool {
+        goalCount >= 2
+    }
+
     /// Read-only copy for locked opening entries (PRD R6 / R16 wording variant on ticket).
     static let lockedAmountsCaption = "Locked amounts never change"
 

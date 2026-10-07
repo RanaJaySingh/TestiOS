@@ -44,7 +44,7 @@ final class OpeningSplitViewModelTests: XCTestCase {
         XCTAssertTrue(viewModel.canLock)
     }
 
-    func testSingleGoalAutoAssigns100WithoutEditableNeed() {
+    func testSingleGoalAutoAssigns100AndSkipsEditor() {
         let goal = sampleGoals()[0]
         let viewModel = OpeningSplitViewModel(
             goals: [goal],
@@ -53,11 +53,48 @@ final class OpeningSplitViewModelTests: XCTestCase {
         )
 
         XCTAssertTrue(viewModel.isSingleGoal)
+        XCTAssertFalse(viewModel.shouldPresentEditor)
         XCTAssertEqual(viewModel.displayPercents[goal.id], 100)
-        XCTAssertTrue(viewModel.canLock)
-        // Frame 8b: changing % is a no-op for single goal.
+        // PIP-101: single-goal skips Opening editor — Lock CTA path disabled.
+        XCTAssertFalse(viewModel.canLock)
+        // Changing % is a no-op for single goal.
         viewModel.setDisplayPercent(goalID: goal.id, percent: 50)
         XCTAssertEqual(viewModel.displayPercents[goal.id], 100)
+    }
+
+    func testSingleGoalSkipLocksOpeningHistoryAndStandingSplit() async throws {
+        let goal = sampleGoals()[0]
+        try await persistence.saveState(
+            PersistedAppState(accounts: [], goals: [goal], history: [], standingSplits: [])
+        )
+
+        let fixedID = UUID(uuidString: "EEEEEEEE-EEEE-EEEE-EEEE-EEEEEEEEEEEE")!
+        let fixedDate = Date(timeIntervalSince1970: 1_700_000_000)
+        let viewModel = OpeningSplitViewModel(
+            goals: [goal],
+            openingBalance: 10_000_000,
+            persistence: persistence,
+            clock: { fixedDate },
+            makeID: { fixedID }
+        )
+
+        await viewModel.applySingleGoalSkipIfNeeded()
+
+        XCTAssertTrue(viewModel.didAutoSkip)
+        XCTAssertTrue(viewModel.shouldNavigateToGoals)
+        XCTAssertEqual(viewModel.lockedEntry?.id, fixedID)
+        XCTAssertEqual(viewModel.lockedEntry?.type, .openingBalance)
+        XCTAssertTrue(viewModel.lockedEntry?.isLocked == true)
+
+        let state = try await persistence.loadState()
+        XCTAssertEqual(state.history.count, 1)
+        XCTAssertEqual(state.history[0].type, .openingBalance)
+        XCTAssertEqual(state.standingSplits.count, 1)
+        XCTAssertEqual(state.standingSplits[0].percentage, Decimal(1))
+        XCTAssertEqual(state.goals[0].savedAmount, 10_000_000)
+        XCTAssertEqual(state.goals[0].shareOfNewCredits, Decimal(1))
+        XCTAssertEqual(state.history[0].isTyped, true)
+        XCTAssertTrue(UpdateBalanceRoutingService.assertOpeningBalanceShape(state.history[0]))
     }
 
     func testConfirmLockCreatesOpeningHistoryEntryAndNavigates() async throws {

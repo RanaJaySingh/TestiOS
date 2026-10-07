@@ -1,27 +1,22 @@
 import SwiftUI
 
-/// Opening split screen — design frames 8 (multi-goal) and 8b (single-goal).
+/// Opening split screen — design frames 8 (multi-goal) and one-goal skip (PIP-101).
 /// Visual parity (PIP-79): goal rows, %, Lock this split PrimaryCTA (≠100% vs 100%).
+/// One goal → 100% default, skip split editor, auto-lock Opening History + standing split.
 struct OpeningSplitView: View {
     @ObservedObject var viewModel: OpeningSplitViewModel
     var onNavigateToGoals: () -> Void
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: DesignTokens.Space.s20) {
-                header
-                balanceCard
-                goalsSection
-                statusFooter
-                if !viewModel.isReadOnly {
-                    lockButton
-                }
+        Group {
+            if viewModel.isReadOnly || viewModel.shouldPresentEditor {
+                multiGoalContent
+            } else {
+                oneGoalSkipContent
             }
-            .padding(DesignTokens.Space.s20)
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .background(PiColors.backgroundApp.ignoresSafeArea())
-        .navigationTitle("Opening split")
+        .navigationTitle(viewModel.shouldPresentEditor || viewModel.isReadOnly ? "Opening split" : "Opening balance")
         .navigationBarTitleDisplayMode(.inline)
         .piPlannerTheme()
         .confirmationDialog(
@@ -35,6 +30,11 @@ struct OpeningSplitView: View {
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("Locked amounts never change. This creates your Opening balance History entry.")
+        }
+        .task {
+            if !viewModel.shouldPresentEditor && !viewModel.isReadOnly {
+                await viewModel.applySingleGoalSkipIfNeeded()
+            }
         }
         .onChange(of: viewModel.shouldNavigateToGoals) { shouldNavigate in
             if shouldNavigate {
@@ -52,6 +52,69 @@ struct OpeningSplitView: View {
         } message: {
             Text(viewModel.errorMessage ?? "")
         }
+        .accessibilityIdentifier("openingSplit.view")
+    }
+
+    // MARK: - Multi-goal / read-only
+
+    private var multiGoalContent: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s20) {
+                header
+                balanceCard
+                goalsSection
+                statusFooter
+                if !viewModel.isReadOnly {
+                    lockButton
+                }
+            }
+            .padding(DesignTokens.Space.s20)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    /// One-goal skip: no % editor — auto-lock 100% and continue to Goals.
+    private var oneGoalSkipContent: some View {
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s20) {
+            Text("One goal — 100% assigned")
+                .font(PiTypography.title())
+                .accessibilityAddTraits(.isHeader)
+            Text(viewModel.statusMessage)
+                .font(PiTypography.body())
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if let goal = viewModel.goals.first {
+                PiCard(padding: DesignTokens.Space.s16) {
+                    VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
+                        Text(goal.name)
+                            .font(PiTypography.body())
+                            .fontWeight(.semibold)
+                        Text(viewModel.formattedOpeningBalance)
+                            .font(PiTypography.amountHero())
+                            .foregroundStyle(PiColors.navyPrimary)
+                            .monospacedDigit()
+                        Text("100%")
+                            .font(PiTypography.title())
+                            .fontWeight(.medium)
+                            .monospacedDigit()
+                            .foregroundStyle(PiColors.navyPrimary)
+                            .accessibilityLabel("\(goal.name) automatically assigned 100 percent")
+                    }
+                }
+            }
+
+            if viewModel.isLocking || !viewModel.didAutoSkip {
+                ProgressView("Locking opening balance…")
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, DesignTokens.Space.s12)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(DesignTokens.Space.s20)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .accessibilityIdentifier("openingSplit.oneGoalSkip")
     }
 
     private var header: some View {
@@ -115,14 +178,7 @@ struct OpeningSplitView: View {
                         .accessibilityLabel("Amount \(viewModel.formattedAmount(for: goal.id))")
                 }
 
-                if viewModel.isSingleGoal {
-                    Text("100%")
-                        .font(PiTypography.title())
-                        .fontWeight(.medium)
-                        .monospacedDigit()
-                        .foregroundStyle(PiColors.navyPrimary)
-                        .accessibilityLabel("\(goal.name) automatically assigned 100 percent")
-                } else if viewModel.isReadOnly {
+                if viewModel.isReadOnly {
                     Text("\(viewModel.displayPercents[goal.id] ?? 0)%")
                         .font(PiTypography.title())
                         .fontWeight(.medium)
@@ -236,7 +292,7 @@ struct OpeningSplitView: View {
     }
 }
 
-#Preview("Single-goal 8b") {
+#Preview("One-goal skip") {
     NavigationStack {
         OpeningSplitView(
             viewModel: OpeningSplitViewModel(
