@@ -81,11 +81,11 @@ Do **not** redefine hex colours — use `PiColors` / `DesignTokens` from `Theme/
 
 ## Parallel work / base
 
-Started from `main` @ `141a2bc` (PIP-67 #20). Prefer `Components/` only; avoid broad `MainTabView` edits (PIP-71 icon/tab chrome may be in flight). Ask `ProposalCard` moved into `Components/` with identical accessibility identifiers and callback API.
+Originally from `main` @ `141a2bc` (PIP-67 #20). Rebased onto `main` @ `22cf8ef` (PIP-71 #21 icon catalog + MainTab chrome). Keep-both on `project.pbxproj`: PIP-69 Components + PIP-71 `PiIcons` / tests. Ask `ProposalCard` moved into `Components/` with identical accessibility identifiers and callback API.
 
 ## Test results
 
-`cd PiPlanner && swift test` — **199 tests, 0 failures** (includes 4 `ComponentsContractTests` + existing `DesignTokensTests`).
+`cd PiPlanner && swift test` — **206 tests, 0 failures** (post PIP-71 rebase; includes 4 `ComponentsContractTests` + PIP-71 `PiIconsTests` + `DesignTokensTests`).
 
 ## How to run tests
 
