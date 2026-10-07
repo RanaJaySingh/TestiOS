@@ -111,6 +111,7 @@
 		A45B0004BD814941ABD3C921 /* GoalsTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45F0004EEA24F56B29EBB6A /* GoalsTabView.swift */; };
 		A45B0005BD814941ABD3C921 /* BalanceCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45F0005EEA24F56B29EBB6A /* BalanceCard.swift */; };
 		A45B0006BD814941ABD3C921 /* GoalCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45F0006EEA24F56B29EBB6A /* GoalCard.swift */; };
+		A81B0001BD814941ABD3C921 /* QuickActionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A81A0001EEA24F56B29EBB6A /* QuickActionRow.swift */; };
 		A45B0007BD814941ABD3C921 /* GoalDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45F0007EEA24F56B29EBB6A /* GoalDetailView.swift */; };
 		A45B0008BD814941ABD3C921 /* SyncSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45F0008EEA24F56B29EBB6A /* SyncSheet.swift */; };
 		A45B0009BD814941ABD3C921 /* UpdateBalanceSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45F0009EEA24F56B29EBB6A /* UpdateBalanceSheet.swift */; };
@@ -249,6 +250,7 @@
 		A45F0004EEA24F56B29EBB6A /* GoalsTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsTabView.swift; sourceTree = "<group>"; };
 		A45F0005EEA24F56B29EBB6A /* BalanceCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceCard.swift; sourceTree = "<group>"; };
 		A45F0006EEA24F56B29EBB6A /* GoalCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalCard.swift; sourceTree = "<group>"; };
+		A81A0001EEA24F56B29EBB6A /* QuickActionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionRow.swift; sourceTree = "<group>"; };
 		A45F0007EEA24F56B29EBB6A /* GoalDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalDetailView.swift; sourceTree = "<group>"; };
 		A45F0008EEA24F56B29EBB6A /* SyncSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSheet.swift; sourceTree = "<group>"; };
 		A45F0009EEA24F56B29EBB6A /* UpdateBalanceSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateBalanceSheet.swift; sourceTree = "<group>"; };
@@ -487,6 +489,7 @@
 				A45F0004EEA24F56B29EBB6A /* GoalsTabView.swift */,
 				A45F0005EEA24F56B29EBB6A /* BalanceCard.swift */,
 				A45F0006EEA24F56B29EBB6A /* GoalCard.swift */,
+				A81A0001EEA24F56B29EBB6A /* QuickActionRow.swift */,
 				A45F0007EEA24F56B29EBB6A /* GoalDetailView.swift */,
 				951D3037C9B340B9AFD53951 /* GoalEditView.swift */,
 				B51A0003EEA24F56B29EBB6A /* StandingSplitView.swift */,
@@ -787,6 +790,7 @@
 				A45B0004BD814941ABD3C921 /* GoalsTabView.swift in Sources */,
 				A45B0005BD814941ABD3C921 /* BalanceCard.swift in Sources */,
 				A45B0006BD814941ABD3C921 /* GoalCard.swift in Sources */,
+				A81B0001BD814941ABD3C921 /* QuickActionRow.swift in Sources */,
 				A45B0007BD814941ABD3C921 /* GoalDetailView.swift in Sources */,
 				A45B0008BD814941ABD3C921 /* SyncSheet.swift in Sources */,
 				A45B0009BD814941ABD3C921 /* UpdateBalanceSheet.swift in Sources */,

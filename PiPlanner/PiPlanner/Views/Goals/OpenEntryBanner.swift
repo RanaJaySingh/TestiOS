@@ -1,30 +1,43 @@
 import SwiftUI
 
-/// Goals open-entry banner (frame 9b / PRD R9 / Spec BR-6).
+/// Goals open-entry banner (frame 9b / PRD R9 / Spec BR-6) — Assign now treatment.
+/// Visual restyle only (PIP-81); Assign now still opens existing credit entry.
 struct OpenEntryBanner: View {
     let message: String
     var onAssignNow: () -> Void
 
     var body: some View {
-        HStack(alignment: .center, spacing: 12) {
-            VStack(alignment: .leading, spacing: 4) {
+        HStack(alignment: .center, spacing: DesignTokens.Space.s12) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s8 / 2) {
                 Text(CreditEntryService.openEntryBannerPrefix)
-                    .font(.subheadline)
+                    .font(PiTypography.body())
                     .fontWeight(.semibold)
+                    .foregroundStyle(PiColors.navyPrimary)
                 Text(message)
-                    .font(.footnote)
+                    .font(PiTypography.caption())
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            Spacer(minLength: 8)
-            Button(CreditEntryService.assignNowTitle, action: onAssignNow)
-                .buttonStyle(.borderedProminent)
-                .controlSize(.small)
-                .accessibilityIdentifier("openEntryBanner.assignNow")
+            Spacer(minLength: DesignTokens.Space.s8)
+            Button(action: onAssignNow) {
+                Text(CreditEntryService.assignNowTitle)
+                    .font(PiTypography.caption())
+                    .fontWeight(.semibold)
+                    .padding(.horizontal, DesignTokens.Space.s12)
+                    .padding(.vertical, DesignTokens.Space.s8)
+                    .foregroundStyle(Color.white)
+                    .background(PiColors.navyPrimary)
+                    .clipShape(
+                        RoundedRectangle(cornerRadius: DesignTokens.Radius.chip, style: .continuous)
+                    )
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("openEntryBanner.assignNow")
         }
-        .padding(12)
+        .padding(DesignTokens.Space.s16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.orange.opacity(0.12))
+        .background(PiColors.chipLightBlue)
+        .clipShape(RoundedRectangle(cornerRadius: DesignTokens.Radius.card, style: .continuous))
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("openEntryBanner")
     }
@@ -51,4 +64,6 @@ struct OpenEntryBanner: View {
         onAssignNow: {}
     )
     .padding()
+    .background(PiColors.backgroundApp)
+    .piPlannerTheme()
 }

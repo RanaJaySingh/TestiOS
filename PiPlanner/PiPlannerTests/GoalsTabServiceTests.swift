@@ -93,6 +93,101 @@ final class GoalsTabServiceTests: XCTestCase {
         XCTAssertNil(GoalsTabService.dedicatedAccountSubtitle(accounts: []))
     }
 
+    // MARK: - PIP-81 presentation helpers (visual labels only)
+
+    func testQuickBalanceActionTitleSyncVsUpdate() {
+        XCTAssertEqual(GoalsTabService.quickBalanceActionTitle(for: .sync), "Sync")
+        XCTAssertEqual(GoalsTabService.quickBalanceActionTitle(for: .updateBalance), "Update")
+        XCTAssertEqual(GoalsTabService.balanceActionTitle(for: .updateBalance), "Update balance")
+    }
+
+    func testLastBalanceActivityLineConsentOnUsesSynced() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        let line = GoalsTabService.lastBalanceActivityLine(
+            for: .sync,
+            referenceDate: now,
+            now: now,
+            calendar: calendar
+        )
+        XCTAssertTrue(line.hasPrefix("Last synced today,"), line)
+    }
+
+    func testLastBalanceActivityLineConsentOffUsesUpdated() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        let line = GoalsTabService.lastBalanceActivityLine(
+            for: .updateBalance,
+            referenceDate: now,
+            now: now,
+            calendar: calendar
+        )
+        XCTAssertTrue(line.hasPrefix("Last updated today,"), line)
+    }
+
+    func testLastBalanceActivityDateUsesNewestHistory() {
+        let older = HistoryEntry(
+            id: UUID(),
+            type: .openingBalance,
+            createdAt: Date(timeIntervalSince1970: 1_700_000_000),
+            isLocked: true,
+            previousBalance: nil,
+            newBalance: 10_000_000,
+            creditAmount: 10_000_000,
+            isTyped: false,
+            fromGoalId: nil,
+            toGoalId: nil,
+            transferAmount: nil,
+            withdrawalAmount: nil,
+            deletedGoalName: nil,
+            releasedAmount: nil,
+            allocations: []
+        )
+        let newer = HistoryEntry(
+            id: UUID(),
+            type: .newCredit,
+            createdAt: Date(timeIntervalSince1970: 1_700_086_400),
+            isLocked: true,
+            previousBalance: 10_000_000,
+            newBalance: 11_000_000,
+            creditAmount: 1_000_000,
+            isTyped: false,
+            fromGoalId: nil,
+            toGoalId: nil,
+            transferAmount: nil,
+            withdrawalAmount: nil,
+            deletedGoalName: nil,
+            releasedAmount: nil,
+            allocations: []
+        )
+        XCTAssertEqual(
+            GoalsTabService.lastBalanceActivityDate(history: [older, newer]),
+            newer.createdAt
+        )
+        XCTAssertNil(GoalsTabService.lastBalanceActivityDate(history: []))
+    }
+
+    func testGoalCardPresentationLabels() {
+        XCTAssertEqual(
+            GoalsTabService.savedOfTargetLabel(
+                savedPaisa: 6_000_000,
+                targetPaisa: 131_079_600,
+                formatting: formatting
+            ),
+            "₹60,000 of ₹13,10,796"
+        )
+        XCTAssertEqual(
+            GoalsTabService.monthlyNeedLabel(monthlyNeedPaisa: 2_605_800, formatting: formatting),
+            "Needs ₹26,058 a month"
+        )
+        XCTAssertEqual(
+            GoalsTabService.creditsPercentLabel(shareOfNewCredits: Decimal(string: "0.6")!),
+            "60% of credits"
+        )
+    }
+
     // MARK: - Helpers
 
     private func dedicated(consent: Bool) -> Account {
