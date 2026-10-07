@@ -10,26 +10,27 @@ Pure Swift `LedgerEngineCore` (Linux-testable) under `PiPlanner/Services`, with 
 |-------------|------|
 | `LedgerEngineCore.adjustedTargetPaisa` / `requiredSavingsPaisa` / `status` | Formulas via tip `GoalInflationFormulas` (PIP-97); on-track status |
 | `BalanceSnapshot` + `applyBalanceDelta` | Snapshot / delta (fetched vs typed) |
-| `lockedSlices` / `saveOpenCredit` / `isAppendOnlyMutation` | History open → save; append-only locked slices |
+| `lockedSlices` / `saveOpenCredit` / `isAppendOnlyMutation` | History open → save helpers (tip PIP-103 owns UI Save path) |
 | `applyStanding` / `singleGoalStandingPercentages` | Standing split (1 goal = 100%) |
 | `createGoal` / `updateGoalPending` / `transfer` / `deleteRedistributing` / `withdraw` | Create / pending edit / transfer / delete redistrib / withdrawal |
 
 `Goal` / `GoalValidationService` use tip `GoalInflationFormulas` directly. `LedgerEngineCore` formula helpers delegate to the same APIs (single source).
 
-## Keep-both with tip (PIP-101 / PIP-102 / PIP-100 / PIP-99 / PIP-97)
+## Keep-both with tip (PIP-103 / PIP-101 / PIP-102 / PIP-100 / PIP-99 / PIP-97)
 
-Rebased onto `main@4f049bd4` (PIP-101 #41).
+Rebased onto `main@b5596e8e` (PIP-103 #37).
 
 | Surface | Owner |
 |---------|--------|
 | `GoalInflationFormulas` | Tip PIP-97 — shared inflation / required-savings formulas |
-| `protocol LedgerEngine` + `StubLedgerEngine` | Tip PIP-102 — Goals Sync/Update injection |
-| `StubLedgerService` | Tip PIP-101 — Opening lock + one-goal skip (no duplicate Opening in Core) |
+| `protocol LedgerEngine` + `StubLedgerEngine` | Tip PIP-102/103 — Goals Sync/Update + History Save / create-goal |
+| `StubLedgerService` | Tip PIP-101 — Opening lock + one-goal skip (no duplicate Opening) |
+| History open→save (`customSplit`, create goal, suggested standing) | Tip PIP-103 — via `CreditEntryService` + stub Save APIs |
 | `LedgerEngineCore` + `LedgerEngineCoreTests` | PIP-98 — pure mutation engine + formula facades |
 | `LedgerFacade` → `LedgerEngineCore.BalanceSource` | Setup Accounts/Consent (PIP-99); maps fetched/typed |
 | `UpdateBalanceRoutingService` / `resolvedIsTyped` | Tip PIP-100 — Update balance routes / History shape |
 
-`StubLedgerEngine.processBalanceUpdate` applies pending goal edits (PIP-102), then delegates the higher-balance credit write to `LedgerEngineCore.applyBalanceDelta`.
+`StubLedgerEngine.processBalanceUpdate` applies pending goal edits (PIP-102), then delegates the higher-balance credit write to `LedgerEngineCore.applyBalanceDelta`. History Save / create-goal stay on tip PIP-103 (`CreditEntryService`) — no duplicate open/save path in Core.
 
 ## Acceptance criteria
 
@@ -40,7 +41,7 @@ Rebased onto `main@4f049bd4` (PIP-101 #41).
 - [x] Formulas: adjusted target, required savings, on-track status (via `GoalInflationFormulas`)
 - [x] `cd PiPlanner && swift test` green
 - [x] No new screens; DesignTokens / Pi* components untouched
-- [x] Coexists with tip Opening/`StubLedgerService` + `StubLedgerEngine` + `LedgerFacade` + PIP-100 + PIP-97
+- [x] Coexists with tip Opening/`StubLedgerService` + History open→save + `StubLedgerEngine` + `LedgerFacade` + PIP-100 + PIP-97
 
 ## Design refs
 
