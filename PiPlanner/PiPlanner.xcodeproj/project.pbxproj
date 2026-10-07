@@ -45,6 +45,13 @@
 		D67B0004BD814941ABD3C921 /* DesignTokensTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D67A0004EEA24F56B29EBB6A /* DesignTokensTests.swift */; };
 		D71B0001BD814941ABD3C921 /* PiIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = D71A0001EEA24F56B29EBB6A /* PiIcons.swift */; };
 		D71B0002BD814941ABD3C921 /* PiIconsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D71A0002EEA24F56B29EBB6A /* PiIconsTests.swift */; };
+		D69B0007BD814941ABD3C921 /* ComponentsContractTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D69A0007EEA24F56B29EBB6A /* ComponentsContractTests.swift */; };
+		D69B0001BD814941ABD3C921 /* PiCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = D69A0001EEA24F56B29EBB6A /* PiCard.swift */; };
+		D69B0002BD814941ABD3C921 /* PrimaryCTA.swift in Sources */ = {isa = PBXBuildFile; fileRef = D69A0002EEA24F56B29EBB6A /* PrimaryCTA.swift */; };
+		D69B0003BD814941ABD3C921 /* SecondaryCTA.swift in Sources */ = {isa = PBXBuildFile; fileRef = D69A0003EEA24F56B29EBB6A /* SecondaryCTA.swift */; };
+		D69B0004BD814941ABD3C921 /* LightBlueChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = D69A0004EEA24F56B29EBB6A /* LightBlueChip.swift */; };
+		D69B0005BD814941ABD3C921 /* PiSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = D69A0005EEA24F56B29EBB6A /* PiSheet.swift */; };
+		D69B0006BD814941ABD3C921 /* ComponentsCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D69A0006EEA24F56B29EBB6A /* ComponentsCatalog.swift */; };
 		1318D194AA484098BD165D58 /* PiPlannerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 656B4AAB996D4CB283413E05 /* PiPlannerApp.swift */; };
 		142F0FC7D4894F32A7F74E7B /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = C670521930484E588DEE0188 /* Account.swift */; };
 		1C65A48285EC416D828D2976 /* Goal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 349DD80CB6684362B4613EB4 /* Goal.swift */; };
@@ -172,6 +179,13 @@
 		D67A0004EEA24F56B29EBB6A /* DesignTokensTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTokensTests.swift; sourceTree = "<group>"; };
 		D71A0001EEA24F56B29EBB6A /* PiIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiIcons.swift; sourceTree = "<group>"; };
 		D71A0002EEA24F56B29EBB6A /* PiIconsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiIconsTests.swift; sourceTree = "<group>"; };
+		D69A0001EEA24F56B29EBB6A /* PiCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiCard.swift; sourceTree = "<group>"; };
+		D69A0002EEA24F56B29EBB6A /* PrimaryCTA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryCTA.swift; sourceTree = "<group>"; };
+		D69A0003EEA24F56B29EBB6A /* SecondaryCTA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryCTA.swift; sourceTree = "<group>"; };
+		D69A0004EEA24F56B29EBB6A /* LightBlueChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightBlueChip.swift; sourceTree = "<group>"; };
+		D69A0005EEA24F56B29EBB6A /* PiSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiSheet.swift; sourceTree = "<group>"; };
+		D69A0006EEA24F56B29EBB6A /* ComponentsCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentsCatalog.swift; sourceTree = "<group>"; };
+		D69A0007EEA24F56B29EBB6A /* ComponentsContractTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentsContractTests.swift; sourceTree = "<group>"; };
 		656B4AAB996D4CB283413E05 /* PiPlannerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiPlannerApp.swift; sourceTree = "<group>"; };
 		C670521930484E588DEE0188 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
 		349DD80CB6684362B4613EB4 /* Goal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Goal.swift; sourceTree = "<group>"; };
@@ -433,7 +447,6 @@
 			isa = PBXGroup;
 			children = (
 				A45F000BEEA24F56B29EBB6A /* AskTabView.swift */,
-				A63F0003EEA24F56B29EBB6A /* ProposalCard.swift */,
 			);
 			path = Ask;
 			sourceTree = "<group>";
@@ -502,6 +515,13 @@
 		FAA719A723F14AD19856F4AF /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				D69A0001EEA24F56B29EBB6A /* PiCard.swift */,
+				D69A0002EEA24F56B29EBB6A /* PrimaryCTA.swift */,
+				D69A0003EEA24F56B29EBB6A /* SecondaryCTA.swift */,
+				D69A0004EEA24F56B29EBB6A /* LightBlueChip.swift */,
+				D69A0005EEA24F56B29EBB6A /* PiSheet.swift */,
+				A63F0003EEA24F56B29EBB6A /* ProposalCard.swift */,
+				D69A0006EEA24F56B29EBB6A /* ComponentsCatalog.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -528,6 +548,7 @@
 				D65A0002EEA24F56B29EBB6A /* DemoDataTests.swift */,
 				D67A0004EEA24F56B29EBB6A /* DesignTokensTests.swift */,
 				D71A0002EEA24F56B29EBB6A /* PiIconsTests.swift */,
+				D69A0007EEA24F56B29EBB6A /* ComponentsContractTests.swift */,
 				B6E95FBCBC4A41B7993C130A /* FormattingServiceTests.swift */,
 				CB1FF2A2773D47A2A2B2B50D /* ModelSerializationTests.swift */,
 				99B5A5E93DC14F1EB79CF38A /* PersistenceServiceTests.swift */,
@@ -723,6 +744,12 @@
 				D67B0002BD814941ABD3C921 /* Color+DesignTokens.swift in Sources */,
 				D67B0003BD814941ABD3C921 /* Theme.swift in Sources */,
 				D71B0001BD814941ABD3C921 /* PiIcons.swift in Sources */,
+				D69B0001BD814941ABD3C921 /* PiCard.swift in Sources */,
+				D69B0002BD814941ABD3C921 /* PrimaryCTA.swift in Sources */,
+				D69B0003BD814941ABD3C921 /* SecondaryCTA.swift in Sources */,
+				D69B0004BD814941ABD3C921 /* LightBlueChip.swift in Sources */,
+				D69B0005BD814941ABD3C921 /* PiSheet.swift in Sources */,
+				D69B0006BD814941ABD3C921 /* ComponentsCatalog.swift in Sources */,
 				T55B0002BD814941ABD3C921 /* TransferViewModel.swift in Sources */,
 				S61B0002BD814941ABD3C921 /* SettingsViewModel.swift in Sources */,
 				T55B0003BD814941ABD3C921 /* TransferView.swift in Sources */,
@@ -811,6 +838,7 @@
 				D65B0002BD814941ABD3C921 /* DemoDataTests.swift in Sources */,
 				D67B0004BD814941ABD3C921 /* DesignTokensTests.swift in Sources */,
 				D71B0002BD814941ABD3C921 /* PiIconsTests.swift in Sources */,
+				D69B0007BD814941ABD3C921 /* ComponentsContractTests.swift in Sources */,
 				C41A1010BD814941ABD3C921 /* GoalChatViewModelTests.swift in Sources */,
 				A45B000DBD814941ABD3C921 /* GoalsTabServiceTests.swift in Sources */,
 				A45B000EBD814941ABD3C921 /* GoalsViewModelTests.swift in Sources */,
