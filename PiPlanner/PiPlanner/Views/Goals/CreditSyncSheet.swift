@@ -5,7 +5,8 @@ import SwiftUI
 struct CreditSyncSheet: View {
     @ObservedObject var viewModel: CreditSyncViewModel
     var onOpenCreditEntry: (HistoryEntry) -> Void
-    var onWithdrawal: (Paisa) -> Void
+    /// PIP-107 — full shortfall / previous / new from `.withdrawalRequired`.
+    var onWithdrawal: (WithdrawalPresentation) -> Void
     var onDismiss: () -> Void
 
     private let formatting = FormattingService()
@@ -151,12 +152,12 @@ struct CreditSyncSheet: View {
             ) {
                 onOpenCreditEntry(entry)
             }
-        } else if let shortfall = viewModel.withdrawalShortfall {
+        } else if let presentation = viewModel.withdrawalPresentation {
             PrimaryCTA(
                 title: "Continue to withdrawal",
                 accessibilityIdentifier: "creditSync.withdrawal"
             ) {
-                onWithdrawal(shortfall)
+                onWithdrawal(presentation)
             }
         } else if viewModel.phase == .idle || viewModel.fetchedBalance == nil {
             PrimaryCTA(

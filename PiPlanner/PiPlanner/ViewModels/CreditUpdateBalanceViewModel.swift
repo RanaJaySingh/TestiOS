@@ -21,8 +21,12 @@ final class CreditUpdateBalanceViewModel: ObservableObject {
     @Published private(set) var infoMessage: String?
     @Published private(set) var errorMessage: String?
     @Published private(set) var createdEntry: HistoryEntry?
-    @Published private(set) var withdrawalShortfall: Paisa?
+    /// Full lower-balance context for Withdrawal sheet (PIP-107 / PIP-102).
+    @Published private(set) var withdrawalPresentation: WithdrawalPresentation?
     @Published private(set) var isBlockedByOpenEntry = false
+
+    /// Shortfall only — convenience for sheets / accessibility.
+    var withdrawalShortfall: Paisa? { withdrawalPresentation?.shortfall }
     @Published private(set) var pinError: PinError?
     @Published private(set) var dedicatedIsPaytmLinked = true
     @Published private(set) var dedicatedBankTitle: String?
@@ -180,7 +184,7 @@ final class CreditUpdateBalanceViewModel: ObservableObject {
         errorMessage = nil
         infoMessage = nil
         createdEntry = nil
-        withdrawalShortfall = nil
+        withdrawalPresentation = nil
         defer { isWorking = false }
 
         do {
@@ -202,8 +206,12 @@ final class CreditUpdateBalanceViewModel: ObservableObject {
             switch outcome {
             case .noNewCredit(let message):
                 infoMessage = message
-            case .withdrawalRequired(let shortfall, _, _):
-                withdrawalShortfall = shortfall
+            case .withdrawalRequired(let shortfall, let previous, let lowerBalance):
+                withdrawalPresentation = WithdrawalPresentation(
+                    shortfall: shortfall,
+                    previousBalance: previous,
+                    newBalance: lowerBalance
+                )
                 infoMessage = "Balance went down by \(formatting.formatINR(paisa: shortfall))."
             case .openCreditCreated(let next, let entry):
                 try await persistence.saveState(next)

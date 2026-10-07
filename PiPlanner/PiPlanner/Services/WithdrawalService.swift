@@ -1,5 +1,26 @@
 import Foundation
 
+/// Presentation payload from Sync/Update `.withdrawalRequired` (PIP-107 completes PIP-102 lower path).
+struct WithdrawalPresentation: Equatable, Sendable {
+    let shortfall: Paisa
+    let previousBalance: Paisa
+    let newBalance: Paisa
+}
+
+extension CreditProcessOutcome {
+    /// Non-nil when Sync/Update must open the Withdrawal sheet (F < P).
+    var withdrawalPresentation: WithdrawalPresentation? {
+        guard case .withdrawalRequired(let shortfall, let previous, let newBalance) = self else {
+            return nil
+        }
+        return WithdrawalPresentation(
+            shortfall: shortfall,
+            previousBalance: previous,
+            newBalance: newBalance
+        )
+    }
+}
+
 /// Withdrawal proportional allocation + History lock (PRD R15, Spec BR-8 / BR-2).
 /// Pure / Linux-testable. Reductions are paisa (`Int64`); standing split is not redefined.
 enum WithdrawalService {

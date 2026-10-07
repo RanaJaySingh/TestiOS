@@ -18,8 +18,12 @@ final class CreditSyncViewModel: ObservableObject {
     @Published private(set) var infoMessage: String?
     @Published private(set) var errorMessage: String?
     @Published private(set) var createdEntry: HistoryEntry?
-    @Published private(set) var withdrawalShortfall: Paisa?
+    /// Full lower-balance context for Withdrawal sheet (PIP-107 / PIP-102).
+    @Published private(set) var withdrawalPresentation: WithdrawalPresentation?
     @Published private(set) var isBlockedByOpenEntry = false
+
+    /// Shortfall only — convenience for sheets / accessibility.
+    var withdrawalShortfall: Paisa? { withdrawalPresentation?.shortfall }
 
     private let persistence: any PersistenceServicing
     private let balanceSync: any BalanceSyncServicing
@@ -79,7 +83,7 @@ final class CreditSyncViewModel: ObservableObject {
         infoMessage = nil
         errorMessage = nil
         createdEntry = nil
-        withdrawalShortfall = nil
+        withdrawalPresentation = nil
         phase = .idle
         if isBlockedByOpenEntry {
             infoMessage = "Assign the open credit before Sync."
@@ -106,7 +110,7 @@ final class CreditSyncViewModel: ObservableObject {
         errorMessage = nil
         infoMessage = nil
         createdEntry = nil
-        withdrawalShortfall = nil
+        withdrawalPresentation = nil
         defer {
             if phase == .syncing { phase = .showingResult }
         }
@@ -139,8 +143,12 @@ final class CreditSyncViewModel: ObservableObject {
                 case .noNewCredit(let message):
                     infoMessage = message
                     phase = .showingResult
-                case .withdrawalRequired(let shortfall, _, _):
-                    withdrawalShortfall = shortfall
+                case .withdrawalRequired(let shortfall, let previous, let newBalance):
+                    withdrawalPresentation = WithdrawalPresentation(
+                        shortfall: shortfall,
+                        previousBalance: previous,
+                        newBalance: newBalance
+                    )
                     infoMessage = "Balance went down by \(formatting.formatINR(paisa: shortfall))."
                     phase = .showingResult
                 case .openCreditCreated(let next, let entry):

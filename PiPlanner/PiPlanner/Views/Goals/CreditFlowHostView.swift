@@ -11,7 +11,7 @@ struct CreditFlowHostView: View {
     /// Consent On → Sync; Consent Off → Update balance.
     var prefersSync: Bool = true
     /// Called when lower balance is detected (host may present Withdrawal).
-    var onWithdrawalRequested: (Paisa) -> Void = { _ in }
+    var onWithdrawalRequested: (WithdrawalPresentation) -> Void = { _ in }
 
     @StateObject private var syncViewModel: CreditSyncViewModel
     @StateObject private var updateViewModel: CreditUpdateBalanceViewModel
@@ -35,7 +35,7 @@ struct CreditFlowHostView: View {
         ),
         formatting: any FormattingServicing = FormattingService(),
         prefersSync: Bool = true,
-        onWithdrawalRequested: @escaping (Paisa) -> Void = { _ in }
+        onWithdrawalRequested: @escaping (WithdrawalPresentation) -> Void = { _ in }
     ) {
         self.persistence = persistence
         self.balanceSync = balanceSync
@@ -94,9 +94,9 @@ struct CreditFlowHostView: View {
                     showSyncSheet = false
                     presentCreditEntry(entry)
                 },
-                onWithdrawal: { shortfall in
+                onWithdrawal: { presentation in
                     showSyncSheet = false
-                    handleWithdrawal(shortfall)
+                    handleWithdrawal(presentation)
                 },
                 onDismiss: { showSyncSheet = false }
             )
@@ -108,9 +108,9 @@ struct CreditFlowHostView: View {
                     showUpdateSheet = false
                     presentCreditEntry(entry)
                 },
-                onWithdrawal: { shortfall in
+                onWithdrawal: { presentation in
                     showUpdateSheet = false
-                    handleWithdrawal(shortfall)
+                    handleWithdrawal(presentation)
                 },
                 onDismiss: { showUpdateSheet = false }
             )
@@ -169,22 +169,21 @@ struct CreditFlowHostView: View {
         }
     }
 
-    private func handleWithdrawal(_ shortfall: Paisa) {
+    private func handleWithdrawal(_ presentation: WithdrawalPresentation) {
         Task {
             do {
                 let state = try await persistence.loadState()
-                let previous = AccountsService.dedicatedAccount(in: state.accounts)?.balance ?? 0
                 await MainActor.run {
-                    withdrawalShortfall = shortfall
-                    withdrawalPrevious = previous
-                    withdrawalNewBalance = previous - shortfall
+                    withdrawalShortfall = presentation.shortfall
+                    withdrawalPrevious = presentation.previousBalance
+                    withdrawalNewBalance = presentation.newBalance
                     withdrawalGoals = state.goals
                     showWithdrawal = true
-                    onWithdrawalRequested(shortfall)
+                    onWithdrawalRequested(presentation)
                 }
             } catch {
                 await MainActor.run {
-                    onWithdrawalRequested(shortfall)
+                    onWithdrawalRequested(presentation)
                 }
             }
         }

@@ -49,6 +49,18 @@ protocol LedgerEngine: Sendable {
         goal: Goal,
         now: Date
     ) throws -> PersistedAppState
+
+    /// Apply Withdrawal sheet Save and lock (PIP-107) — proportional reductions + History.
+    /// Completes the Sync/Update `.withdrawalRequired` path via `LedgerEngineCore.withdraw`.
+    func withdraw(
+        state: PersistedAppState,
+        shortfall: Paisa,
+        previousBalance: Paisa,
+        newBalance: Paisa,
+        reductions: [UUID: Paisa],
+        entryID: UUID,
+        now: Date
+    ) throws -> PersistedAppState
 }
 
 extension LedgerEngine {
@@ -187,6 +199,26 @@ struct StubLedgerEngine: LedgerEngine {
             to: state,
             entryID: entryID,
             goal: goal,
+            now: now
+        )
+    }
+
+    func withdraw(
+        state: PersistedAppState,
+        shortfall: Paisa,
+        previousBalance: Paisa,
+        newBalance: Paisa,
+        reductions: [UUID: Paisa],
+        entryID: UUID,
+        now: Date
+    ) throws -> PersistedAppState {
+        try LedgerEngineCore.withdraw(
+            to: state,
+            shortfall: shortfall,
+            previousBalance: previousBalance,
+            newBalance: newBalance,
+            reductions: reductions,
+            entryID: entryID,
             now: now
         )
     }

@@ -16,7 +16,7 @@ final class GoalsViewModel: ObservableObject {
     @Published var showUpdateBalanceSheet = false
     @Published var showSettings = false
     @Published var showCreditEntry = false
-    /// Withdrawal sheet (PIP-57) from Sync lower or Record a withdrawal.
+    /// Withdrawal sheet (PIP-107 / PIP-57) from Sync lower or Record a withdrawal.
     @Published var showWithdrawal = false
     /// Manual shortfall entry before Withdrawal (frame 18c).
     @Published var showRecordWithdrawal = false
@@ -196,15 +196,14 @@ final class GoalsViewModel: ObservableObject {
     }
 
     /// Lower-balance path (10b) → Withdrawal (18) with proportional default.
-    func handleWithdrawal(shortfall: Paisa) {
+    /// Uses tip `CreditProcessOutcome.withdrawalRequired` balances (PIP-102 / PIP-107).
+    func handleWithdrawal(_ presentation: WithdrawalPresentation) {
         showSyncSheet = false
         showUpdateBalanceSheet = false
-        let previous = AccountsService.dedicatedAccount(in: accounts)?.balance
-            ?? creditSyncViewModel.previousBalance
         presentWithdrawal(
-            shortfall: shortfall,
-            previousBalance: previous,
-            newBalance: previous - shortfall,
+            shortfall: presentation.shortfall,
+            previousBalance: presentation.previousBalance,
+            newBalance: presentation.newBalance,
             isManual: false
         )
     }

@@ -127,11 +127,69 @@ final class LedgerEngineTests: XCTestCase {
             createdAt: createdAt
         )
 
-        guard case .withdrawalRequired(let shortfall, _, _) = outcome else {
+        guard case .withdrawalRequired(let shortfall, let previous, let newBalance) = outcome else {
             return XCTFail("Expected withdrawal path")
         }
         XCTAssertEqual(shortfall, 1_000_000)
+        XCTAssertEqual(previous, 10_000_000)
+        XCTAssertEqual(newBalance, 9_000_000)
+        XCTAssertEqual(
+            outcome.withdrawalPresentation,
+            WithdrawalPresentation(
+                shortfall: 1_000_000,
+                previousBalance: 10_000_000,
+                newBalance: 9_000_000
+            )
+        )
         XCTAssertEqual(state.heldGoalChanges.count, 1)
+    }
+
+    /// PIP-107 — Sync/Update lower path completes via `StubLedgerEngine.withdraw` → History.
+    func testWithdrawalRequiredThenWithdrawViaEngineLocksHistory() throws {
+        let state = samplePostSetupState()
+        let outcome = try ledger.processBalanceUpdate(
+            state: state,
+            newBalance: 9_000_000,
+            dedicatedAccountID: hdfcID,
+            isTyped: false,
+            id: entryID,
+            createdAt: createdAt
+        )
+        guard let presentation = outcome.withdrawalPresentation else {
+            return XCTFail("Expected withdrawalPresentation from lower balance")
+        }
+
+        let reductions = WithdrawalService.proportionalReductions(
+            goals: state.goals,
+            shortfall: presentation.shortfall
+        )
+        XCTAssertEqual(reductions.values.reduce(0, +), presentation.shortfall)
+        XCTAssertTrue(
+            WithdrawalService.canSave(
+                reductions: reductions,
+                goals: state.goals,
+                shortfall: presentation.shortfall
+            )
+        )
+
+        let next = try ledger.withdraw(
+            state: state,
+            shortfall: presentation.shortfall,
+            previousBalance: presentation.previousBalance,
+            newBalance: presentation.newBalance,
+            reductions: reductions,
+            entryID: UUID(uuidString: "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDDD")!,
+            now: createdAt
+        )
+
+        XCTAssertEqual(next.accounts.first(where: \.isDedicated)?.balance, presentation.newBalance)
+        XCTAssertEqual(next.history.last?.type, .withdrawal)
+        XCTAssertEqual(next.history.last?.withdrawalAmount, presentation.shortfall)
+        XCTAssertTrue(next.history.last?.isLocked ?? false)
+        XCTAssertEqual(next.standingSplits, state.standingSplits)
+        // Credit was never written — Day-1 Sync block (F<P) holds until withdrawal completes.
+        XCTAssertNil(ledger.openCreditEntry(in: next.history))
+        XCTAssertFalse(ledger.isSyncOrUpdateBlocked(history: next.history))
     }
 
     // MARK: - No Sync while open
