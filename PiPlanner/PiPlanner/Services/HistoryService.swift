@@ -1,7 +1,11 @@
 import Foundation
 
-/// Pure History-tab presentation helpers (PIP-59 / frames 12 / 12a).
-/// Linux-testable without SwiftUI. Reuses writers’ `HistoryEntry` payloads unchanged.
+/// Pure History-tab presentation helpers (PIP-59 / PIP-104 / frames 12 / 12a).
+/// Linux-testable without SwiftUI. Reuses tip ledger `HistoryEntry` payloads unchanged.
+///
+/// PIP-104: newest-first list of saved/locked entries (read-only) plus open Assign-now
+/// credit; Typed / Custom list chips; open vs saved destination via tip `LedgerEngine` /
+/// `CreditEntryService` open-credit discovery (keep-both with PIP-102/103).
 enum HistoryService {
     /// Read-only caption on locked / opening entries (frame 12a).
     static let originalAmountsCaption = "Original amounts never change"
@@ -21,11 +25,28 @@ enum HistoryService {
         case readOnlyDetail
     }
 
+    /// List-row chips for New credit variants (PRD J6: Typed / Custom split).
+    enum RowBadge: String, Equatable, Sendable, CaseIterable {
+        case typed = "Typed"
+        case custom = "Custom"
+    }
+
     // MARK: - Ordering
 
-    /// Newest first (frame 12).
+    /// Newest first (frame 12 / PIP-104).
     static func sortedNewestFirst(_ history: [HistoryEntry]) -> [HistoryEntry] {
         history.sorted { $0.createdAt > $1.createdAt }
+    }
+
+    /// Saved/locked entries only (read-only list slice). Open Assign-now credits are
+    /// still shown in the full tab list via `sortedNewestFirst`.
+    static func savedEntries(in history: [HistoryEntry]) -> [HistoryEntry] {
+        sortedNewestFirst(history.filter { $0.isLocked || $0.type == .openingBalance })
+    }
+
+    /// Open (unlocked) New credit, if any — tip ledger discovery (PIP-102/103/98).
+    static func openCreditEntry(in history: [HistoryEntry]) -> HistoryEntry? {
+        CreditEntryService.openCreditEntry(in: history)
     }
 
     // MARK: - Labels / icons
@@ -43,6 +64,21 @@ enum HistoryService {
 
     static func typeLabel(for entry: HistoryEntry) -> String {
         typeLabel(for: entry.type)
+    }
+
+    /// List type label (PRD J6): distinguishes Custom split / Typed among New credits
+    /// while keeping Opening / Transfer / Withdrawal / Goal deleted labels unchanged.
+    static func listTypeLabel(for entry: HistoryEntry) -> String {
+        guard entry.type == .newCredit else {
+            return typeLabel(for: entry)
+        }
+        if showsCustomSplitBadge(entry) {
+            return "Custom split"
+        }
+        if showsTypedBadge(entry) {
+            return "Typed"
+        }
+        return typeLabel(for: entry)
     }
 
     /// SF Symbol name for the entry type icon (PIP-71 / Spec §3.3 catalog where applicable).
@@ -89,6 +125,32 @@ enum HistoryService {
     /// Custom-split badge when the saved this-credit % differs from suggested standing (PIP-103).
     static func showsCustomSplitBadge(_ entry: HistoryEntry) -> Bool {
         entry.type == .newCredit && entry.customSplit == true
+    }
+
+    /// List-row chips (PRD J6 / PIP-104). Custom wins over Typed for the primary
+    /// `listTypeLabel`; both may still appear as chips on locked credits.
+    static func rowBadges(for entry: HistoryEntry) -> [RowBadge] {
+        guard entry.type == .newCredit else { return [] }
+        var badges: [RowBadge] = []
+        if showsTypedBadge(entry) { badges.append(.typed) }
+        if showsCustomSplitBadge(entry) { badges.append(.custom) }
+        return badges
+    }
+
+    /// Titles for list chips. Omits a chip when `listTypeLabel` already names that
+    /// variant (e.g. "Custom split" → no "Custom" chip); keeps the other when both apply.
+    static func rowBadgeTitles(for entry: HistoryEntry) -> [String] {
+        let label = listTypeLabel(for: entry)
+        return rowBadges(for: entry).compactMap { badge in
+            switch badge {
+            case .custom where label == "Custom split":
+                return nil
+            case .typed where label == "Typed":
+                return nil
+            default:
+                return badge.rawValue
+            }
+        }
     }
 
     // MARK: - Amounts / subtitles

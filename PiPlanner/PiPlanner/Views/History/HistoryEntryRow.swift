@@ -1,9 +1,11 @@
 import SwiftUI
 
-/// Single History list row — type icon/label, lock when saved, amount, date (frame 12 / PIP-91).
+/// Single History list row — type icon/label, lock when saved, amount, date
+/// (frame 12 / PIP-91 / PIP-104).
 ///
 /// Visual-only: consumes `DesignTokens` / `PiColors` / `PiTypography` / `PiIcons` / `PiCard`.
 /// Open vs locked chrome differs; product destination logic stays in `HistoryTabView`.
+/// Typed / Custom chips surface PRD J6 New-credit variants on the list.
 struct HistoryEntryRow: View {
     let typeLabel: String
     let systemImageName: String
@@ -11,6 +13,7 @@ struct HistoryEntryRow: View {
     let dateLabel: String
     let amountLabel: String
     let showsLock: Bool
+    var badgeTitles: [String] = []
 
     /// Open (unlocked) credit rows get Assign-now accent chrome; locked rows show lock + quieter well.
     private var isOpenChrome: Bool { !showsLock }
@@ -35,6 +38,9 @@ struct HistoryEntryRow: View {
                                 .accessibilityLabel("Locked")
                                 .accessibilityIdentifier("history.row.lock")
                         }
+                    }
+                    if !badgeTitles.isEmpty {
+                        badgeRow
                     }
                     if let subtitle, !subtitle.isEmpty {
                         subtitleLabel(subtitle)
@@ -75,6 +81,23 @@ struct HistoryEntryRow: View {
                 Circle()
                     .fill(isOpenChrome ? PiColors.chipLightBlue : PiColors.chipLightBlue.opacity(0.55))
             )
+    }
+
+    private var badgeRow: some View {
+        HStack(spacing: DesignTokens.Space.s8) {
+            ForEach(badgeTitles, id: \.self) { title in
+                Text(title)
+                    .font(PiTypography.caption())
+                    .fontWeight(.semibold)
+                    .foregroundStyle(PiColors.chipLightBlueLabel)
+                    .padding(.horizontal, DesignTokens.Space.s8)
+                    .padding(.vertical, 4)
+                    .background(PiColors.chipLightBlue.opacity(0.85))
+                    .clipShape(RoundedRectangle(cornerRadius: DesignTokens.Radius.chip, style: .continuous))
+                    .accessibilityIdentifier("history.row.badge.\(title.lowercased())")
+            }
+        }
+        .accessibilityIdentifier("history.row.badges")
     }
 
     @ViewBuilder
@@ -140,6 +163,23 @@ struct HistoryEntryRow: View {
             dateLabel: "5 Oct 2026, 7:42 PM",
             amountLabel: "₹5,000",
             showsLock: true
+        )
+        .padding(DesignTokens.Space.s16)
+    }
+    .piPlannerTheme()
+}
+
+#Preview("Custom split + Typed") {
+    ZStack {
+        PiColors.backgroundApp.ignoresSafeArea()
+        HistoryEntryRow(
+            typeLabel: "Custom split",
+            systemImageName: PiIcons.newCredit,
+            subtitle: nil,
+            dateLabel: "5 Oct 2026, 8:10 PM",
+            amountLabel: "₹10,000",
+            showsLock: true,
+            badgeTitles: ["Typed"]
         )
         .padding(DesignTokens.Space.s16)
     }

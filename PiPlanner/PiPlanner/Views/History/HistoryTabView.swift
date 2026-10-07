@@ -1,11 +1,12 @@
 import SwiftUI
 
-/// History navigation — open credit vs read-only locked detail (PIP-59).
+/// History navigation — open credit vs read-only locked detail (PIP-59 / PIP-104).
 enum HistoryRoute: Hashable {
     case detail(UUID)
 }
 
-/// History tab — frames 12 / 12a (PIP-59). Newest first; open credit → edit; locked → read-only.
+/// History tab — frames 12 / 12a (PIP-59 / PIP-104).
+/// Newest first; open Assign-now credit → edit; saved/locked → read-only detail.
 struct HistoryTabView: View {
     @StateObject private var viewModel: HistoryViewModel
 
@@ -139,7 +140,8 @@ struct HistoryTabView: View {
             subtitle: viewModel.rowSubtitle(for: entry),
             dateLabel: viewModel.dateLabel(for: entry),
             amountLabel: viewModel.amountLabel(for: entry),
-            showsLock: viewModel.showsLockIcon(for: entry)
+            showsLock: viewModel.showsLockIcon(for: entry),
+            badgeTitles: viewModel.rowBadgeTitles(for: entry)
         )
         switch viewModel.destination(for: entry) {
         case .editableCredit:

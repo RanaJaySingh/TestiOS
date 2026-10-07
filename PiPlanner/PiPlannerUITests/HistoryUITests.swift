@@ -1,6 +1,6 @@
 import XCTest
 
-/// UI tests for History tab list / read-only (PIP-59).
+/// UI tests for History tab list / read-only (PIP-59 / PIP-104).
 /// Run on macOS with Xcode — Linux hosts cannot execute XCUITest.
 final class HistoryUITests: XCTestCase {
     private var app: XCUIApplication!
@@ -48,5 +48,29 @@ final class HistoryUITests: XCTestCase {
             app.staticTexts["Original amounts never change"].waitForExistence(timeout: 8)
                 || app.descendants(matching: .any)["history.detail.originalCaption"].waitForExistence(timeout: 8)
         )
+    }
+
+    /// PIP-104: History list is tappable; saved rows route to read-only detail.
+    func testHistoryListExistsAndSavedRowOpensDetail() {
+        let historyTab = app.tabBars.buttons["History"]
+        if historyTab.waitForExistence(timeout: 10) {
+            historyTab.tap()
+        } else if app.descendants(matching: .any)["tab.history"].waitForExistence(timeout: 10) {
+            app.descendants(matching: .any)["tab.history"].tap()
+        }
+
+        XCTAssertTrue(
+            app.descendants(matching: .any)["history.list"].waitForExistence(timeout: 10)
+                || app.staticTexts["Opening balance"].waitForExistence(timeout: 10)
+        )
+
+        let opening = app.staticTexts["Opening balance"]
+        if opening.waitForExistence(timeout: 8) {
+            opening.tap()
+            XCTAssertTrue(
+                app.descendants(matching: .any)["history.detail"].waitForExistence(timeout: 8)
+                    || app.staticTexts["Original amounts never change"].waitForExistence(timeout: 8)
+            )
+        }
     }
 }
