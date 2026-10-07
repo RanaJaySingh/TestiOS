@@ -4,7 +4,7 @@ Ticket: https://linear.app/telco-paytm/issue/PIP-53/ios-implement-delete-goal-fl
 
 ## Delivered
 
-Delete goal reassignment under `PiPlanner/Views/Goals/DeleteGoalView.swift` (+ `DeleteGoalFlow` entry), `DeleteGoalViewModel`, pure `DeleteGoalService` + shared `StandingSplitService` (Linux-testable), History `goalDeleted` / “deleted / moved” entry, standing-split renormalization, only-goal gate (17e), mid-delete create with equal standing reset (17d). Goal detail Delete button wires to the real flow (replaces `GoalDeleteStubView`).
+Delete goal reassignment under `PiPlanner/Views/Goals/DeleteGoalView.swift` (+ `DeleteGoalFlow` entry), `DeleteGoalViewModel`, pure `DeleteGoalService`, History `goalDeleted` / “deleted / moved” entry, standing-split renormalization via shared `StandingSplitService`, only-goal gate (17e), mid-delete create with equal standing reset (17d). Goal detail Delete button wires to the real flow (replaces `GoalDeleteStubView`).
 
 ## Mapping to Spec / PRD
 
@@ -12,7 +12,7 @@ Delete goal reassignment under `PiPlanner/Views/Goals/DeleteGoalView.swift` (+ `
 |-------------|----------------|
 | R13 / BR-9 Delete reassigns money | `DeleteGoalService.applyDeletion` — equal default, edit once, confirm |
 | BR-2 splits total 100% | Reuses `OpeningSplitService` validation / paisa allocation |
-| Standing split renormalises | `StandingSplitService.renormalize` (shared with PIP-51) |
+| Standing split renormalises | `StandingSplitService.renormalize` (additive on PIP-51 service) |
 | Only-goal gate 17e | `requiresReplacement` / phase `.onlyGoalGate`; confirm disabled |
 | Mid-delete create 17d | `addGoalDuringDelete(resetStandingToEqual:)` |
 | History deleted / moved | Locked `HistoryEntryType.goalDeleted`; label via `DeleteGoalService.historyTitle` |
@@ -29,13 +29,14 @@ Delete goal reassignment under `PiPlanner/Views/Goals/DeleteGoalView.swift` (+ `
 - [x] States: Reassign default, Reassign edit, Confirm, Only-goal gate
 - [x] Tests: Unit test for money reassignment and renormalization
 
-## Parallel work / rebase note
+## Parallel work / merge order
 
-Rebased onto `main` @ `93e6284` (PIP-49 Goal detail/edit merge). Kept PIP-49’s real `GoalDetailView`; replaced only the Delete stub destination with `DeleteGoalFlow`. Transfer stub unchanged.
+**Stacks on PR #12 (PIP-51).** Branch is rebased onto `cursor/pip-51-standing-split-ba09` @ `98297e6`. PR base remains `main`; **merge after #12** so the diff shrinks to PIP-53-only once Standing split lands.
 
-- **PIP-49:** Delete button already navigates `GoalDetailRoute.delete` — hook is the destination swap + `allGoals` on `GoalDetailViewModel` for reassignment targets.
-- **PIP-51 Standing split:** Use `StandingSplitService` (`equalSplits` / `renormalize` / `applyShares`) rather than duplicating math.
-- **PIP-47:** Do not introduce `Credit*` file names (none added here).
+- Kept PIP-51 `StandingSplitService` as the single source of truth; added Delete helpers (`equalSplits` / `equalFractions` / `renormalize` / `applyShares` / UUID `equalDisplayPercents`).
+- Kept PIP-47 `Credit*` sheets and PIP-51 Settings → Standing split entry in `GoalsTabView` / `SettingsView` (additive only).
+- Goal detail Delete destination → `DeleteGoalFlow`; `allGoals` seeded from Goals tab.
+- No second `StandingSplitService` type/file; `project.pbxproj` has one StandingSplitService entry set (PIP-51 IDs).
 
 ## How to run tests
 
@@ -53,4 +54,4 @@ swift test
 
 ## Out of scope
 
-Transfer UI; Standing split screen (PIP-51); credit entry; rewriting Goal detail wholesale.
+Transfer UI; Standing split screen ownership (PIP-51); credit entry ownership (PIP-47); rewriting Goal detail wholesale.
