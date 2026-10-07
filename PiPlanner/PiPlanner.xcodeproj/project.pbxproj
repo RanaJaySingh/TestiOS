@@ -183,7 +183,9 @@
 		T55F0005EEA24F56B29EBB6A /* TransferViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferViewModelTests.swift; sourceTree = "<group>"; };
 		P1060002EEA24F56B29EBB6A /* DeleteGoalViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteGoalViewModelTests.swift; sourceTree = "<group>"; };
 		P1060004EEA24F56B29EBB6A /* TransferDeleteRedistributionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferDeleteRedistributionTests.swift; sourceTree = "<group>"; };
+		C98F0001EEA24F56B29EBB6A /* LedgerEngineCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LedgerEngineCore.swift; sourceTree = "<group>"; };
 		C98F0002EEA24F56B29EBB6A /* LedgerEngineCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LedgerEngineCoreTests.swift; sourceTree = "<group>"; };
+		L99F0001EEA24F56B29EBB6A /* LedgerFacade.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LedgerFacade.swift; sourceTree = "<group>"; };
 		H59F0001EEA24F56B29EBB6A /* HistoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryService.swift; sourceTree = "<group>"; };
 		H59F0002EEA24F56B29EBB6A /* HistoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryViewModel.swift; sourceTree = "<group>"; };
 		H59F0003EEA24F56B29EBB6A /* HistoryEntryRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryEntryRow.swift; sourceTree = "<group>"; };
