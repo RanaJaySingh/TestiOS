@@ -16,14 +16,22 @@ final class GoalsViewModel: ObservableObject {
     @Published var showUpdateBalanceSheet = false
     @Published var showSettings = false
     @Published var showCreditEntry = false
+    /// Withdrawal sheet (PIP-57) from Sync lower or Record a withdrawal.
+    @Published var showWithdrawal = false
+    /// Manual shortfall entry before Withdrawal (frame 18c).
+    @Published var showRecordWithdrawal = false
     /// Selected goal for navigation to GoalDetailView.
     @Published var selectedGoalID: UUID?
     /// Open New credit entry pending assignment (frame 9b).
     @Published private(set) var openEntry: HistoryEntry?
     @Published private(set) var openEntryBannerMessage: String?
-    @Published private(set) var withdrawalStubMessage: String?
     /// Entry presented in CreditEntryView after Sync/Update Continue or Assign now.
     @Published private(set) var activeCreditEntry: HistoryEntry?
+    /// Active withdrawal context for WithdrawalView.
+    @Published private(set) var activeWithdrawalShortfall: Paisa?
+    @Published private(set) var activeWithdrawalPrevious: Paisa?
+    @Published private(set) var activeWithdrawalNewBalance: Paisa?
+    @Published private(set) var activeWithdrawalIsManual = false
 
     /// Shared persistence for Goal detail / edit (PIP-49), credit sheets (PIP-47), and Standing split (PIP-51).
     let persistence: any PersistenceServicing
@@ -174,13 +182,67 @@ final class GoalsViewModel: ObservableObject {
         Task { await load() }
     }
 
-    /// Lower-balance stub (full Withdrawal UI is a separate ticket).
-    func handleWithdrawalStub(shortfall: Paisa) {
+    /// Lower-balance path (10b) → Withdrawal (18) with proportional default.
+    func handleWithdrawal(shortfall: Paisa) {
         showSyncSheet = false
         showUpdateBalanceSheet = false
-        let formatted = formatting.formatINR(paisa: shortfall)
-        withdrawalStubMessage = "Withdrawal stub: shortfall \(formatted) (full UI in a later ticket)."
+        let previous = AccountsService.dedicatedAccount(in: accounts)?.balance
+            ?? creditSyncViewModel.previousBalance
+        presentWithdrawal(
+            shortfall: shortfall,
+            previousBalance: previous,
+            newBalance: previous - shortfall,
+            isManual: false
+        )
+    }
+
+    /// Manual "Record a withdrawal" (18c).
+    func openRecordWithdrawal() {
+        guard hasGoals, totalSavingsPaisa > 0 else {
+            infoMessage = "Nothing to withdraw yet."
+            return
+        }
+        infoMessage = nil
+        showRecordWithdrawal = true
+    }
+
+    func presentWithdrawal(
+        shortfall: Paisa,
+        previousBalance: Paisa,
+        newBalance: Paisa,
+        isManual: Bool
+    ) {
+        activeWithdrawalShortfall = shortfall
+        activeWithdrawalPrevious = previousBalance
+        activeWithdrawalNewBalance = newBalance
+        activeWithdrawalIsManual = isManual
+        showRecordWithdrawal = false
+        showSyncSheet = false
+        showUpdateBalanceSheet = false
+        showWithdrawal = true
+    }
+
+    func continueRecordWithdrawal(shortfall: Paisa, newBalance: Paisa) {
+        let previous = AccountsService.dedicatedAccount(in: accounts)?.balance ?? previousBalanceFallback
+        presentWithdrawal(
+            shortfall: shortfall,
+            previousBalance: previous,
+            newBalance: newBalance,
+            isManual: true
+        )
+    }
+
+    func withdrawalFinished() {
+        showWithdrawal = false
+        activeWithdrawalShortfall = nil
+        activeWithdrawalPrevious = nil
+        activeWithdrawalNewBalance = nil
+        activeWithdrawalIsManual = false
         Task { await load() }
+    }
+
+    private var previousBalanceFallback: Paisa {
+        AccountsService.dedicatedAccount(in: accounts)?.balance ?? 0
     }
 
     /// After Sync/Update sheet closes without navigating to credit entry.

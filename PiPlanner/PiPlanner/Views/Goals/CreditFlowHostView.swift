@@ -10,7 +10,7 @@ struct CreditFlowHostView: View {
     var formatting: any FormattingServicing = FormattingService()
     /// Consent On → Sync; Consent Off → Update balance.
     var prefersSync: Bool = true
-    /// Stub navigation when lower balance is detected (Withdrawal UI is a separate ticket).
+    /// Called when lower balance is detected (host may present Withdrawal).
     var onWithdrawalRequested: (Paisa) -> Void = { _ in }
 
     @StateObject private var syncViewModel: CreditSyncViewModel
@@ -20,7 +20,11 @@ struct CreditFlowHostView: View {
     @State private var showSyncSheet = false
     @State private var showUpdateSheet = false
     @State private var showCreditEntry = false
-    @State private var withdrawalMessage: String?
+    @State private var showWithdrawal = false
+    @State private var withdrawalShortfall: Paisa?
+    @State private var withdrawalPrevious: Paisa?
+    @State private var withdrawalNewBalance: Paisa?
+    @State private var withdrawalGoals: [Goal] = []
     @State private var bannerMessage: String?
     @State private var syncBlocked = false
 
@@ -78,13 +82,6 @@ struct CreditFlowHostView: View {
             .disabled(syncBlocked)
             .accessibilityIdentifier(prefersSync ? "creditHost.sync" : "creditHost.update")
 
-            if let withdrawalMessage {
-                Text(withdrawalMessage)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .accessibilityIdentifier("creditHost.withdrawalStub")
-            }
-
             Text("PIP-47 credit flow host — Goals tab can present these sheets.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -128,6 +125,25 @@ struct CreditFlowHostView: View {
                 }
             }
         }
+        .sheet(isPresented: $showWithdrawal) {
+            NavigationStack {
+                if let shortfall = withdrawalShortfall,
+                   let previous = withdrawalPrevious,
+                   let newBalance = withdrawalNewBalance {
+                    WithdrawalFlow(
+                        shortfall: shortfall,
+                        previousBalance: previous,
+                        newBalance: newBalance,
+                        goals: withdrawalGoals,
+                        persistence: persistence,
+                        formatting: formatting
+                    ) {
+                        showWithdrawal = false
+                        Task { await refreshBanner() }
+                    }
+                }
+            }
+        }
     }
 
     private func presentCreditEntry(_ entry: HistoryEntry) {
@@ -154,9 +170,24 @@ struct CreditFlowHostView: View {
     }
 
     private func handleWithdrawal(_ shortfall: Paisa) {
-        let formatted = formatting.formatINR(paisa: shortfall)
-        withdrawalMessage = "Withdrawal stub: shortfall \(formatted) (full UI in a later ticket)."
-        onWithdrawalRequested(shortfall)
+        Task {
+            do {
+                let state = try await persistence.loadState()
+                let previous = AccountsService.dedicatedAccount(in: state.accounts)?.balance ?? 0
+                await MainActor.run {
+                    withdrawalShortfall = shortfall
+                    withdrawalPrevious = previous
+                    withdrawalNewBalance = previous - shortfall
+                    withdrawalGoals = state.goals
+                    showWithdrawal = true
+                    onWithdrawalRequested(shortfall)
+                }
+            } catch {
+                await MainActor.run {
+                    onWithdrawalRequested(shortfall)
+                }
+            }
+        }
     }
 
     private func refreshBanner() async {

@@ -28,19 +28,18 @@ struct GoalsTabView: View {
                 )
                 .accessibilityIdentifier("goals.balanceCard")
 
-                if let withdrawal = viewModel.withdrawalStubMessage {
-                    Text(withdrawal)
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                        .accessibilityIdentifier("goals.withdrawalStub")
-                }
-
                 if let info = viewModel.infoMessage {
                     Text(info)
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                         .accessibilityIdentifier("goals.info")
                 }
+
+                Button("Record a withdrawal") {
+                    viewModel.openRecordWithdrawal()
+                }
+                .font(.subheadline)
+                .accessibilityIdentifier("goals.recordWithdrawal")
 
                 goalsSection
             }
@@ -93,7 +92,7 @@ struct GoalsTabView: View {
                     viewModel.presentCreditEntry(entry)
                 },
                 onWithdrawal: { shortfall in
-                    viewModel.handleWithdrawalStub(shortfall: shortfall)
+                    viewModel.handleWithdrawal(shortfall: shortfall)
                 },
                 onDismiss: { viewModel.showSyncSheet = false }
             )
@@ -107,7 +106,11 @@ struct GoalsTabView: View {
                     viewModel.presentCreditEntry(entry)
                 },
                 onWithdrawal: { shortfall in
-                    viewModel.handleWithdrawalStub(shortfall: shortfall)
+                    viewModel.handleWithdrawal(shortfall: shortfall)
+                },
+                onRecordWithdrawal: {
+                    viewModel.showUpdateBalanceSheet = false
+                    viewModel.openRecordWithdrawal()
                 },
                 onDismiss: { viewModel.showUpdateBalanceSheet = false }
             )
@@ -126,6 +129,39 @@ struct GoalsTabView: View {
                         )
                     ) {
                         viewModel.showCreditEntry = false
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $viewModel.showRecordWithdrawal) {
+            RecordWithdrawalSheet(
+                previousBalance: viewModel.totalSavingsPaisa,
+                goals: viewModel.goals,
+                persistence: viewModel.persistence,
+                formatting: viewModel.formatting,
+                onContinue: { shortfall, newBalance in
+                    viewModel.continueRecordWithdrawal(shortfall: shortfall, newBalance: newBalance)
+                },
+                onDismiss: { viewModel.showRecordWithdrawal = false }
+            )
+        }
+        .sheet(isPresented: $viewModel.showWithdrawal, onDismiss: {
+            viewModel.withdrawalFinished()
+        }) {
+            NavigationStack {
+                if let shortfall = viewModel.activeWithdrawalShortfall,
+                   let previous = viewModel.activeWithdrawalPrevious,
+                   let newBalance = viewModel.activeWithdrawalNewBalance {
+                    WithdrawalFlow(
+                        shortfall: shortfall,
+                        previousBalance: previous,
+                        newBalance: newBalance,
+                        goals: viewModel.goals,
+                        persistence: viewModel.persistence,
+                        formatting: viewModel.formatting,
+                        isManualRecord: viewModel.activeWithdrawalIsManual
+                    ) {
+                        viewModel.showWithdrawal = false
                     }
                 }
             }
