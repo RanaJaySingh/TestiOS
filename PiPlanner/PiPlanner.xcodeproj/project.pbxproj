@@ -134,6 +134,7 @@
 		A45B000FBD814941ABD3C921 /* GoalsTabUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45F000FEEA24F56B29EBB6A /* GoalsTabUITests.swift */; };
 		D47A0010BD814941ABD3C921 /* CreditEntryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47A0011EEA24F56B29EBB6A /* CreditEntryService.swift */; };
 		F1020001BD814941ABD3C921 /* LedgerEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1020002EEA24F56B29EBB6A /* LedgerEngine.swift */; };
+		C98B0001BD814941ABD3C921 /* LedgerEngineCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C98F0001EEA24F56B29EBB6A /* LedgerEngineCore.swift */; };
 		D47A0012BD814941ABD3C921 /* CreditSyncViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47A0013EEA24F56B29EBB6A /* CreditSyncViewModel.swift */; };
 		D47A0014BD814941ABD3C921 /* CreditUpdateBalanceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47A0015EEA24F56B29EBB6A /* CreditUpdateBalanceViewModel.swift */; };
 		D47A0016BD814941ABD3C921 /* CreditEntryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47A0017EEA24F56B29EBB6A /* CreditEntryViewModel.swift */; };
@@ -144,6 +145,7 @@
 		D47A0020BD814941ABD3C921 /* CreditFlowHostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47A0021EEA24F56B29EBB6A /* CreditFlowHostView.swift */; };
 		D47A0022BD814941ABD3C921 /* CreditEntryServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47A0023EEA24F56B29EBB6A /* CreditEntryServiceTests.swift */; };
 		F1020003BD814941ABD3C921 /* LedgerEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1020004EEA24F56B29EBB6A /* LedgerEngineTests.swift */; };
+		C98B0002BD814941ABD3C921 /* LedgerEngineCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C98F0002EEA24F56B29EBB6A /* LedgerEngineCoreTests.swift */; };
 		B51B0001BD814941ABD3C921 /* StandingSplitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51A0001EEA24F56B29EBB6A /* StandingSplitService.swift */; };
 		B51B0002BD814941ABD3C921 /* StandingSplitViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51A0002EEA24F56B29EBB6A /* StandingSplitViewModel.swift */; };
 		B51B0003BD814941ABD3C921 /* StandingSplitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51A0003EEA24F56B29EBB6A /* StandingSplitView.swift */; };
@@ -407,6 +409,7 @@
 				A45F0001EEA24F56B29EBB6A /* GoalsTabService.swift */,
 				D47A0011EEA24F56B29EBB6A /* CreditEntryService.swift */,
 				F1020002EEA24F56B29EBB6A /* LedgerEngine.swift */,
+				C98F0001EEA24F56B29EBB6A /* LedgerEngineCore.swift */,
 				B51A0001EEA24F56B29EBB6A /* StandingSplitService.swift */,
 				391854E68EAC46CDA39D0B3B /* AppLaunchRouter.swift */,
 			);
@@ -582,6 +585,7 @@
 				99B5A5E93DC14F1EB79CF38A /* PersistenceServiceTests.swift */,
 				D47A0023EEA24F56B29EBB6A /* CreditEntryServiceTests.swift */,
 				F1020004EEA24F56B29EBB6A /* LedgerEngineTests.swift */,
+				C98F0002EEA24F56B29EBB6A /* LedgerEngineCoreTests.swift */,
 				40BC3302B98D49298CC4A151 /* OpeningSplitServiceTests.swift */,
 				L1010002EEA24F56B29EBB6A /* StubLedgerServiceTests.swift */,
 				442B1016E1AC4C9BB48B1357 /* OpeningSplitViewModelTests.swift */,
@@ -832,6 +836,7 @@
 				A45B000CBD814941ABD3C921 /* SettingsView.swift in Sources */,
 				D47A0010BD814941ABD3C921 /* CreditEntryService.swift in Sources */,
 				F1020001BD814941ABD3C921 /* LedgerEngine.swift in Sources */,
+				C98B0001BD814941ABD3C921 /* LedgerEngineCore.swift in Sources */,
 				D47A0012BD814941ABD3C921 /* CreditSyncViewModel.swift in Sources */,
 				D47A0014BD814941ABD3C921 /* CreditUpdateBalanceViewModel.swift in Sources */,
 				D47A0016BD814941ABD3C921 /* CreditEntryViewModel.swift in Sources */,
@@ -887,6 +892,7 @@
 				A45B000EBD814941ABD3C921 /* GoalsViewModelTests.swift in Sources */,
 				D47A0022BD814941ABD3C921 /* CreditEntryServiceTests.swift in Sources */,
 				F1020003BD814941ABD3C921 /* LedgerEngineTests.swift in Sources */,
+				C98B0002BD814941ABD3C921 /* LedgerEngineCoreTests.swift in Sources */,
 				B51B0004BD814941ABD3C921 /* StandingSplitServiceTests.swift in Sources */,
 				B51B0005BD814941ABD3C921 /* StandingSplitViewModelTests.swift in Sources */,
 			);
