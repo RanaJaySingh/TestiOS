@@ -31,7 +31,7 @@ final class TransferServiceTests: XCTestCase {
 
     func testOverAmountDisablesMove() {
         let goals = sampleGoals()
-        let amount = 7_000_000 // Car has 6_000_000
+        let amount: Paisa = 7_000_000 // Car has 6_000_000
         XCTAssertTrue(
             TransferService.isOverAmount(amountPaisa: amount, fromSaved: 6_000_000)
         )
