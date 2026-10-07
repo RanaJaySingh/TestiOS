@@ -1,6 +1,7 @@
 import SwiftUI
 
 /// Goal chat — design frames 5 / 5a / 5b / 5c, with form hand-off (6) and goals-defined Continue.
+/// Visual parity (PIP-79): tokens + ProposalCard / PiCard / PrimaryCTA / SecondaryCTA only.
 struct GoalChatView: View {
     @ObservedObject var viewModel: GoalChatViewModel
     var onContinueToOpeningSplit: () -> Void
@@ -23,7 +24,7 @@ struct GoalChatView: View {
     private var chatBody: some View {
         VStack(spacing: 0) {
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: DesignTokens.Space.s16) {
                     ForEach(viewModel.messages) { message in
                         messageBubble(message)
                     }
@@ -40,7 +41,7 @@ struct GoalChatView: View {
                         goalsDefinedSection
                     }
                 }
-                .padding()
+                .padding(DesignTokens.Space.s20)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
 
@@ -50,6 +51,7 @@ struct GoalChatView: View {
                 composer
             }
         }
+        .background(PiColors.backgroundApp.ignoresSafeArea())
         .navigationTitle("Goals")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -58,24 +60,26 @@ struct GoalChatView: View {
                     Button("Use a form") {
                         viewModel.useFormPath()
                     }
+                    .font(PiTypography.body())
+                    .foregroundStyle(PiColors.navyPrimary)
                     .accessibilityLabel("Use a form")
                 }
             }
         }
+        .piPlannerTheme()
     }
 
     private func messageBubble(_ message: GoalChatMessage) -> some View {
         HStack {
             if message.role == .user { Spacer(minLength: 40) }
             Text(message.text)
-                .font(.body)
-                .padding(12)
-                .background(
-                    message.role == .user
-                        ? Color.accentColor.opacity(0.15)
-                        : Color(.secondarySystemBackground)
+                .font(PiTypography.body())
+                .foregroundStyle(message.role == .user ? PiColors.chipLightBlueLabel : .primary)
+                .padding(DesignTokens.Space.s12)
+                .background(bubbleBackground(for: message.role))
+                .clipShape(
+                    RoundedRectangle(cornerRadius: DesignTokens.Radius.card, style: .continuous)
                 )
-                .clipShape(RoundedRectangle(cornerRadius: 14))
                 .accessibilityLabel(
                     message.role == .user
                         ? "You: \(message.text)"
@@ -85,179 +89,162 @@ struct GoalChatView: View {
         }
     }
 
-    private var proposalCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Suggested goals")
-                .font(.headline)
-                .accessibilityAddTraits(.isHeader)
-
-            ForEach(viewModel.proposals) { proposal in
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(proposal.name)
-                            .font(.body)
-                            .fontWeight(.semibold)
-                        Text(
-                            viewModel.formatINR(paisa: proposal.suggestedTarget ?? 0)
-                        )
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                        .monospacedDigit()
-                    }
-                    Spacer()
-                    Text("\(GoalValidationService.displayPercent(fromFraction: proposal.sharePercentage))%")
-                        .font(.title3)
-                        .fontWeight(.semibold)
-                        .monospacedDigit()
-                }
-                .accessibilityElement(children: .combine)
-            }
-
-            Text(viewModel.checkedByLabel)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .accessibilityLabel(viewModel.checkedByLabel)
-
-            HStack(spacing: 12) {
-                Button("Edit") {
-                    viewModel.editProposals()
-                }
-                .buttonStyle(.bordered)
-                .accessibilityLabel("Edit proposal")
-
-                Button("Confirm") {
-                    viewModel.confirmProposals()
-                }
-                .buttonStyle(.borderedProminent)
-                .accessibilityLabel("Confirm proposal")
-            }
+    private func bubbleBackground(for role: GoalChatMessage.Role) -> Color {
+        switch role {
+        case .user:
+            return PiColors.chipLightBlue
+        case .assistant:
+            return PiColors.surfaceCard
         }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+    }
+
+    /// Shared ProposalCard shell — title / summary / checked-by / Edit·Confirm (PRD R9).
+    private var proposalCard: some View {
+        ProposalCard(
+            title: "Grok's proposal",
+            summary: proposalSummary,
+            checkedByLabel: viewModel.checkedByLabel,
+            onEdit: { viewModel.editProposals() },
+            onConfirm: { viewModel.confirmProposals() }
+        )
         .accessibilityElement(children: .contain)
     }
 
-    private var unavailableCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Grok unavailable")
-                .font(.headline)
-                .accessibilityAddTraits(.isHeader)
-            Text("You can keep going with a hand form. Ledger rules still apply.")
-                .font(.body)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-            Button("Use a form") {
-                viewModel.useFormPath()
-            }
-            .buttonStyle(.borderedProminent)
-            .accessibilityLabel("Use a form")
+    private var proposalSummary: String {
+        viewModel.formattedProposals.map { proposal, target in
+            let percent = GoalValidationService.displayPercent(fromFraction: proposal.sharePercentage)
+            return "\(proposal.name) · \(target) · \(percent)%"
         }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .joined(separator: "\n")
+    }
+
+    private var unavailableCard: some View {
+        PiCard(padding: DesignTokens.Space.s16) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s12) {
+                Text("Grok unavailable")
+                    .font(PiTypography.title())
+                    .accessibilityAddTraits(.isHeader)
+                Text("You can keep going with a hand form. Ledger rules still apply.")
+                    .font(PiTypography.body())
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                PrimaryCTA(title: "Use a form", action: { viewModel.useFormPath() })
+                    .accessibilityLabel("Use a form")
+            }
+        }
     }
 
     private var goalsDefinedSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Goals defined")
-                .font(.headline)
-                .accessibilityAddTraits(.isHeader)
+        PiCard(padding: DesignTokens.Space.s16) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s12) {
+                Text("Goals defined")
+                    .font(PiTypography.title())
+                    .accessibilityAddTraits(.isHeader)
 
-            ForEach(viewModel.definedGoals) { goal in
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(goal.name)
-                            .font(.body)
-                            .fontWeight(.semibold)
-                        Text(viewModel.formatINR(paisa: goal.targetAmount))
-                            .font(.callout)
+                ForEach(viewModel.definedGoals) { goal in
+                    HStack {
+                        VStack(alignment: .leading, spacing: DesignTokens.Space.s8 / 2) {
+                            Text(goal.name)
+                                .font(PiTypography.body())
+                                .fontWeight(.semibold)
+                            Text(viewModel.formatINR(paisa: goal.targetAmount))
+                                .font(PiTypography.caption())
+                                .foregroundStyle(.secondary)
+                                .monospacedDigit()
+                        }
+                        Spacer()
+                        TextField(
+                            "%",
+                            value: Binding(
+                                get: {
+                                    GoalValidationService.displayPercent(
+                                        fromFraction: goal.shareOfNewCredits
+                                    )
+                                },
+                                set: { viewModel.updateShare(for: goal.id, displayPercent: $0) }
+                            ),
+                            format: .number
+                        )
+                        .keyboardType(.numberPad)
+                        .multilineTextAlignment(.trailing)
+                        .font(PiTypography.title())
+                        .monospacedDigit()
+                        .frame(width: 56)
+                        .accessibilityLabel("\(goal.name) share percent")
+                        Text("%")
+                            .font(PiTypography.body())
                             .foregroundStyle(.secondary)
-                            .monospacedDigit()
+                        Button("Edit") {
+                            viewModel.editDefinedGoal(goal)
+                        }
+                        .font(PiTypography.caption())
+                        .fontWeight(.semibold)
+                        .foregroundStyle(PiColors.navyPrimary)
                     }
-                    Spacer()
-                    TextField(
-                        "%",
-                        value: Binding(
-                            get: {
-                                GoalValidationService.displayPercent(
-                                    fromFraction: goal.shareOfNewCredits
-                                )
-                            },
-                            set: { viewModel.updateShare(for: goal.id, displayPercent: $0) }
-                        ),
-                        format: .number
-                    )
-                    .keyboardType(.numberPad)
-                    .multilineTextAlignment(.trailing)
-                    .frame(width: 56)
-                    .accessibilityLabel("\(goal.name) share percent")
-                    Text("%")
-                        .foregroundStyle(.secondary)
-                    Button("Edit") {
-                        viewModel.editDefinedGoal(goal)
-                    }
-                    .font(.subheadline)
                 }
-            }
 
-            if let reason = viewModel.continueDisabledReason {
-                Text(reason)
-                    .font(.footnote)
-                    .foregroundStyle(.orange)
-                    .fixedSize(horizontal: false, vertical: true)
-            } else {
-                Text("Shares total 100%. Continue to Opening split.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-            }
+                if let reason = viewModel.continueDisabledReason {
+                    Text(reason)
+                        .font(PiTypography.caption())
+                        .foregroundStyle(PiColors.behind)
+                        .fixedSize(horizontal: false, vertical: true)
+                } else {
+                    Text("Shares total 100%. Continue to Opening split.")
+                        .font(PiTypography.caption())
+                        .foregroundStyle(.secondary)
+                }
 
-            Button {
-                viewModel.continueToOpeningSplit()
-            } label: {
-                Text("Continue")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
+                PrimaryCTA(
+                    title: "Continue",
+                    isEnabled: viewModel.canContinue,
+                    action: { viewModel.continueToOpeningSplit() }
+                )
+                .accessibilityLabel("Continue")
+                .accessibilityHint(
+                    viewModel.canContinue
+                        ? "Continues to Opening split"
+                        : "Disabled until goal shares total 100 percent"
+                )
             }
-            .buttonStyle(.borderedProminent)
-            .disabled(!viewModel.canContinue)
-            .accessibilityLabel("Continue")
-            .accessibilityHint(
-                viewModel.canContinue
-                    ? "Continues to Opening split"
-                    : "Disabled until goal shares total 100 percent"
-            )
         }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 14))
     }
 
     private var composer: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: DesignTokens.Space.s8) {
             Divider()
-            HStack(spacing: 10) {
+            HStack(spacing: DesignTokens.Space.s12) {
                 TextField("Describe your goals…", text: $viewModel.draftInput, axis: .vertical)
                     .lineLimit(1...4)
-                    .textFieldStyle(.roundedBorder)
+                    .font(PiTypography.body())
+                    .padding(.horizontal, DesignTokens.Space.s12)
+                    .padding(.vertical, DesignTokens.Space.s8)
+                    .background(PiColors.surfaceCard)
+                    .clipShape(
+                        RoundedRectangle(cornerRadius: DesignTokens.Radius.chip, style: .continuous)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: DesignTokens.Radius.chip, style: .continuous)
+                            .strokeBorder(PiColors.navyPrimary.opacity(0.18), lineWidth: 1)
+                    )
                     .accessibilityLabel("Goal description")
                 Button {
                     viewModel.sendDraft()
                 } label: {
                     Image(systemName: "arrow.up.circle.fill")
                         .font(.title2)
+                        .foregroundStyle(
+                            viewModel.canSend
+                                ? PiColors.navyPrimary
+                                : PiColors.navyPrimary.opacity(0.35)
+                        )
                 }
                 .disabled(!viewModel.canSend)
                 .accessibilityLabel("Send")
             }
-            .padding(.horizontal)
-            .padding(.vertical, 10)
+            .padding(.horizontal, DesignTokens.Space.s16)
+            .padding(.vertical, DesignTokens.Space.s12)
         }
-        .background(.bar)
+        .background(PiColors.surfaceCard)
     }
 }
 
