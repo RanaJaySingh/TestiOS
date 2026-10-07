@@ -97,7 +97,23 @@ struct GoalDetailView: View {
             case .transfer:
                 GoalTransferStubView(goalName: viewModel.navigationTitle)
             case .delete:
-                GoalDeleteStubView(goalName: viewModel.navigationTitle)
+                // PIP-53: real Delete flow. Keep GoalDetailView otherwise unchanged.
+                if let goal = viewModel.goal, let persistence {
+                    DeleteGoalFlow(
+                        goal: goal,
+                        goals: viewModel.allGoals.isEmpty ? [goal] : viewModel.allGoals,
+                        persistence: persistence,
+                        formatting: formatting,
+                        onDeleted: {
+                            Task { await viewModel.refresh() }
+                        }
+                    )
+                } else {
+                    Text("Delete requires a saved goal and persistence.")
+                        .foregroundStyle(.secondary)
+                        .padding()
+                        .accessibilityIdentifier("goals.delete.unavailable")
+                }
             }
         }
         .overlay(alignment: .bottom) {
@@ -277,27 +293,6 @@ struct GoalTransferStubView: View {
         .navigationTitle("Transfer")
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier("goals.transfer.stub")
-    }
-}
-
-/// Stub Delete destination — full flow is a separate ticket.
-struct GoalDeleteStubView: View {
-    let goalName: String
-
-    var body: some View {
-        VStack(spacing: 12) {
-            Text("Delete goal")
-                .font(.title2)
-                .fontWeight(.semibold)
-            Text("Delete \(goalName) and reassign saved money. Full Delete flow arrives in a later ticket.")
-                .font(.body)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-        }
-        .padding()
-        .navigationTitle("Delete")
-        .navigationBarTitleDisplayMode(.inline)
-        .accessibilityIdentifier("goals.delete.stub")
     }
 }
 

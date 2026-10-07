@@ -1,9 +1,10 @@
 import Foundation
 
 /// Standing split validation and persistence helpers (PRD R12, Spec BR-2 / BR-4, frame 15).
+/// Also hosts Delete reassignment helpers (PIP-53 / BR-9): equal split + renormalize after remove.
 ///
 /// Standing split sets default shares for the *next* credit. Saved amounts on goals are never
-/// rewritten here ("Saved money stays put").
+/// rewritten by `applyStandingSplit` ("Saved money stays put").
 enum StandingSplitService {
     /// Frame 15 copy — edits do not move money already locked to goals.
     static let savedMoneyStaysPutMessage = "Saved money stays put"
@@ -165,16 +166,94 @@ enum StandingSplitService {
     }
 
     static func equalDisplayPercents(for goals: [Goal]) -> [UUID: Int] {
-        guard !goals.isEmpty else { return [:] }
-        let base = 100 / goals.count
-        var remainder = 100 - (base * goals.count)
+        equalDisplayPercents(for: goals.map(\.id))
+    }
+
+    // MARK: - Delete reassignment (PIP-53 / BR-9)
+
+    /// Whole-number display percents (0…100) that sum to exactly 100.
+    static func equalDisplayPercents(for goalIDs: [UUID]) -> [UUID: Int] {
+        guard !goalIDs.isEmpty else { return [:] }
+        let base = 100 / goalIDs.count
+        var remainder = 100 - (base * goalIDs.count)
         var result: [UUID: Int] = [:]
-        for goal in goals {
+        for id in goalIDs {
             let extra = remainder > 0 ? 1 : 0
             if remainder > 0 { remainder -= 1 }
-            result[goal.id] = base + extra
+            result[id] = base + extra
         }
         return result
+    }
+
+    /// Equal fractions keyed by goal id (whole-percent remainder distribution).
+    static func equalFractions(for goalIDs: [UUID]) -> [UUID: Decimal] {
+        guard !goalIDs.isEmpty else { return [:] }
+        let display = equalDisplayPercents(for: goalIDs)
+        return Dictionary(uniqueKeysWithValues: goalIDs.map { id in
+            (id, Decimal(display[id] ?? 0) / 100)
+        })
+    }
+
+    /// Equal standing split across `goalIDs`.
+    static func equalSplits(for goalIDs: [UUID]) -> [StandingSplit] {
+        let fractions = equalFractions(for: goalIDs)
+        return goalIDs.map { StandingSplit(goalId: $0, percentage: fractions[$0] ?? 0) }
+    }
+
+    /// Renormalizes standing split after removing a goal (BR-9).
+    /// Remaining shares keep relative weight; if their sum is 0, falls back to equal.
+    static func renormalize(
+        splits: [StandingSplit],
+        removingGoalID: UUID,
+        remainingGoalIDs: [UUID]
+    ) -> [StandingSplit] {
+        guard !remainingGoalIDs.isEmpty else { return [] }
+
+        let byID = Dictionary(uniqueKeysWithValues: splits.map { ($0.goalId, $0.percentage) })
+        let remainingShares = remainingGoalIDs.map { byID[$0] ?? 0 }
+        let total = remainingShares.reduce(Decimal(0), +)
+
+        if total <= 0 {
+            return equalSplits(for: remainingGoalIDs)
+        }
+
+        let normalized = remainingShares.map { ($0 / total).rounded(scale: 4) }
+        let adjusted = forceSumToOne(normalized)
+        return zip(remainingGoalIDs, adjusted).map { StandingSplit(goalId: $0.0, percentage: $0.1) }
+    }
+
+    /// Applies standing splits onto goals' `shareOfNewCredits` (used by Delete confirm).
+    static func applyShares(to goals: [Goal], splits: [StandingSplit], now: Date = Date()) -> [Goal] {
+        let byID = Dictionary(uniqueKeysWithValues: splits.map { ($0.goalId, $0.percentage) })
+        return goals.map { goal in
+            guard let share = byID[goal.id] else { return goal }
+            var copy = goal
+            copy.shareOfNewCredits = share
+            copy.updatedAt = now
+            return copy
+        }
+    }
+
+    // MARK: - Private
+
+    private static func forceSumToOne(_ fractions: [Decimal]) -> [Decimal] {
+        guard !fractions.isEmpty else { return [] }
+        var units = fractions.map { Int((($0 * 10_000) as NSDecimalNumber).intValue) }
+        let sum = units.reduce(0, +)
+        var delta = 10_000 - sum
+        var index = 0
+        while delta != 0 && !units.isEmpty {
+            if delta > 0 {
+                units[index % units.count] += 1
+                delta -= 1
+            } else if units[index % units.count] > 0 {
+                units[index % units.count] -= 1
+                delta += 1
+            }
+            index += 1
+            if index > units.count * 20_000 { break }
+        }
+        return units.map { Decimal($0) / 10_000 }
     }
 }
 

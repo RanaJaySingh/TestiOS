@@ -168,7 +168,7 @@ enum GoalHeldChangeService {
         case .newCredit: return "New credit"
         case .transfer: return "Transfer"
         case .withdrawal: return "Withdrawal"
-        case .goalDeleted: return "Goal deleted"
+        case .goalDeleted: return DeleteGoalService.historyTitle
         }
     }
 

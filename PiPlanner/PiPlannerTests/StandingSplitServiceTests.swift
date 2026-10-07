@@ -202,4 +202,71 @@ final class StandingSplitServiceTests: XCTestCase {
             )
         ]
     }
+
+    // MARK: - Delete renormalization (PIP-53 / BR-9)
+
+    func testEqualSplitsSumToOne() {
+        let a = carID
+        let b = emergencyID
+        let c = UUID(uuidString: "CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC")!
+        let splits = StandingSplitService.equalSplits(for: [a, b, c])
+        XCTAssertEqual(splits.count, 3)
+        let total = splits.map(\.percentage).reduce(Decimal(0), +)
+        XCTAssertEqual(total, Decimal(1))
+        let percents = StandingSplitService.equalDisplayPercents(for: [a, b, c])
+        XCTAssertEqual(percents.values.reduce(0, +), 100)
+    }
+
+    func testRenormalizeRemovesDeletedShareProportionally() throws {
+        let a = carID
+        let b = emergencyID
+        let c = UUID(uuidString: "CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC")!
+        let splits = [
+            StandingSplit(goalId: a, percentage: Decimal(string: "0.50")!),
+            StandingSplit(goalId: b, percentage: Decimal(string: "0.30")!),
+            StandingSplit(goalId: c, percentage: Decimal(string: "0.20")!)
+        ]
+        let next = StandingSplitService.renormalize(
+            splits: splits,
+            removingGoalID: a,
+            remainingGoalIDs: [b, c]
+        )
+        XCTAssertEqual(next.count, 2)
+        let total = next.map(\.percentage).reduce(Decimal(0), +)
+        XCTAssertEqual(total, Decimal(1))
+
+        let bShare = try XCTUnwrap(next.first { $0.goalId == b }?.percentage)
+        let cShare = try XCTUnwrap(next.first { $0.goalId == c }?.percentage)
+        XCTAssertEqual(bShare, Decimal(string: "0.6000")!)
+        XCTAssertEqual(cShare, Decimal(string: "0.4000")!)
+    }
+
+    func testRenormalizeFallsBackToEqualWhenRemainingSharesZero() {
+        let splits = [
+            StandingSplit(goalId: carID, percentage: Decimal(1)),
+            StandingSplit(goalId: emergencyID, percentage: 0)
+        ]
+        let next = StandingSplitService.renormalize(
+            splits: splits,
+            removingGoalID: carID,
+            remainingGoalIDs: [emergencyID]
+        )
+        XCTAssertEqual(next, [StandingSplit(goalId: emergencyID, percentage: Decimal(1))])
+    }
+
+    func testApplySharesUpdatesGoalShareOfNewCredits() {
+        let goals = sampleGoals()
+        let splits = [
+            StandingSplit(goalId: carID, percentage: Decimal(string: "0.70")!),
+            StandingSplit(goalId: emergencyID, percentage: Decimal(string: "0.30")!)
+        ]
+        let updated = StandingSplitService.applyShares(
+            to: goals,
+            splits: splits,
+            now: Date(timeIntervalSince1970: 100)
+        )
+        XCTAssertEqual(updated[0].shareOfNewCredits, Decimal(string: "0.70")!)
+        XCTAssertEqual(updated[1].shareOfNewCredits, Decimal(string: "0.30")!)
+    }
+
 }
