@@ -9,7 +9,7 @@ enum UPIPinCheckOutcome: Equatable, Sendable {
     case otherApp
 }
 
-/// View model for Consent + balance entry (frames 3–4e) — PRD R3 / R4; Spec §3.3.
+    /// View model for Consent + balance entry (frames 3–4e) — PRD R3 / R4; Spec §3.3 / PIP-99.
 @MainActor
 final class ConsentViewModel: ObservableObject {
     @Published private(set) var accounts: [Account]
@@ -25,6 +25,7 @@ final class ConsentViewModel: ObservableObject {
     private let persistence: any PersistenceServicing
     private let balanceSync: any BalanceSyncServicing
     private let formatting: any FormattingServicing
+    /// Ledger mutations go through `LedgerFacade` until PIP-98 `LedgerEngine` lands.
 
     var dedicatedAccount: Account? {
         AccountsService.dedicatedAccount(in: accounts)
@@ -202,9 +203,11 @@ final class ConsentViewModel: ObservableObject {
     // MARK: - Persistence
 
     private func persistConsentFlag(autoUpdate: Bool) async {
+        // Setup path: only Consent No uses this (autoUpdate false). Settings On uses confirmConsentOn.
+        _ = autoUpdate
         do {
             var state = try await persistence.loadState()
-            let updated = applyingConsent(autoUpdate: autoUpdate)
+            let updated = LedgerFacade.applyConsentDeclined(to: accounts)
             accounts = updated
             state.accounts = updated
             try await persistence.saveState(state)
@@ -216,17 +219,15 @@ final class ConsentViewModel: ObservableObject {
     }
 
     private func persistConsentAndBalance(paisa: Paisa, autoUpdate: Bool, isTyped: Bool) async {
-        _ = isTyped // Reserved for History isTyped when credit flows land.
+        let source: LedgerFacade.BalanceSource = isTyped ? .typedManual : .snapshotFetch
         do {
             var state = try await persistence.loadState()
-            let updated = accounts.map { account -> Account in
-                var copy = account
-                if copy.isDedicated {
-                    copy.balance = paisa
-                    copy.consentAutoUpdate = autoUpdate
-                }
-                return copy
-            }
+            let updated = LedgerFacade.applySetupOpeningBalance(
+                to: accounts,
+                balancePaisa: paisa,
+                consentAutoUpdate: autoUpdate,
+                source: source
+            )
             accounts = updated
             state.accounts = updated
             try await persistence.saveState(state)
@@ -234,16 +235,6 @@ final class ConsentViewModel: ObservableObject {
             errorMessage = error.localizedDescription
         } catch {
             errorMessage = error.localizedDescription
-        }
-    }
-
-    private func applyingConsent(autoUpdate: Bool) -> [Account] {
-        accounts.map { account in
-            var copy = account
-            if copy.isDedicated {
-                copy.consentAutoUpdate = autoUpdate
-            }
-            return copy
         }
     }
 }

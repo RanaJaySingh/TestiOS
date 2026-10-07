@@ -69,6 +69,29 @@ final class AccountsServiceTests: XCTestCase {
         XCTAssertEqual(AccountsService.displayTitle(for: sbi), "SBI ••7730")
     }
 
+    func testRoleLabelsAndSpendingVisibility() {
+        let hdfc = sampleHDFC(isDedicated: false)
+        let sbi = sampleSBI(isDedicated: false)
+        XCTAssertEqual(AccountsService.roleLabel(for: hdfc), "Savings")
+        XCTAssertEqual(AccountsService.roleLabel(for: sbi), "Spending")
+        XCTAssertTrue(AccountsService.isSpendingAccount(hdfc))
+        XCTAssertTrue(AccountsService.isSpendingAccount(sbi))
+        XCTAssertTrue(AccountsService.balancesTrackedOutsideAccounts(in: [hdfc, sbi]).isEmpty)
+
+        let dedicated = sampleHDFC(isDedicated: true)
+        let spending = sampleSBI(isDedicated: false)
+        XCTAssertEqual(AccountsService.roleLabel(for: dedicated), "Dedicated savings")
+        XCTAssertEqual(AccountsService.roleLabel(for: spending), "Spending")
+        XCTAssertFalse(AccountsService.isSpendingAccount(dedicated))
+        XCTAssertTrue(AccountsService.isSpendingAccount(spending))
+        XCTAssertTrue(AccountsService.tracksBalanceOutsideAccounts(dedicated))
+        XCTAssertFalse(AccountsService.tracksBalanceOutsideAccounts(spending))
+        XCTAssertEqual(
+            AccountsService.balancesTrackedOutsideAccounts(in: [dedicated, spending]).map(\.id),
+            [dedicated.id]
+        )
+    }
+
     private func sampleHDFC(isDedicated: Bool) -> Account {
         Account(
             id: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!,

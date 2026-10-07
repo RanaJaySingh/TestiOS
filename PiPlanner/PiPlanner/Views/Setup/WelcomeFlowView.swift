@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Hosts Welcome → Accounts → Consent / balance → Goal chat → Opening split.
+/// Hosts Welcome → Accounts → Consent sheet → balance → Goal chat → Opening split (PIP-99).
 struct WelcomeFlowView: View {
     @StateObject private var welcomeViewModel = WelcomeViewModel()
     @StateObject private var accountsViewModel: AccountsViewModel
@@ -8,6 +8,8 @@ struct WelcomeFlowView: View {
     @StateObject private var goalChatViewModel = GoalChatViewModel()
     @State private var openingSplitViewModel: OpeningSplitViewModel?
     @State private var path = NavigationPath()
+    /// Consent is a sheet over Accounts (frame 3), not a pushed destination.
+    @State private var showConsentSheet = false
 
     private let persistence: any PersistenceServicing
 
@@ -31,16 +33,11 @@ struct WelcomeFlowView: View {
                 switch route {
                 case .accounts:
                     AccountsView(viewModel: accountsViewModel) {
-                        path.append(WelcomeRoute.consent)
-                    }
-                case .consent:
-                    ConsentSheet(
-                        viewModel: consentViewModel,
-                        onYesFetched: { path.append(WelcomeRoute.fetchedBalance) },
-                        onNo: { path.append(WelcomeRoute.updateBalance) }
-                    )
-                    .onAppear {
                         consentViewModel.updateAccounts(accountsViewModel.accounts)
+                        showConsentSheet = true
+                    }
+                    .sheet(isPresented: $showConsentSheet) {
+                        consentSheet
                     }
                 case .fetchedBalance:
                     FetchedBalanceView(viewModel: consentViewModel) {
@@ -96,6 +93,25 @@ struct WelcomeFlowView: View {
         }
     }
 
+    /// Paytm-like Consent sheet over Accounts (Yes → auto updates + fetch; No → Update balance).
+    private var consentSheet: some View {
+        NavigationStack {
+            ConsentSheet(
+                viewModel: consentViewModel,
+                onYesFetched: {
+                    showConsentSheet = false
+                    path.append(WelcomeRoute.fetchedBalance)
+                },
+                onNo: {
+                    showConsentSheet = false
+                    path.append(WelcomeRoute.updateBalance)
+                }
+            )
+        }
+        .presentationDetents([.medium, .large])
+        .accessibilityIdentifier("setup.consentSheet")
+    }
+
     private func continueToGoalChat() {
         goalChatViewModel.reset()
         path.append(WelcomeRoute.goalChat)
@@ -116,15 +132,14 @@ struct WelcomeFlowView: View {
     private func returnToUpdateBalance() {
         path = NavigationPath()
         path.append(WelcomeRoute.accounts)
-        path.append(WelcomeRoute.consent)
         path.append(WelcomeRoute.updateBalance)
     }
 }
 
-/// Navigation targets from Welcome through Goal chat / Opening split (PIP-35 / 37 / 39 / 41).
+/// Navigation targets from Welcome through Goal chat / Opening split (PIP-35 / 37 / 39 / 41 / 99).
+/// Consent is presented as a sheet from Accounts — not a path destination.
 enum WelcomeRoute: Hashable {
     case accounts
-    case consent
     case fetchedBalance
     case updateBalance
     case manualBalance
