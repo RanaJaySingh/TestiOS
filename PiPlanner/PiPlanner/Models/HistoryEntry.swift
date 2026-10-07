@@ -79,6 +79,8 @@ struct HistoryEntry: Codable, Equatable, Identifiable, Sendable {
     var creditAmount: Paisa?
     /// true if manually typed vs synced
     var isTyped: Bool?
+    /// true when this-credit % differs from suggested standing split (PIP-103 / frame 13d Custom).
+    var customSplit: Bool? = nil
 
     // Transfers
     var fromGoalId: UUID?

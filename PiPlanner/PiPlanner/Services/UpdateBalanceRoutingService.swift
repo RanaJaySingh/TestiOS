@@ -24,7 +24,9 @@ enum UpdateBalanceRoute: Equatable, Sendable {
 /// - Other UPI app (not Paytm-linked, or explicit other-app) → Manual amount only
 ///
 /// Setup Consent persists balances via PIP-99 `LedgerFacade` (snapshot vs typed).
-/// History writers reuse `CreditEntryService` / `OpeningSplitService` (PIP-47 / PIP-43).
+/// Goals Sync / Update open-credit goes through PIP-102/103 `StubLedgerEngine`
+/// (`processBalanceUpdate`). Shape helpers / Opening writers reuse
+/// `CreditEntryService` / `OpeningSplitService` (PIP-47 / PIP-43).
 /// When PIP-98 lands a dedicated ledger engine, redirect these helpers there — do not
 /// invent a parallel entry writer here.
 enum UpdateBalanceRoutingService {

@@ -74,7 +74,16 @@ enum CreditEntryService {
         return openEntryBannerMessage(creditAmount: amount, formatting: formatting)
     }
 
-    // MARK: - Default percentages (standing → this credit)
+    // MARK: - Default / suggested standing percentages (standing → this credit)
+
+    /// Suggested this-credit split from standing splits / goal shares (PIP-103).
+    /// Single goal → 100% (frame 13e). Alias of `defaultPercentages`.
+    static func suggestedStandingPercentages(
+        goals: [Goal],
+        standingSplits: [StandingSplit]
+    ) -> [UUID: Decimal] {
+        defaultPercentages(goals: goals, standingSplits: standingSplits)
+    }
 
     /// Defaults for this-credit-only split from standing splits / goal shares.
     /// Single goal → 100% (frame 13e).
@@ -99,6 +108,22 @@ enum CreditEntryService {
             return fractions
         }
         return equalPercentages(for: goals)
+    }
+
+    /// Whether this-credit percentages differ from the suggested standing split (PIP-103).
+    static func isCustomSplit(
+        percentages: [UUID: Decimal],
+        suggested: [UUID: Decimal]
+    ) -> Bool {
+        let keys = Set(percentages.keys).union(suggested.keys)
+        for key in keys {
+            let left = (percentages[key] ?? 0).rounded(scale: 4)
+            let right = (suggested[key] ?? 0).rounded(scale: 4)
+            if left != right {
+                return true
+            }
+        }
+        return false
     }
 
     static func equalPercentages(for goals: [Goal]) -> [UUID: Decimal] {
@@ -166,6 +191,7 @@ enum CreditEntryService {
             newBalance: newBalance,
             creditAmount: creditAmount,
             isTyped: isTyped,
+            customSplit: false,
             fromGoalId: nil,
             toGoalId: nil,
             transferAmount: nil,
@@ -174,6 +200,68 @@ enum CreditEntryService {
             releasedAmount: nil,
             allocations: allocations
         )
+    }
+
+    // MARK: - Create goal while open (PIP-103 / R10)
+
+    /// Inserts a goal (saved ₹0) into an open New credit without changing existing goal totals.
+    /// Rebuilds this-credit allocations: new goal at 0%, prior rows keep their percentages.
+    static func addGoalToOpenCredit(
+        to state: PersistedAppState,
+        entryID: UUID,
+        goal: Goal,
+        now: Date = Date()
+    ) throws -> PersistedAppState {
+        guard let index = state.history.firstIndex(where: { $0.id == entryID }) else {
+            throw AppError.validationError(
+                ValidationError(
+                    field: "entryID",
+                    message: "Credit entry not found.",
+                    code: .splitNotHundred
+                )
+            )
+        }
+
+        var entry = state.history[index]
+        guard entry.type == .newCredit, !entry.isLocked else {
+            throw AppError.validationError(
+                ValidationError(
+                    field: "isLocked",
+                    message: "Goals can only be added on an open New credit entry.",
+                    code: .splitNotHundred
+                )
+            )
+        }
+
+        var next = state
+        var inserted = goal
+        inserted.savedAmount = 0
+        inserted.updatedAt = now
+        if !next.goals.contains(where: { $0.id == inserted.id }) {
+            next.goals.append(inserted)
+        }
+
+        // Standing: keep prior weights; new goal starts at 0% until Save / standing edit.
+        if !next.standingSplits.contains(where: { $0.goalId == inserted.id }) {
+            next.standingSplits.append(StandingSplit(goalId: inserted.id, percentage: 0))
+        }
+
+        let creditAmount = entry.creditAmount ?? 0
+        var percentages = Dictionary(uniqueKeysWithValues: entry.allocations.map {
+            ($0.goalId, $0.percentage)
+        })
+        percentages[inserted.id] = percentages[inserted.id] ?? 0
+
+        let allocations = try OpeningSplitService.makeAllocations(
+            goals: next.goals,
+            openingBalance: creditAmount,
+            percentages: percentages
+        )
+        entry.allocations = allocations
+        // Adding a goal while open starts a custom this-credit path until Save resolves the flag.
+        entry.customSplit = true
+        next.history[index] = entry
+        return next
     }
 
     /// Applies an open credit: updates dedicated balance, appends unlocked History entry.
@@ -322,8 +410,13 @@ enum CreditEntryService {
             percentages: percentages
         )
 
+        let suggested = suggestedStandingPercentages(
+            goals: state.goals,
+            standingSplits: state.standingSplits
+        )
         entry.allocations = allocations
         entry.isLocked = true
+        entry.customSplit = isCustomSplit(percentages: percentages, suggested: suggested)
 
         var next = state
         var goalsByID = Dictionary(uniqueKeysWithValues: next.goals.map { ($0.id, $0) })
@@ -338,6 +431,7 @@ enum CreditEntryService {
                     )
                 )
             }
+            // Goal totals update on Save only (PIP-103).
             goal.savedAmount += allocation.amount
             if useThisSplitForStanding {
                 goal.shareOfNewCredits = allocation.percentage

@@ -1,10 +1,11 @@
 import Foundation
 
-/// Pure ledger surface used by Goals Sync / Update (PIP-102).
+/// Pure ledger surface used by Goals Sync / Update (PIP-102) and History
+/// open → save (PIP-103).
 ///
 /// PIP-98 owns the full engine; until that lands, `StubLedgerEngine` adapts the
 /// existing pure services (`CreditEntryService`, `GoalHeldChangeService`) so
-/// Goals tab call sites stay engine-shaped and swap cleanly later.
+/// Goals tab + Credit entry call sites stay engine-shaped and swap cleanly later.
 ///
 /// Distinct from PIP-99 `LedgerFacade` (Accounts/Consent opening-balance setup).
 /// Both stubs coexist until PIP-98 unifies them.
@@ -16,6 +17,7 @@ protocol LedgerEngine: Sendable {
     func openCreditEntry(in history: [HistoryEntry]) -> HistoryEntry?
 
     /// Suggested this-credit split fractions (standing → goal share → equal).
+    /// PIP-103 alias surface: same as `CreditEntryService.suggestedStandingPercentages`.
     func suggestedSplitPercentages(
         goals: [Goal],
         standingSplits: [StandingSplit]
@@ -31,10 +33,57 @@ protocol LedgerEngine: Sendable {
         id: UUID,
         createdAt: Date
     ) throws -> CreditProcessOutcome
+
+    /// One-time Save and lock: updates goal totals, sets `customSplit`, freezes entry (PIP-103).
+    func saveAndLockCredit(
+        state: PersistedAppState,
+        entryID: UUID,
+        percentages: [UUID: Decimal],
+        useThisSplitForStanding: Bool,
+        now: Date
+    ) throws -> PersistedAppState
+
+    /// Create a goal while an open credit is pending (saved ₹0; totals unchanged until Save).
+    func addGoalToOpenCredit(
+        state: PersistedAppState,
+        entryID: UUID,
+        goal: Goal,
+        now: Date
+    ) throws -> PersistedAppState
+}
+
+extension LedgerEngine {
+    /// PIP-103 / Sync open-credit alias — delegates to `processBalanceUpdate`.
+    func openCreditFromFetchedBalance(
+        state: PersistedAppState,
+        fetchedBalance: Paisa,
+        dedicatedAccountID: UUID,
+        isTyped: Bool,
+        id: UUID = UUID(),
+        createdAt: Date = Date()
+    ) throws -> CreditProcessOutcome {
+        try processBalanceUpdate(
+            state: state,
+            newBalance: fetchedBalance,
+            dedicatedAccountID: dedicatedAccountID,
+            isTyped: isTyped,
+            id: id,
+            createdAt: createdAt
+        )
+    }
+
+    /// Suggested standing split (1 goal → 100%) — PIP-103 naming.
+    func suggestedStandingPercentages(
+        goals: [Goal],
+        standingSplits: [StandingSplit]
+    ) -> [UUID: Decimal] {
+        suggestedSplitPercentages(goals: goals, standingSplits: standingSplits)
+    }
 }
 
 /// Adapter ledger used while PIP-98 is unmerged. Delegates to existing services;
-/// owns the PIP-102 rule of applying pending goal edits before an open entry write.
+/// owns the PIP-102 rule of applying pending goal edits before an open entry write,
+/// plus PIP-103 Save / create-goal while open.
 struct StubLedgerEngine: LedgerEngine {
     func isSyncOrUpdateBlocked(history: [HistoryEntry]) -> Bool {
         CreditEntryService.isSyncOrUpdateBlocked(history: history)
@@ -48,7 +97,10 @@ struct StubLedgerEngine: LedgerEngine {
         goals: [Goal],
         standingSplits: [StandingSplit]
     ) -> [UUID: Decimal] {
-        CreditEntryService.defaultPercentages(goals: goals, standingSplits: standingSplits)
+        CreditEntryService.suggestedStandingPercentages(
+            goals: goals,
+            standingSplits: standingSplits
+        )
     }
 
     func processBalanceUpdate(
@@ -114,5 +166,35 @@ struct StubLedgerEngine: LedgerEngine {
             )
             return .openCreditCreated(state: next, entry: entry)
         }
+    }
+
+    func saveAndLockCredit(
+        state: PersistedAppState,
+        entryID: UUID,
+        percentages: [UUID: Decimal],
+        useThisSplitForStanding: Bool,
+        now: Date = Date()
+    ) throws -> PersistedAppState {
+        try CreditEntryService.applyCreditLock(
+            to: state,
+            entryID: entryID,
+            percentages: percentages,
+            useThisSplitForStanding: useThisSplitForStanding,
+            now: now
+        )
+    }
+
+    func addGoalToOpenCredit(
+        state: PersistedAppState,
+        entryID: UUID,
+        goal: Goal,
+        now: Date = Date()
+    ) throws -> PersistedAppState {
+        try CreditEntryService.addGoalToOpenCredit(
+            to: state,
+            entryID: entryID,
+            goal: goal,
+            now: now
+        )
     }
 }

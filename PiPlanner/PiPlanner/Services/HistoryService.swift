@@ -81,6 +81,16 @@ enum HistoryService {
         canEditAsCredit(entry) ? .editableCredit : .readOnlyDetail
     }
 
+    /// Typed badge on New credit (synced vs typed — frame 13t).
+    static func showsTypedBadge(_ entry: HistoryEntry) -> Bool {
+        entry.type == .newCredit && entry.isTyped == true
+    }
+
+    /// Custom-split badge when the saved this-credit % differs from suggested standing (PIP-103).
+    static func showsCustomSplitBadge(_ entry: HistoryEntry) -> Bool {
+        entry.type == .newCredit && entry.customSplit == true
+    }
+
     // MARK: - Amounts / subtitles
 
     /// Primary amount for the list trailing label (paisa).

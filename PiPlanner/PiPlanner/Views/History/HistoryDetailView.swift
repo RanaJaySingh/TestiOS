@@ -11,8 +11,8 @@ struct HistoryDetailView: View {
 
     private var typeLabel: String { HistoryService.typeLabel(for: entry) }
     private var isNewCredit: Bool { entry.type == .newCredit }
-    private var isTyped: Bool { entry.isTyped == true }
-    private var showsCustomBadge: Bool { isNewCredit && entry.isLocked && !isTyped }
+    private var isTyped: Bool { HistoryService.showsTypedBadge(entry) }
+    private var showsCustomBadge: Bool { HistoryService.showsCustomSplitBadge(entry) }
 
     private var amountLabel: String {
         guard let amount = HistoryService.primaryAmountPaisa(for: entry) else {
