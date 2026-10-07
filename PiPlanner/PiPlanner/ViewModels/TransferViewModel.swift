@@ -191,7 +191,8 @@ final class TransferViewModel: ObservableObject {
                 state.standingSplits = standingSplitsSnapshot
             }
 
-            state = try TransferService.applyTransfer(
+            // PIP-106: Transfer sheet → History via LedgerEngineCore (append-only locked entry).
+            state = try LedgerEngineCore.transfer(
                 to: state,
                 fromGoalId: fromID,
                 toGoalId: toID,

@@ -28,8 +28,15 @@ final class TransferViewModelTests: XCTestCase {
         XCTAssertTrue(viewModel.didComplete)
         XCTAssertFalse(viewModel.canMove, "Move must stay disabled after Complete")
 
+        // PIP-106: confirmMove → LedgerEngineCore.transfer appends one locked History entry.
         let historyAfterFirst = try await persistence.loadState().history
         XCTAssertEqual(historyAfterFirst.filter { $0.type == .transfer }.count, 1)
+        let transferEntry = try XCTUnwrap(historyAfterFirst.last)
+        XCTAssertEqual(transferEntry.type, .transfer)
+        XCTAssertTrue(transferEntry.isLocked)
+        XCTAssertEqual(transferEntry.fromGoalId, carID)
+        XCTAssertEqual(transferEntry.toGoalId, emergencyID)
+        XCTAssertEqual(transferEntry.transferAmount, 500_000)
 
         // Second tap must no-op (defense in depth).
         await viewModel.confirmMove()

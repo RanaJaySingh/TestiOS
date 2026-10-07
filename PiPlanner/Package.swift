@@ -49,6 +49,7 @@ let package = Package(
                 "StandingSplitViewModelTests.swift",
                 "WithdrawalViewModelTests.swift",
                 "TransferViewModelTests.swift",
+                "DeleteGoalViewModelTests.swift",
                 "SettingsViewModelTests.swift",
                 "CreditUpdateBalanceViewModelTests.swift"
             ]

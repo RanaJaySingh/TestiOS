@@ -27,6 +27,8 @@
 		T55B0003BD814941ABD3C921 /* TransferView.swift in Sources */ = {isa = PBXBuildFile; fileRef = T55F0003EEA24F56B29EBB6A /* TransferView.swift */; };
 		T55B0004BD814941ABD3C921 /* TransferServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T55F0004EEA24F56B29EBB6A /* TransferServiceTests.swift */; };
 		T55B0005BD814941ABD3C921 /* TransferViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T55F0005EEA24F56B29EBB6A /* TransferViewModelTests.swift */; };
+		P1060001BD814941ABD3C921 /* DeleteGoalViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = P1060002EEA24F56B29EBB6A /* DeleteGoalViewModelTests.swift */; };
+		P1060003BD814941ABD3C921 /* TransferDeleteRedistributionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = P1060004EEA24F56B29EBB6A /* TransferDeleteRedistributionTests.swift */; };
 		H59B0001BD814941ABD3C921 /* HistoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = H59F0001EEA24F56B29EBB6A /* HistoryService.swift */; };
 		H59B0002BD814941ABD3C921 /* HistoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = H59F0002EEA24F56B29EBB6A /* HistoryViewModel.swift */; };
 		H59B0003BD814941ABD3C921 /* HistoryEntryRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = H59F0003EEA24F56B29EBB6A /* HistoryEntryRow.swift */; };
@@ -175,6 +177,9 @@
 		T55F0003EEA24F56B29EBB6A /* TransferView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferView.swift; sourceTree = "<group>"; };
 		T55F0004EEA24F56B29EBB6A /* TransferServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferServiceTests.swift; sourceTree = "<group>"; };
 		T55F0005EEA24F56B29EBB6A /* TransferViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferViewModelTests.swift; sourceTree = "<group>"; };
+		P1060002EEA24F56B29EBB6A /* DeleteGoalViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteGoalViewModelTests.swift; sourceTree = "<group>"; };
+		P1060004EEA24F56B29EBB6A /* TransferDeleteRedistributionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferDeleteRedistributionTests.swift; sourceTree = "<group>"; };
+		C98F0002EEA24F56B29EBB6A /* LedgerEngineCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LedgerEngineCoreTests.swift; sourceTree = "<group>"; };
 		H59F0001EEA24F56B29EBB6A /* HistoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryService.swift; sourceTree = "<group>"; };
 		H59F0002EEA24F56B29EBB6A /* HistoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryViewModel.swift; sourceTree = "<group>"; };
 		H59F0003EEA24F56B29EBB6A /* HistoryEntryRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryEntryRow.swift; sourceTree = "<group>"; };
@@ -575,6 +580,8 @@
 				A57F0005EEA24F56B29EBB6A /* WithdrawalViewModelTests.swift */,
 				T55F0004EEA24F56B29EBB6A /* TransferServiceTests.swift */,
 				T55F0005EEA24F56B29EBB6A /* TransferViewModelTests.swift */,
+				P1060002EEA24F56B29EBB6A /* DeleteGoalViewModelTests.swift */,
+				P1060004EEA24F56B29EBB6A /* TransferDeleteRedistributionTests.swift */,
 				H59F0005EEA24F56B29EBB6A /* HistoryServiceTests.swift */,
 				S61A0003EEA24F56B29EBB6A /* SettingsServiceTests.swift */,
 				S61A0004EEA24F56B29EBB6A /* SettingsViewModelTests.swift */,
@@ -883,6 +890,8 @@
 				A57B0005BD814941ABD3C921 /* WithdrawalViewModelTests.swift in Sources */,
 				T55B0004BD814941ABD3C921 /* TransferServiceTests.swift in Sources */,
 				T55B0005BD814941ABD3C921 /* TransferViewModelTests.swift in Sources */,
+				P1060001BD814941ABD3C921 /* DeleteGoalViewModelTests.swift in Sources */,
+				P1060003BD814941ABD3C921 /* TransferDeleteRedistributionTests.swift in Sources */,
 				H59B0005BD814941ABD3C921 /* HistoryServiceTests.swift in Sources */,
 				S61B0003BD814941ABD3C921 /* SettingsServiceTests.swift in Sources */,
 				S61B0004BD814941ABD3C921 /* SettingsViewModelTests.swift in Sources */,
