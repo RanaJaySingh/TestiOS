@@ -1,11 +1,13 @@
 import SwiftUI
 
-/// Post-setup shell — Spec §4.3 Tab Bar: Goals | History | Ask (Settings via gear).
+/// Post-setup shell — Spec §4.3 / §3.4 Tab Bar: Goals | History | Ask (Settings via gear).
+/// PIP-71: Material-style SF Symbol catalog + navy selected-state chrome (visual only).
 struct MainTabView: View {
     let persistence: any PersistenceServicing
     /// Bubbles Settings → Reset demo up to `ContentView` for Welcome (1).
     var onDemoReset: (() -> Void)?
     @StateObject private var goalsViewModel: GoalsViewModel
+    @State private var selectedTab: MainTabChrome.Tab = .goals
 
     init(
         persistence: any PersistenceServicing,
@@ -19,7 +21,7 @@ struct MainTabView: View {
     }
 
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             NavigationStack {
                 GoalsTabView(
                     viewModel: goalsViewModel,
@@ -27,17 +29,19 @@ struct MainTabView: View {
                 )
             }
             .tabItem {
-                Label("Goals", systemImage: "target")
+                tabLabel(for: .goals)
             }
-            .accessibilityIdentifier("tab.goals")
+            .tag(MainTabChrome.Tab.goals)
+            .accessibilityIdentifier(MainTabChrome.Tab.goals.accessibilityIdentifier)
 
             NavigationStack {
                 HistoryTabView(persistence: persistence)
             }
             .tabItem {
-                Label("History", systemImage: "clock")
+                tabLabel(for: .history)
             }
-            .accessibilityIdentifier("tab.history")
+            .tag(MainTabChrome.Tab.history)
+            .accessibilityIdentifier(MainTabChrome.Tab.history.accessibilityIdentifier)
 
             NavigationStack {
                 AskTabView(
@@ -49,16 +53,29 @@ struct MainTabView: View {
                 )
             }
             .tabItem {
-                Label("Ask", systemImage: "bubble.left.and.bubble.right")
+                tabLabel(for: .ask)
             }
-            .accessibilityIdentifier("tab.ask")
+            .tag(MainTabChrome.Tab.ask)
+            .accessibilityIdentifier(MainTabChrome.Tab.ask.accessibilityIdentifier)
         }
+        // Selected tab chrome: navy primary from PIP-67 tokens (not bright Accent / purple).
+        .tint(PiColors.navyPrimary)
         .accessibilityIdentifier("main.tabBar")
+    }
+
+    @ViewBuilder
+    private func tabLabel(for tab: MainTabChrome.Tab) -> some View {
+        let selected = selectedTab == tab
+        Label(
+            tab.title,
+            systemImage: tab.systemImage(selected: selected)
+        )
     }
 }
 
 #Preview {
     MainTabView(persistence: PreviewPersistence())
+        .piPlannerTheme()
 }
 
 /// In-memory persistence for SwiftUI previews.

@@ -69,7 +69,7 @@ struct GoalsTabView: View {
                 Button {
                     viewModel.openSettings()
                 } label: {
-                    Image(systemName: "gearshape")
+                    Image(systemName: PiIcons.settings)
                 }
                 .accessibilityLabel("Settings")
                 .accessibilityIdentifier("goals.settings")

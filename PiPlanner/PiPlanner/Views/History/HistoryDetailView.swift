@@ -52,7 +52,7 @@ struct HistoryDetailView: View {
                     .fontWeight(.semibold)
                     .accessibilityAddTraits(.isHeader)
                 if HistoryService.showsLockIcon(entry) {
-                    Image(systemName: "lock.fill")
+                    Image(systemName: PiIcons.lock)
                         .foregroundStyle(.secondary)
                         .accessibilityLabel("Locked")
                 }

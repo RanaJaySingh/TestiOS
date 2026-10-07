@@ -23,7 +23,7 @@ struct HistoryEntryRow: View {
                         .font(.body)
                         .fontWeight(.semibold)
                     if showsLock {
-                        Image(systemName: "lock.fill")
+                        Image(systemName: PiIcons.lock)
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .accessibilityLabel("Locked")

@@ -45,13 +45,13 @@ enum HistoryService {
         typeLabel(for: entry.type)
     }
 
-    /// SF Symbol name for the entry type icon.
+    /// SF Symbol name for the entry type icon (PIP-71 / Spec §3.3 catalog where applicable).
     static func systemImageName(for type: HistoryEntryType) -> String {
         switch type {
         case .openingBalance: return "banknote"
-        case .newCredit: return "plus.circle"
-        case .transfer: return "arrow.left.arrow.right"
-        case .withdrawal: return "arrow.down.circle"
+        case .newCredit: return PiIcons.newCredit
+        case .transfer: return PiIcons.transfer
+        case .withdrawal: return PiIcons.withdrawal
         case .goalDeleted: return "trash"
         }
     }
