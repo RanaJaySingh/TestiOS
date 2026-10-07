@@ -40,11 +40,15 @@ cd PiPlanner
 swift test
 ```
 
-**Result (this run):** 133 tests, 0 failures (includes 10 `WithdrawalServiceTests`).
+**Result (round-1 must-fix):** 134 tests, 0 failures (includes 11 `WithdrawalServiceTests`; `WithdrawalViewModelTests` excluded from Linux SPM like other VM suites).
+
+## Round-1 must-fix
+
+`finishEdit()` no longer sets `hasEditedOnce` when reductions ≠ shortfall. Uses `WithdrawalService.evaluateFinishEdit` (DeleteGoal Done-gate parity): refused Done → `.invalidTotal` + `errorMessage`, `canStartEdit` remains true; only a valid total completes the edit pass.
 
 ## Assumptions
 
-- “Editable once” = one Edit → Done pass locks reduction amounts until Save (proportional default usable without editing).
+- “Editable once” = one **successful** Edit → Done pass locks reduction amounts until Save (invalid Done does not soft-lock; proportional default usable without editing).
 - Proportional weights use current `savedAmount` (not standing %); zero-saved goals get ₹0 reduction; all-zero saved falls back to equal.
 - Manual 18c: user enters shortfall in rupees; `newBalance = previous − shortfall`.
 - Design frames 18 / 18a / 18b / 18c inferred from PRD R15 + Spec BR-8 (artifact not scraped in-agent).
