@@ -10,6 +10,7 @@ final class AskServiceTests: XCTestCase {
         XCTAssertEqual(AskService.suggestionChips.count, 2)
         XCTAssertTrue(AskService.suggestionChips[0].contains("split"))
         XCTAssertTrue(AskService.suggestionChips[1].lowercased().contains("inflation"))
+        XCTAssertEqual(AskService.askStarters, AskService.suggestionChips)
     }
 
     func testPlainAnswerIncludesEngineNumbers() {

@@ -21,6 +21,17 @@ enum SettingsService {
         "Clears goals and history and returns to Welcome."
     static let resetDemoButtonTitle = "Reset demo"
 
+    /// Post–Reset Welcome seed (PIP-108 / PIP-65) — accounts only; no goals / history.
+    /// Persistence clears the JSON file; the app root reseeds via this snapshot.
+    static func welcomeStateAfterDemoReset() -> PersistedAppState {
+        PersistedAppState(
+            accounts: DemoData.sampleAccounts,
+            goals: [],
+            history: [],
+            standingSplits: []
+        )
+    }
+
     /// Applies `consentAutoUpdate` on the dedicated savings account only.
     static func applyingConsent(
         autoUpdate: Bool,

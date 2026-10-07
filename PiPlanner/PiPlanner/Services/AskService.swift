@@ -31,11 +31,14 @@ struct AskEngineContext: Equatable, Sendable {
 /// Pure Ask helpers — chips, engine answers, proposal copy, fallback policy (PIP-63).
 /// Linux-testable; amounts remain Int64 paisa.
 enum AskService {
-    /// Design frame 19 suggestion chips.
+    /// Design frame 19 suggestion chips / Ask starters (PIP-108).
     static let suggestionChips: [String] = [
         "What happens if I change the split?",
         "Why is inflation 7%?"
     ]
+
+    /// Idle Ask starters — same as suggestion chips (PIP-108 naming).
+    static var askStarters: [String] { suggestionChips }
 
     /// Frame 19c template sentences when Grok is unavailable.
     static let unavailableTemplateSentences: [String] = [
