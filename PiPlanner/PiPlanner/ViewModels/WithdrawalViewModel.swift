@@ -25,6 +25,8 @@ final class WithdrawalViewModel: ObservableObject {
 
     private let persistence: any PersistenceServicing
     private let formatting: any FormattingServicing
+    /// PIP-107 — Save and lock via tip `StubLedgerEngine` → `LedgerEngineCore.withdraw`.
+    private let ledger: any LedgerEngine
     private let clock: () -> Date
     private let makeID: () -> UUID
     private let onSaved: (() -> Void)?
@@ -36,6 +38,7 @@ final class WithdrawalViewModel: ObservableObject {
         goals: [Goal],
         persistence: any PersistenceServicing,
         formatting: any FormattingServicing = FormattingService(),
+        ledger: any LedgerEngine = StubLedgerEngine(),
         isManualRecord: Bool = false,
         clock: @escaping () -> Date = Date.init,
         makeID: @escaping () -> UUID = UUID.init,
@@ -47,6 +50,7 @@ final class WithdrawalViewModel: ObservableObject {
         self.goals = goals
         self.persistence = persistence
         self.formatting = formatting
+        self.ledger = ledger
         self.isManualRecord = isManualRecord
         self.clock = clock
         self.makeID = makeID
@@ -216,8 +220,9 @@ final class WithdrawalViewModel: ObservableObject {
             if state.goals.isEmpty {
                 state.goals = goals
             }
-            state = try WithdrawalService.applyWithdrawal(
-                to: state,
+            // History entry via engine (PIP-107) — completes Sync/Update withdrawalRequired path.
+            state = try ledger.withdraw(
+                state: state,
                 shortfall: shortfall,
                 previousBalance: previousBalance,
                 newBalance: newBalance,

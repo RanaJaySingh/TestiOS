@@ -18,6 +18,7 @@ struct WithdrawalView: View {
         goals: [Goal],
         persistence: any PersistenceServicing,
         formatting: any FormattingServicing = FormattingService(),
+        ledger: any LedgerEngine = StubLedgerEngine(),
         isManualRecord: Bool = false,
         onSaved: (() -> Void)? = nil
     ) {
@@ -29,6 +30,7 @@ struct WithdrawalView: View {
                 goals: goals,
                 persistence: persistence,
                 formatting: formatting,
+                ledger: ledger,
                 isManualRecord: isManualRecord,
                 onSaved: onSaved
             )
@@ -220,6 +222,7 @@ struct WithdrawalFlow: View {
     let goals: [Goal]
     let persistence: any PersistenceServicing
     var formatting: any FormattingServicing = FormattingService()
+    var ledger: any LedgerEngine = StubLedgerEngine()
     var isManualRecord: Bool = false
     var onSaved: (() -> Void)? = nil
 
@@ -231,6 +234,7 @@ struct WithdrawalFlow: View {
             goals: goals,
             persistence: persistence,
             formatting: formatting,
+            ledger: ledger,
             isManualRecord: isManualRecord,
             onSaved: onSaved
         )

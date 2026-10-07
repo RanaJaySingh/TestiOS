@@ -142,8 +142,8 @@ struct GoalsTabView: View {
                 onOpenCreditEntry: { entry in
                     viewModel.presentCreditEntry(entry)
                 },
-                onWithdrawal: { shortfall in
-                    viewModel.handleWithdrawal(shortfall: shortfall)
+                onWithdrawal: { presentation in
+                    viewModel.handleWithdrawal(presentation)
                 },
                 onDismiss: { viewModel.showSyncSheet = false }
             )
@@ -156,8 +156,8 @@ struct GoalsTabView: View {
                 onOpenCreditEntry: { entry in
                     viewModel.presentCreditEntry(entry)
                 },
-                onWithdrawal: { shortfall in
-                    viewModel.handleWithdrawal(shortfall: shortfall)
+                onWithdrawal: { presentation in
+                    viewModel.handleWithdrawal(presentation)
                 },
                 onRecordWithdrawal: {
                     viewModel.showUpdateBalanceSheet = false
@@ -210,6 +210,7 @@ struct GoalsTabView: View {
                         goals: viewModel.goals,
                         persistence: viewModel.persistence,
                         formatting: viewModel.formatting,
+                        ledger: viewModel.ledger,
                         isManualRecord: viewModel.activeWithdrawalIsManual
                     ) {
                         viewModel.showWithdrawal = false

@@ -6,7 +6,8 @@ import SwiftUI
 struct CreditUpdateBalanceSheet: View {
     @ObservedObject var viewModel: CreditUpdateBalanceViewModel
     var onOpenCreditEntry: (HistoryEntry) -> Void
-    var onWithdrawal: (Paisa) -> Void
+    /// PIP-107 — full shortfall / previous / new from `.withdrawalRequired`.
+    var onWithdrawal: (WithdrawalPresentation) -> Void
     /// Optional manual path (frame 18c / 11a "Record a withdrawal" link).
     var onRecordWithdrawal: (() -> Void)? = nil
     var onDismiss: () -> Void
@@ -40,9 +41,9 @@ struct CreditUpdateBalanceSheet: View {
                     onOpenCreditEntry(entry)
                 }
             }
-            .onChange(of: viewModel.withdrawalShortfall) { shortfall in
-                if let shortfall {
-                    onWithdrawal(shortfall)
+            .onChange(of: viewModel.withdrawalPresentation) { presentation in
+                if let presentation {
+                    onWithdrawal(presentation)
                 }
             }
         }
