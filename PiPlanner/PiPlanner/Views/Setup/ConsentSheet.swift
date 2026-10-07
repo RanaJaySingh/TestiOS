@@ -32,12 +32,8 @@ struct ConsentSheet: View {
         }
         .background(PiColors.backgroundApp.ignoresSafeArea())
         // Keep the nav back chevron on setup push; title lives in PiSheet chrome.
+        .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                EmptyView()
-            }
-        }
         .piPlannerTheme()
         .alert(
             "Couldn’t update balance",
