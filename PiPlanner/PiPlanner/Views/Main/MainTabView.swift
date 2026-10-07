@@ -23,7 +23,7 @@ struct MainTabView: View {
             .accessibilityIdentifier("tab.goals")
 
             NavigationStack {
-                HistoryTabView()
+                HistoryTabView(persistence: persistence)
             }
             .tabItem {
                 Label("History", systemImage: "clock")
