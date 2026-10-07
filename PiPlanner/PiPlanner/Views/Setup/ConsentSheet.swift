@@ -182,139 +182,134 @@ struct FetchedBalanceView: View {
     }
 }
 
-/// Update balance sheet (setup) — design frame 4 (Consent No).
+/// Update balance sheet (setup) — design frame 4 (Consent No). Paytm-like choice rows (PIP-77).
 struct UpdateBalanceSheet: View {
     var onManually: () -> Void
     var onBalanceSync: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            Text("Update balance")
-                .font(.title2)
-                .fontWeight(.semibold)
-                .accessibilityAddTraits(.isHeader)
-            Text("How do you want to set the opening balance?")
-                .font(.body)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
+        ScrollView {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s20) {
+                VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
+                    Text("Update balance")
+                        .font(PiTypography.title())
+                        .foregroundStyle(.primary)
+                        .accessibilityAddTraits(.isHeader)
+                    Text("How do you want to set the opening balance?")
+                        .font(PiTypography.body())
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
 
-            Button {
-                onManually()
-            } label: {
-                Text("Manually")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
+                VStack(spacing: DesignTokens.Space.s12) {
+                    UpdateBalanceChoiceRow(
+                        title: "Manually",
+                        subtitle: "Type the opening balance",
+                        systemImage: "pencil",
+                        accessibilityIdentifier: "updateBalance.manually",
+                        action: onManually
+                    )
+                    .accessibilityLabel("Manually")
+                    .accessibilityHint("Type the opening balance")
+
+                    UpdateBalanceChoiceRow(
+                        title: "Balance sync",
+                        subtitle: "Check with demo UPI PIN",
+                        systemImage: PiIcons.sync,
+                        accessibilityIdentifier: "updateBalance.balanceSync",
+                        action: onBalanceSync
+                    )
+                    .accessibilityLabel("Balance sync")
+                    .accessibilityHint("Opens demo UPI PIN")
+                }
             }
-            .buttonStyle(.borderedProminent)
-            .accessibilityLabel("Manually")
-            .accessibilityHint("Type the opening balance")
-
-            Button {
-                onBalanceSync()
-            } label: {
-                Text("Balance sync")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-            }
-            .buttonStyle(.bordered)
-            .accessibilityLabel("Balance sync")
-            .accessibilityHint("Opens demo UPI PIN")
-
-            Spacer(minLength: 0)
+            .padding(DesignTokens.Space.s20)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding()
+        .background(PiColors.backgroundApp.ignoresSafeArea())
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .navigationTitle("Update balance")
         .navigationBarTitleDisplayMode(.inline)
+        .piPlannerTheme()
     }
 }
 
-/// Account on another UPI app — design frame 4c (forces manual).
+/// Account on another UPI app — design frame 4c (forces manual). PIP-77 chrome.
 struct OtherAppView: View {
     var onContinueManual: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            Text("Account on another UPI app")
-                .font(.title2)
-                .fontWeight(.semibold)
-                .accessibilityAddTraits(.isHeader)
-            Text(
-                "This savings account looks linked in another UPI app. Enter the balance manually to continue setup."
-            )
-            .font(.body)
-            .foregroundStyle(.secondary)
-            .fixedSize(horizontal: false, vertical: true)
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s20) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
+                Text("Account on another UPI app")
+                    .font(PiTypography.title())
+                    .accessibilityAddTraits(.isHeader)
+                Text(
+                    "This savings account looks linked in another UPI app. Enter the balance manually to continue setup."
+                )
+                .font(PiTypography.body())
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            }
 
             Spacer(minLength: 0)
 
-            Button {
-                onContinueManual()
-            } label: {
-                Text("Enter balance manually")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-            }
-            .buttonStyle(.borderedProminent)
-            .accessibilityLabel("Enter balance manually")
+            PrimaryCTA(title: "Enter balance manually", action: onContinueManual)
+                .accessibilityLabel("Enter balance manually")
         }
-        .padding()
+        .padding(DesignTokens.Space.s20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .background(PiColors.backgroundApp.ignoresSafeArea())
         .navigationTitle("Another UPI app")
         .navigationBarTitleDisplayMode(.inline)
+        .piPlannerTheme()
     }
 }
 
-/// Wrong PIN — design frames 4d / 4e (retry or manual).
+/// Wrong PIN — design frames 4d / 4e (retry or manual). PIP-77 chrome (no logic change).
 struct WrongPinView: View {
     @ObservedObject var viewModel: ConsentViewModel
     var onRetry: () -> Void
     var onManual: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            Text("Incorrect PIN")
-                .font(.title2)
-                .fontWeight(.semibold)
-                .accessibilityAddTraits(.isHeader)
-            Text(viewModel.errorMessage ?? "Incorrect PIN. Try again or enter the balance manually.")
-                .font(.body)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s20) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
+                Text("Incorrect PIN")
+                    .font(PiTypography.title())
+                    .foregroundStyle(PiColors.destructive)
+                    .accessibilityAddTraits(.isHeader)
+                Text(viewModel.errorMessage ?? "Incorrect PIN. Try again or enter the balance manually.")
+                    .font(PiTypography.body())
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            UPIPinDots(filledCount: 4, showsError: true)
+                .frame(maxWidth: .infinity)
 
             Spacer(minLength: 0)
 
-            Button {
-                viewModel.retryPIN()
-                onRetry()
-            } label: {
-                Text("Try again")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-            }
-            .buttonStyle(.borderedProminent)
-            .accessibilityLabel("Try again")
+            VStack(spacing: DesignTokens.Space.s12) {
+                PrimaryCTA(title: "Try again") {
+                    viewModel.retryPIN()
+                    onRetry()
+                }
+                .accessibilityLabel("Try again")
 
-            Button {
-                viewModel.clearPIN()
-                onManual()
-            } label: {
-                Text("Enter manually")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
+                SecondaryCTA(title: "Enter manually", style: .outline) {
+                    viewModel.clearPIN()
+                    onManual()
+                }
+                .accessibilityLabel("Enter manually")
             }
-            .buttonStyle(.bordered)
-            .accessibilityLabel("Enter manually")
         }
-        .padding()
+        .padding(DesignTokens.Space.s20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .background(PiColors.backgroundApp.ignoresSafeArea())
         .navigationTitle("UPI PIN")
         .navigationBarTitleDisplayMode(.inline)
+        .piPlannerTheme()
     }
 }
 

@@ -1,21 +1,23 @@
 import SwiftUI
 
-/// Manual amount · setup — design frame 4a (PRD R4). Continue disabled at ₹0.
+/// Manual amount · setup — design frame 4a (PRD R4 / R8). Continue disabled at ₹0 (PIP-77 chrome).
 struct ManualBalanceView: View {
     @ObservedObject var viewModel: ConsentViewModel
     var onContinue: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s20) {
             header
-            amountField
+            amountCard
             Spacer(minLength: 0)
             continueButton
         }
-        .padding()
+        .padding(DesignTokens.Space.s20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .background(PiColors.backgroundApp.ignoresSafeArea())
         .navigationTitle("Manual amount")
         .navigationBarTitleDisplayMode(.inline)
+        .piPlannerTheme()
         .alert(
             "Couldn’t save balance",
             isPresented: Binding(
@@ -30,77 +32,75 @@ struct ManualBalanceView: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
             Text("Enter opening balance")
-                .font(.title2)
-                .fontWeight(.semibold)
+                .font(PiTypography.title())
                 .accessibilityAddTraits(.isHeader)
             Text("Type the current balance of your dedicated savings. No withdrawal link during setup.")
-                .font(.body)
+                .font(PiTypography.body())
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .accessibilityElement(children: .combine)
     }
 
-    private var amountField: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Amount")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            HStack(alignment: .firstTextBaseline, spacing: 4) {
-                Text("₹")
-                    .font(.title)
-                    .fontWeight(.semibold)
-                TextField(
-                    "0",
-                    text: Binding(
-                        get: { viewModel.manualRupeeDigits },
-                        set: { viewModel.setManualRupeeDigits($0) }
+    private var amountCard: some View {
+        PiCard {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
+                Text("Amount")
+                    .font(PiTypography.caption())
+                    .foregroundStyle(.secondary)
+                HStack(alignment: .firstTextBaseline, spacing: 4) {
+                    Text("₹")
+                        .font(PiTypography.amountHero())
+                        .foregroundStyle(PiColors.navyPrimary)
+                    TextField(
+                        "0",
+                        text: Binding(
+                            get: { viewModel.manualRupeeDigits },
+                            set: { viewModel.setManualRupeeDigits($0) }
+                        )
                     )
-                )
-                .keyboardType(.numberPad)
-                .font(.title)
-                .fontWeight(.semibold)
-                .monospacedDigit()
-                .accessibilityLabel("Opening balance in rupees")
+                    .keyboardType(.numberPad)
+                    .font(PiTypography.amountHero())
+                    .foregroundStyle(PiColors.navyPrimary)
+                    .monospacedDigit()
+                    .accessibilityLabel("Opening balance in rupees")
+                }
+                Text(viewModel.formattedManualAmount)
+                    .font(PiTypography.caption())
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+                    .accessibilityLabel("Formatted amount \(viewModel.formattedManualAmount)")
             }
-            Text(viewModel.formattedManualAmount)
-                .font(.callout)
-                .foregroundStyle(.secondary)
-                .monospacedDigit()
-                .accessibilityLabel("Formatted amount \(viewModel.formattedManualAmount)")
         }
     }
 
+    @ViewBuilder
     private var continueButton: some View {
-        Button {
-            Task {
-                if await viewModel.continueManual() != nil {
-                    onContinue()
+        if viewModel.isWorking {
+            ProgressView()
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, DesignTokens.Space.s12)
+        } else {
+            PrimaryCTA(
+                title: "Continue",
+                isEnabled: viewModel.canContinueManual,
+                accessibilityIdentifier: "manualBalance.continue"
+            ) {
+                Task {
+                    if await viewModel.continueManual() != nil {
+                        onContinue()
+                    }
                 }
             }
-        } label: {
-            Group {
-                if viewModel.isWorking {
-                    ProgressView()
-                        .frame(maxWidth: .infinity)
-                } else {
-                    Text("Continue")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                }
-            }
-            .padding(.vertical, 14)
+            .accessibilityLabel("Continue")
+            .accessibilityHint(
+                viewModel.canContinueManual
+                    ? "Continues with the typed opening balance"
+                    : "Enabled when amount is greater than zero"
+            )
         }
-        .buttonStyle(.borderedProminent)
-        .disabled(!viewModel.canContinueManual)
-        .accessibilityLabel("Continue")
-        .accessibilityHint(
-            viewModel.canContinueManual
-                ? "Continues with the typed opening balance"
-                : "Enabled when amount is greater than zero"
-        )
     }
 }
 
