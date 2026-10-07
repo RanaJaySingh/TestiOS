@@ -62,7 +62,7 @@ Do **not** change ViewModels / services / money logic in this ticket.
 
 ## Parallel work / base
 
-Started from `b30a048` (PIP-69 shared components on main). Touches **only** StandingSplit / Transfer / Withdrawal / DeleteGoal view files + this ticket doc — rebase-friendly vs PIP-73..95.
+Started from `b30a048` (PIP-69 shared components). Rebased onto `main@528a4b1` (PIP-81 Goals home visual #34; includes PIP-77/75/73). Touches **only** StandingSplit / Transfer / Withdrawal / DeleteGoal view files + this ticket doc — keep-both: sheet visuals ours; Goals home / Welcome / Sync/Update / Settings / setup / Ask / History / Goal detail from main unchanged.
 
 ## Test results
 
