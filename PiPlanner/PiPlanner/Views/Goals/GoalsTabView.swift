@@ -1,8 +1,9 @@
 import SwiftUI
 
-/// In-Goals navigation targets — Goal detail (PIP-49).
+/// In-Goals navigation targets — Goal detail (PIP-49); Transfer (PIP-55).
 enum GoalsRoute: Hashable {
     case detail(UUID)
+    case transfer
 }
 
 /// Goals tab — design frames 9 / 9b / 9c (PIP-45); detail via PIP-49; Sync/Update/Credit via PIP-47.
@@ -49,6 +50,13 @@ struct GoalsTabView: View {
         .navigationTitle("Goals")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                NavigationLink(value: GoalsRoute.transfer) {
+                    Text("Transfer")
+                }
+                .disabled(viewModel.goals.count < 2)
+                .accessibilityIdentifier("goals.transfer.entry")
+            }
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
                     viewModel.openSettings()
@@ -81,6 +89,16 @@ struct GoalsTabView: View {
                         persistence: viewModel.persistence
                     )
                 }
+            case .transfer:
+                TransferFlow(
+                    goals: viewModel.goals,
+                    standingSplits: viewModel.standingSplits,
+                    persistence: viewModel.persistence,
+                    formatting: viewModel.formatting,
+                    onCompleted: {
+                        Task { await viewModel.load() }
+                    }
+                )
             }
         }
         .sheet(isPresented: $viewModel.showSyncSheet, onDismiss: {

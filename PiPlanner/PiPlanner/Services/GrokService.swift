@@ -113,6 +113,13 @@ struct StubGrokService: GrokServicing {
         return .success(.proposals(Self.happyPathProposals))
     }
 
+    /// Demo Transfer proposal (frame 16c): Car → Emergency Fund · ₹5,000.
+    static let demoTransferPrefill = TransferService.Prefill(
+        fromGoalId: UUID(uuidString: "AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA")!,
+        toGoalId: UUID(uuidString: "BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB")!,
+        amountPaisa: 500_000
+    )
+
     func askQuestion(query: String) -> Result<AskResponse, GrokError> {
         if isUnavailable {
             return .failure(.unavailable)
@@ -121,11 +128,31 @@ struct StubGrokService: GrokServicing {
         if trimmed.isEmpty {
             return .failure(.invalidDraft)
         }
+        // Frame 16c — Ask can propose a Transfer that opens pre-filled.
+        let lowered = trimmed.lowercased()
+        if lowered.contains("transfer") || lowered.contains("move") {
+            let prefill = Self.demoTransferPrefill
+            return .success(
+                .actionProposal(
+                    action: .transfer(
+                        from: prefill.fromGoalId!,
+                        to: prefill.toGoalId!,
+                        amount: prefill.amountPaisa ?? 0
+                    )
+                )
+            )
+        }
         return .success(
             .plainAnswer(
                 text: "Your plan assigns every rupee to a named goal. Ask again after setup for live numbers."
             )
         )
+    }
+
+    /// Maps a Transfer ProposedAction to TransferService.Prefill (Ask → Transfer).
+    static func transferPrefill(from action: ProposedAction) -> TransferService.Prefill? {
+        guard case .transfer(let from, let to, let amount) = action else { return nil }
+        return TransferService.Prefill(fromGoalId: from, toGoalId: to, amountPaisa: amount)
     }
 
     /// Vague when short / filler-only, or lacks concrete goal nouns from the demo set.

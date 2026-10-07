@@ -98,7 +98,31 @@ struct GoalDetailView: View {
                         .foregroundStyle(.secondary)
                 }
             case .transfer:
-                GoalTransferStubView(goalName: viewModel.navigationTitle)
+                // PIP-55: real Transfer flow. Keep GoalDetailView otherwise unchanged.
+                if let persistence {
+                    let goals = viewModel.allGoals.isEmpty
+                        ? (viewModel.goal.map { [$0] } ?? [])
+                        : viewModel.allGoals
+                    TransferFlow(
+                        goals: goals,
+                        standingSplits: viewModel.standingSplits,
+                        persistence: persistence,
+                        formatting: formatting,
+                        prefill: TransferService.Prefill(
+                            fromGoalId: viewModel.goal?.id,
+                            toGoalId: nil,
+                            amountPaisa: nil
+                        ),
+                        onCompleted: {
+                            Task { await viewModel.refresh() }
+                        }
+                    )
+                } else {
+                    Text("Transfer requires persistence.")
+                        .foregroundStyle(.secondary)
+                        .padding()
+                        .accessibilityIdentifier("goals.transfer.unavailable")
+                }
             case .delete:
                 // PIP-53: real Delete flow. Keep GoalDetailView otherwise unchanged.
                 if let goal = viewModel.goal, let persistence {
@@ -275,27 +299,6 @@ struct GoalDetailView: View {
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .accessibilityIdentifier("goals.detail.toast")
             .accessibilityLabel(viewModel.toastMessage)
-    }
-}
-
-/// Stub Transfer destination — full UI is a separate ticket.
-struct GoalTransferStubView: View {
-    let goalName: String
-
-    var body: some View {
-        VStack(spacing: 12) {
-            Text("Transfer")
-                .font(.title2)
-                .fontWeight(.semibold)
-            Text("Move saved money from \(goalName). Full Transfer UI arrives in a later ticket.")
-                .font(.body)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-        }
-        .padding()
-        .navigationTitle("Transfer")
-        .navigationBarTitleDisplayMode(.inline)
-        .accessibilityIdentifier("goals.transfer.stub")
     }
 }
 
