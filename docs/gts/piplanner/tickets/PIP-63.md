@@ -50,7 +50,7 @@ cd PiPlanner
 swift test
 ```
 
-**Result:** 179 tests, 0 failures (includes expanded `GrokServiceTests` + `AskServiceTests`).
+**Result (post PIP-65 rebase):** 188 tests, 0 failures (includes `AskServiceTests`, expanded `GrokServiceTests`, and PIP-65 `DemoDataTests`).
 
 ## Assumptions
 
