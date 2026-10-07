@@ -63,20 +63,62 @@ final class GoalsViewModelTests: XCTestCase {
         XCTAssertTrue(viewModel.showSettings)
     }
 
-    func testPerformSyncUpdatesDedicatedBalance() async throws {
+    func testOpenEntryBlocksSyncAndShowsBanner() async throws {
         let persistence = InMemoryPersistence()
         var state = makePostSetupState(consent: true)
-        state.accounts[0].balance = 5_000_000
+        let open = HistoryEntry(
+            id: UUID(uuidString: "CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC")!,
+            type: .newCredit,
+            createdAt: Date(timeIntervalSince1970: 1_700_000_200),
+            isLocked: false,
+            previousBalance: 10_000_000,
+            newBalance: 11_000_000,
+            creditAmount: 1_000_000,
+            isTyped: false,
+            fromGoalId: nil,
+            toGoalId: nil,
+            transferAmount: nil,
+            withdrawalAmount: nil,
+            deletedGoalName: nil,
+            releasedAmount: nil,
+            allocations: []
+        )
+        state.history.append(open)
         try await persistence.saveState(state)
 
-        let sync = MockBalanceSyncService(knownAccountIDs: [state.accounts[0].id])
+        let viewModel = GoalsViewModel(persistence: persistence)
+        await viewModel.load()
+
+        XCTAssertTrue(viewModel.isSyncOrUpdateBlocked)
+        XCTAssertFalse(viewModel.canTapBalanceAction)
+        XCTAssertNotNil(viewModel.openEntryBannerMessage)
+        XCTAssertTrue(viewModel.openEntryBannerMessage?.contains("Assign now") == true)
+
+        viewModel.tapBalanceAction()
+        XCTAssertFalse(viewModel.showSyncSheet)
+        XCTAssertEqual(viewModel.infoMessage, "Assign the open credit before Sync or Update.")
+
+        viewModel.assignOpenEntryNow()
+        XCTAssertTrue(viewModel.showCreditEntry)
+        XCTAssertEqual(viewModel.activeCreditEntry?.id, open.id)
+    }
+
+    func testCreditSyncSheetCreatesOpenEntryViaOwnedViewModel() async throws {
+        let persistence = InMemoryPersistence()
+        try await persistence.saveState(makePostSetupState(consent: true))
+        let sync = MockBalanceSyncService(
+            knownAccountIDs: [UUID(uuidString: "11111111-1111-1111-1111-111111111111")!],
+            fetchedBalancePaisa: MockBalanceSyncService.demoHigherBalancePaisa
+        )
         let viewModel = GoalsViewModel(persistence: persistence, balanceSync: sync)
         await viewModel.load()
-        viewModel.showSyncSheet = true
-        await viewModel.performSync()
+        await viewModel.creditSyncViewModel.loadAndPrepare()
+        await viewModel.creditSyncViewModel.syncNow()
 
-        XCTAssertFalse(viewModel.showSyncSheet)
-        XCTAssertEqual(viewModel.totalSavingsPaisa, MockBalanceSyncService.demoBalancePaisa)
+        XCTAssertNotNil(viewModel.creditSyncViewModel.createdEntry)
+        XCTAssertEqual(viewModel.creditSyncViewModel.createdEntry?.creditAmount, 1_000_000)
+        await viewModel.load()
+        XCTAssertTrue(viewModel.isSyncOrUpdateBlocked)
     }
 
     // MARK: - Fixtures

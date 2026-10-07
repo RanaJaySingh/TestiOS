@@ -1,7 +1,7 @@
 import Combine
 import Foundation
 
-/// View model for Goals tab (frames 9 / 9b / 9c / 11) — PIP-45 / PIP-49 detail nav.
+/// View model for Goals tab (frames 9 / 9b / 9c / 11) — PIP-45 / PIP-49 detail nav + PIP-47 credit flow.
 @MainActor
 final class GoalsViewModel: ObservableObject {
     @Published private(set) var goals: [Goal] = []
@@ -10,28 +10,50 @@ final class GoalsViewModel: ObservableObject {
     @Published private(set) var heldGoalChanges: [HeldGoalChange] = []
     @Published private(set) var standingSplits: [StandingSplit] = []
     @Published private(set) var isLoading = false
-    @Published private(set) var isSyncing = false
     @Published private(set) var errorMessage: String?
+    @Published private(set) var infoMessage: String?
     @Published var showSyncSheet = false
     @Published var showUpdateBalanceSheet = false
     @Published var showSettings = false
+    @Published var showCreditEntry = false
     /// Selected goal for navigation to GoalDetailView.
     @Published var selectedGoalID: UUID?
+    /// Open New credit entry pending assignment (frame 9b).
+    @Published private(set) var openEntry: HistoryEntry?
+    @Published private(set) var openEntryBannerMessage: String?
+    @Published private(set) var withdrawalStubMessage: String?
+    /// Entry presented in CreditEntryView after Sync/Update Continue or Assign now.
+    @Published private(set) var activeCreditEntry: HistoryEntry?
 
-    /// Shared persistence for Goal detail / edit (PIP-49).
+    /// Shared persistence for Goal detail / edit (PIP-49) and credit sheets (PIP-47).
     let persistence: any PersistenceServicing
-    private let formatting: any FormattingServicing
-    private let balanceSync: any BalanceSyncServicing
+    let formatting: any FormattingServicing
+    let balanceSync: any BalanceSyncServicing
+    /// Owned credit-flow sheets (PIP-47).
+    let creditSyncViewModel: CreditSyncViewModel
+    let creditUpdateViewModel: CreditUpdateBalanceViewModel
 
     init(
         persistence: any PersistenceServicing,
         formatting: any FormattingServicing = FormattingService(),
-        balanceSync: any BalanceSyncServicing = MockBalanceSyncService(),
+        balanceSync: any BalanceSyncServicing = MockBalanceSyncService(
+            fetchedBalancePaisa: MockBalanceSyncService.demoHigherBalancePaisa
+        ),
         initialState: PersistedAppState? = nil
     ) {
         self.persistence = persistence
         self.formatting = formatting
         self.balanceSync = balanceSync
+        self.creditSyncViewModel = CreditSyncViewModel(
+            persistence: persistence,
+            balanceSync: balanceSync,
+            formatting: formatting
+        )
+        self.creditUpdateViewModel = CreditUpdateBalanceViewModel(
+            persistence: persistence,
+            balanceSync: balanceSync,
+            formatting: formatting
+        )
         if let initialState {
             apply(initialState)
         }
@@ -64,6 +86,15 @@ final class GoalsViewModel: ObservableObject {
     var selectedGoal: Goal? {
         guard let selectedGoalID else { return nil }
         return goals.first { $0.id == selectedGoalID }
+    }
+
+    /// BR-6 / R9 — Sync / Update blocked while an open credit exists.
+    var isSyncOrUpdateBlocked: Bool {
+        CreditEntryService.isSyncOrUpdateBlocked(history: history)
+    }
+
+    var canTapBalanceAction: Bool {
+        !isSyncOrUpdateBlocked
     }
 
     func formattedSavedAmount(for goal: Goal) -> String {
@@ -104,8 +135,18 @@ final class GoalsViewModel: ObservableObject {
         errorMessage = nil
     }
 
-    /// Consent On → present Sync sheet / run mock sync.
+    func clearInfo() {
+        infoMessage = nil
+    }
+
+    /// Consent On → CreditSyncSheet; Consent Off → CreditUpdateBalanceSheet.
+    /// Blocked when open entry pending (BR-6).
     func tapBalanceAction() {
+        guard canTapBalanceAction else {
+            infoMessage = "Assign the open credit before Sync or Update."
+            return
+        }
+        infoMessage = nil
         switch balanceAction {
         case .sync:
             showSyncSheet = true
@@ -114,46 +155,37 @@ final class GoalsViewModel: ObservableObject {
         }
     }
 
-    /// Invoked from SyncSheet — calls BalanceSyncService stub (full credit entry later).
-    func performSync() async {
-        guard let dedicated = AccountsService.dedicatedAccount(in: accounts) else {
-            errorMessage = "No dedicated savings account."
-            showSyncSheet = false
-            return
-        }
-        isSyncing = true
-        defer { isSyncing = false }
-        let result = await balanceSync.fetchBalance(accountId: dedicated.id)
-        switch result {
-        case .success(let paisa):
-            await updateDedicatedBalance(paisa)
-            showSyncSheet = false
-        case .failure(let error):
-            errorMessage = String(describing: error)
-            showSyncSheet = false
-        }
+    /// Banner "Assign now" → open CreditEntryView for the pending entry.
+    func assignOpenEntryNow() {
+        guard let openEntry else { return }
+        presentCreditEntry(openEntry)
     }
 
-    /// Invoked from UpdateBalanceSheet stub — applies typed amount without full credit flow.
-    func applyManualBalance(_ paisa: Paisa) async {
-        await updateDedicatedBalance(paisa)
+    func presentCreditEntry(_ entry: HistoryEntry) {
+        activeCreditEntry = entry
+        showSyncSheet = false
         showUpdateBalanceSheet = false
+        showCreditEntry = true
     }
 
-    private func updateDedicatedBalance(_ paisa: Paisa) async {
-        do {
-            var state = try await persistence.loadState()
-            state.accounts = state.accounts.map { account in
-                guard account.isDedicated else { return account }
-                var updated = account
-                updated.balance = paisa
-                return updated
-            }
-            try await persistence.saveState(state)
-            apply(state)
-        } catch {
-            errorMessage = error.localizedDescription
-        }
+    func creditEntryFinished() {
+        showCreditEntry = false
+        activeCreditEntry = nil
+        Task { await load() }
+    }
+
+    /// Lower-balance stub (full Withdrawal UI is a separate ticket).
+    func handleWithdrawalStub(shortfall: Paisa) {
+        showSyncSheet = false
+        showUpdateBalanceSheet = false
+        let formatted = formatting.formatINR(paisa: shortfall)
+        withdrawalStubMessage = "Withdrawal stub: shortfall \(formatted) (full UI in a later ticket)."
+        Task { await load() }
+    }
+
+    /// After Sync/Update sheet closes without navigating to credit entry.
+    func sheetDismissed() {
+        Task { await load() }
     }
 
     private func apply(_ state: PersistedAppState) {
@@ -162,5 +194,15 @@ final class GoalsViewModel: ObservableObject {
         history = state.history
         heldGoalChanges = state.heldGoalChanges
         standingSplits = state.standingSplits
+        if let entry = CreditEntryService.openCreditEntry(in: state.history) {
+            openEntry = entry
+            openEntryBannerMessage = CreditEntryService.openEntryBannerMessage(
+                for: entry,
+                formatting: formatting
+            )
+        } else {
+            openEntry = nil
+            openEntryBannerMessage = nil
+        }
     }
 }

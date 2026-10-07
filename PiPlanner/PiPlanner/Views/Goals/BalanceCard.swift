@@ -5,6 +5,8 @@ struct BalanceCard: View {
     let formattedTotal: String
     let accountSubtitle: String?
     let actionTitle: String
+    /// When false, Sync/Update is disabled (open credit pending — BR-6 / R9).
+    var actionEnabled: Bool = true
     var onAction: () -> Void
 
     var body: some View {
@@ -32,6 +34,7 @@ struct BalanceCard: View {
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
+            .disabled(!actionEnabled)
             .accessibilityIdentifier("goals.balance.action")
             .accessibilityLabel(actionTitle)
         }
