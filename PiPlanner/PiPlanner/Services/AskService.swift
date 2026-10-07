@@ -34,7 +34,7 @@ enum AskService {
     /// Design frame 19 suggestion chips / Ask starters (PIP-108).
     static let suggestionChips: [String] = [
         "What happens if I change the split?",
-        "Why is inflation 7%?"
+        "Why is inflation 5%?"
     ]
 
     /// Idle Ask starters — same as suggestion chips (PIP-108 naming).
@@ -89,7 +89,7 @@ enum AskService {
     }
 
     static func inflationAnswer() -> String {
-        "PiPlanner starts at 7% inflation as a cautious default. It’s an estimate, not a guarantee — you can change it on any goal."
+        "PiPlanner starts at 5% inflation as a cautious default. It’s an estimate, not a guarantee — you can change it on any goal."
     }
 
     static func splitAnswer(

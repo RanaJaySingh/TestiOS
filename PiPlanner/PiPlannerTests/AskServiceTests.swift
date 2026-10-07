@@ -27,11 +27,11 @@ final class AskServiceTests: XCTestCase {
 
     func testInflationChipAnswer() {
         let answer = AskService.plainAnswer(
-            for: "Why is inflation 7%?",
+            for: "Why is inflation 5%?",
             engine: AskEngineContext(),
             formatting: formatting
         )
-        XCTAssertTrue(answer.contains("7%"))
+        XCTAssertTrue(answer.contains("5%"))
     }
 
     func testSplitChipAnswerUsesShares() {

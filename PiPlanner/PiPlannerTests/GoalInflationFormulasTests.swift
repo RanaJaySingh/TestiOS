@@ -12,8 +12,35 @@ final class GoalInflationFormulasTests: XCTestCase {
         calendar.date(byAdding: .month, value: months, to: start)!
     }
 
-    func testDefaultInflationIsSevenPercent() {
-        XCTAssertEqual(GoalInflationFormulas.defaultInflationRate, Decimal(string: "0.07")!)
+    func testDefaultInflationIsFivePercent() {
+        XCTAssertEqual(GoalInflationFormulas.defaultInflationRate, Decimal(string: "0.05")!)
+        XCTAssertEqual(GoalInflationFormulas.defaultInflationPercent, 5)
+    }
+
+    func testParseInflationPercentTextAcceptsBounds() {
+        XCTAssertEqual(GoalInflationFormulas.parseInflationPercentText("0"), 0)
+        XCTAssertEqual(GoalInflationFormulas.parseInflationPercentText("5"), 5)
+        XCTAssertEqual(GoalInflationFormulas.parseInflationPercentText("30"), 30)
+        XCTAssertNil(GoalInflationFormulas.parseInflationPercentText(""))
+        XCTAssertNil(GoalInflationFormulas.parseInflationPercentText(" "))
+        XCTAssertNil(GoalInflationFormulas.parseInflationPercentText("abc"))
+        XCTAssertNil(GoalInflationFormulas.parseInflationPercentText("31"))
+        XCTAssertNil(GoalInflationFormulas.parseInflationPercentText("-1"))
+    }
+
+    func testEffectiveInflationRateFallsBackToDefaultWhenInvalid() {
+        XCTAssertEqual(
+            GoalInflationFormulas.effectiveInflationRate(fromPercentText: "12"),
+            Decimal(string: "0.12")!
+        )
+        XCTAssertEqual(
+            GoalInflationFormulas.effectiveInflationRate(fromPercentText: ""),
+            GoalInflationFormulas.defaultInflationRate
+        )
+        XCTAssertEqual(
+            GoalInflationFormulas.effectiveInflationRate(fromPercentText: "99"),
+            GoalInflationFormulas.defaultInflationRate
+        )
     }
 
     func testMonthsBetweenUsesCalendarMonths() {

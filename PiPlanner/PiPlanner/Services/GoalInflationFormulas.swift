@@ -9,8 +9,52 @@ import Foundation
 /// - `adjustedTarget = target × (1 + inflation) ^ (monthsStartToEnd / 12)`
 /// - `requiredSavings = (adjustedTarget − currentSaving) / monthsRemaining`
 enum GoalInflationFormulas {
-    /// Default inflation rate — 7% (0.07).
-    static let defaultInflationRate = Decimal(string: "0.07")!
+    /// Default inflation rate — 5% (0.05).
+    static let defaultInflationRate = Decimal(string: "0.05")!
+
+    /// Inclusive whole-percent bounds for the inflation rate field (PIP-109).
+    static let minInflationPercent = 0
+    static let maxInflationPercent = 30
+
+    /// Message when the typed percent is empty, non-numeric, or out of bounds.
+    static let invalidInflationPercentMessage =
+        "Enter a whole number from \(minInflationPercent) to \(maxInflationPercent)."
+
+    /// Default displayed as a whole percent (5).
+    static var defaultInflationPercent: Int {
+        displayPercent(fromFraction: defaultInflationRate)
+    }
+
+    /// Display percent 0…100 from a 0.0–1.0 fraction.
+    static func displayPercent(fromFraction fraction: Decimal) -> Int {
+        let percent = (fraction * 100 as NSDecimalNumber).doubleValue
+        return Int(percent.rounded())
+    }
+
+    /// Parses whole-percent text. Nil if empty, non-numeric, or outside 0…30.
+    static func parseInflationPercentText(_ text: String) -> Int? {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, trimmed.allSatisfy(\.isNumber), let value = Int(trimmed) else {
+            return nil
+        }
+        guard value >= minInflationPercent, value <= maxInflationPercent else {
+            return nil
+        }
+        return value
+    }
+
+    /// Fraction (0.0–1.0) from a whole percent.
+    static func inflationRate(fromPercent percent: Int) -> Decimal {
+        Decimal(percent) / 100
+    }
+
+    /// Live math rate: valid typed percent, otherwise the 5% default.
+    static func effectiveInflationRate(fromPercentText text: String) -> Decimal {
+        if let percent = parseInflationPercentText(text) {
+            return inflationRate(fromPercent: percent)
+        }
+        return defaultInflationRate
+    }
 
     // MARK: - Calendar helpers
 

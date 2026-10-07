@@ -74,7 +74,7 @@ struct GoalFormView: View {
             Text(
                 mode == .heldEdit
                     ? "Edits apply at the next credit. Earlier history is unchanged."
-                    : "Name, target, dates, and share of new credits. Inflation defaults to 7%."
+                    : "Name, target, dates, and share of new credits. Inflation defaults to 5%."
             )
                 .font(PiTypography.body())
                 .foregroundStyle(.secondary)
