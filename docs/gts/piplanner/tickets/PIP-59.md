@@ -50,6 +50,8 @@ cd PiPlanner
 swift test
 ```
 
+**Result:** 158 tests, 0 failures (includes 10 `HistoryServiceTests`; ViewModel / UITests are Xcode-host only).
+
 ## Assumptions
 
 - History type label for deletions is **Goal deleted** (AC); writer copy `DeleteGoalService.historyTitle` (“Deleted / moved”) unchanged.
