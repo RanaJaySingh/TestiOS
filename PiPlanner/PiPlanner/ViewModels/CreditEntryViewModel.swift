@@ -2,23 +2,31 @@ import Combine
 import Foundation
 
 /// View model for open / locked New credit History entry (frames 13 / 13a–13g / 13t).
-/// PRD R7–R8; Spec BR-2, BR-5.
+/// PRD R7–R8; Spec BR-2, BR-5; PIP-103 open → save + create goal.
 @MainActor
 final class CreditEntryViewModel: ObservableObject {
     @Published private(set) var displayPercents: [UUID: Int]
     @Published var useThisSplitForStanding = false
     @Published private(set) var isSaving = false
+    @Published private(set) var isCreatingGoal = false
     @Published private(set) var errorMessage: String?
     @Published private(set) var entry: HistoryEntry
     @Published private(set) var goals: [Goal]
+    @Published var showCreateGoalSheet = false
+    @Published var createGoalName = ""
+    @Published var createGoalTargetRupees = ""
 
     private let persistence: any PersistenceServicing
     private let formatting: any FormattingServicing
+    private let ledger: any LedgerEngine
     private let clock: () -> Date
+    private let makeID: () -> UUID
 
     var isSingleGoal: Bool { goals.count == 1 }
     var isLocked: Bool { entry.isLocked }
     var isTyped: Bool { entry.isTyped == true }
+    var showsCustomBadge: Bool { HistoryService.showsCustomSplitBadge(entry) }
+    var showsTypedBadge: Bool { HistoryService.showsTypedBadge(entry) }
 
     var creditAmount: Paisa { entry.creditAmount ?? 0 }
 
@@ -70,25 +78,39 @@ final class CreditEntryViewModel: ObservableObject {
         goals: [Goal],
         persistence: any PersistenceServicing,
         formatting: any FormattingServicing = FormattingService(),
-        clock: @escaping () -> Date = Date.init
+        ledger: any LedgerEngine = StubLedgerEngine(),
+        clock: @escaping () -> Date = Date.init,
+        makeID: @escaping () -> UUID = UUID.init
     ) {
         self.entry = entry
         self.goals = goals
         self.persistence = persistence
         self.formatting = formatting
+        self.ledger = ledger
         self.clock = clock
+        self.makeID = makeID
+        self.displayPercents = Self.percents(from: entry, goals: goals)
+    }
 
+    private static func percents(from entry: HistoryEntry, goals: [Goal]) -> [UUID: Int] {
         if goals.count == 1, let goal = goals.first {
-            self.displayPercents = [goal.id: 100]
-        } else {
-            self.displayPercents = Dictionary(uniqueKeysWithValues: entry.allocations.map {
-                ($0.goalId, ($0.percentage * 100).roundedTowardZeroInt)
-            })
-            // Ensure every current goal has a key.
-            for goal in goals where displayPercents[goal.id] == nil {
-                displayPercents[goal.id] = 0
-            }
+            return [goal.id: 100]
         }
+        var map = Dictionary(uniqueKeysWithValues: entry.allocations.map {
+            ($0.goalId, ($0.percentage * 100).roundedTowardZeroInt)
+        })
+        for goal in goals where map[goal.id] == nil {
+            map[goal.id] = 0
+        }
+        return map
+    }
+
+    func openCreateGoal() {
+        guard !isLocked else { return }
+        createGoalName = ""
+        createGoalTargetRupees = ""
+        errorMessage = nil
+        showCreateGoalSheet = true
     }
 
     static func load(
@@ -142,7 +164,7 @@ final class CreditEntryViewModel: ObservableObject {
         formatting.formatINR(paisa: goal.savedAmount)
     }
 
-    /// BR-5 / R8: Save and lock once; optional standing split update.
+    /// BR-5 / R8 / PIP-103: Save and lock once via StubLedgerEngine; optional standing split.
     func saveAndLock() async {
         guard canSave else { return }
         isSaving = true
@@ -151,8 +173,8 @@ final class CreditEntryViewModel: ObservableObject {
 
         do {
             var state = try await persistence.loadState()
-            state = try CreditEntryService.applyCreditLock(
-                to: state,
+            state = try ledger.saveAndLockCredit(
+                state: state,
                 entryID: entry.id,
                 percentages: fractionMap,
                 useThisSplitForStanding: useThisSplitForStanding,
@@ -163,6 +185,61 @@ final class CreditEntryViewModel: ObservableObject {
                 entry = locked
             }
             goals = state.goals
+            displayPercents = Self.percents(from: entry, goals: goals)
+        } catch let error as AppError {
+            errorMessage = error.localizedDescription
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    /// PIP-103 / R10: Create goal while open — saved ₹0; goal totals unchanged until Save.
+    func createGoal() async {
+        guard !isLocked, !isCreatingGoal else { return }
+        let trimmed = createGoalName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            errorMessage = "Enter a goal name."
+            return
+        }
+        let digits = createGoalTargetRupees.filter(\.isNumber)
+        guard let rupees = Paisa(digits), rupees > 0 else {
+            errorMessage = "Enter a target greater than ₹0."
+            return
+        }
+
+        isCreatingGoal = true
+        errorMessage = nil
+        defer { isCreatingGoal = false }
+
+        let now = clock()
+        let goal = GoalValidationService.makeGoal(
+            id: makeID(),
+            name: trimmed,
+            targetPaisa: rupees * 100,
+            startDate: now,
+            endDate: now.addingTimeInterval(86_400 * 365),
+            shareOfNewCredits: 0,
+            savedAmount: 0,
+            now: now
+        )
+
+        do {
+            var state = try await persistence.loadState()
+            state = try ledger.addGoalToOpenCredit(
+                state: state,
+                entryID: entry.id,
+                goal: goal,
+                now: now
+            )
+            try await persistence.saveState(state)
+            if let open = state.history.first(where: { $0.id == entry.id }) {
+                entry = open
+            }
+            goals = state.goals
+            displayPercents = Self.percents(from: entry, goals: goals)
+            showCreateGoalSheet = false
+            createGoalName = ""
+            createGoalTargetRupees = ""
         } catch let error as AppError {
             errorMessage = error.localizedDescription
         } catch {

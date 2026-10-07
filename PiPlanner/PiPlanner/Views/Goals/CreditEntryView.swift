@@ -18,6 +18,9 @@ struct CreditEntryView: View {
                 if !viewModel.isLocked && !viewModel.isSingleGoal {
                     standingCheckbox
                 }
+                if !viewModel.isLocked {
+                    createGoalLink
+                }
                 statusFooter
                 if !viewModel.isLocked {
                     saveButton
@@ -35,6 +38,9 @@ struct CreditEntryView: View {
         .navigationTitle(viewModel.isLocked ? "Credit locked" : "New credit")
         .navigationBarTitleDisplayMode(.inline)
         .piPlannerTheme()
+        .sheet(isPresented: $viewModel.showCreateGoalSheet) {
+            createGoalSheet
+        }
         .alert(
             "Couldn’t save",
             isPresented: Binding(
@@ -104,18 +110,13 @@ struct CreditEntryView: View {
     @ViewBuilder
     private var badges: some View {
         HStack(spacing: DesignTokens.Space.s8) {
-            if viewModel.isTyped {
+            if viewModel.showsTypedBadge {
                 entryBadge(title: "Typed", accessibilityIdentifier: "creditEntry.typedBadge")
             }
-            if showsCustomBadge {
+            if viewModel.showsCustomBadge {
                 entryBadge(title: "Custom", accessibilityIdentifier: "creditEntry.customBadge")
             }
         }
-    }
-
-    /// Locked non-typed credits show the design “Custom” badge (13d / History · Custom split).
-    private var showsCustomBadge: Bool {
-        viewModel.isLocked && !viewModel.isTyped
     }
 
     private func entryBadge(title: String, accessibilityIdentifier: String) -> some View {
@@ -275,6 +276,66 @@ struct CreditEntryView: View {
         }
         .tint(PiColors.navyPrimary)
         .accessibilityIdentifier("creditEntry.useStanding")
+    }
+
+    private var createGoalLink: some View {
+        SecondaryCTA(
+            title: "Create goal",
+            style: .text,
+            accessibilityIdentifier: "creditEntry.createGoal",
+            action: { viewModel.openCreateGoal() }
+        )
+    }
+
+    private var createGoalSheet: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: DesignTokens.Space.s16) {
+                    Text("Create goal")
+                        .font(PiTypography.title())
+                        .foregroundStyle(PiColors.navyPrimary)
+                        .accessibilityAddTraits(.isHeader)
+                    Text("Saved starts at ₹0. Goal totals update only when you Save and lock this credit.")
+                        .font(PiTypography.body())
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    PiCard {
+                        VStack(alignment: .leading, spacing: DesignTokens.Space.s12) {
+                            TextField("Name", text: $viewModel.createGoalName)
+                                .font(PiTypography.body())
+                                .accessibilityIdentifier("creditEntry.createGoal.name")
+                            TextField("Target (₹)", text: $viewModel.createGoalTargetRupees)
+                                .font(PiTypography.body())
+                                .keyboardType(.numberPad)
+                                .accessibilityIdentifier("creditEntry.createGoal.target")
+                        }
+                    }
+
+                    if viewModel.isCreatingGoal {
+                        ProgressView()
+                            .frame(maxWidth: .infinity)
+                    } else {
+                        PrimaryCTA(
+                            title: "Add goal",
+                            accessibilityIdentifier: "creditEntry.createGoal.save"
+                        ) {
+                            Task { await viewModel.createGoal() }
+                        }
+                    }
+                }
+                .padding(DesignTokens.Space.s16)
+            }
+            .background(PiColors.backgroundApp.ignoresSafeArea())
+            .navigationTitle("Create goal")
+            .navigationBarTitleDisplayMode(.inline)
+            .piPlannerTheme()
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") { viewModel.showCreateGoalSheet = false }
+                }
+            }
+        }
     }
 
     private var statusFooter: some View {
