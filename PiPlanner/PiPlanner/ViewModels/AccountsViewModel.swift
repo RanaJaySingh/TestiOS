@@ -43,15 +43,9 @@ final class AccountsViewModel: ObservableObject {
         formatting.formatINR(paisa: account.balance)
     }
 
-    /// Role label for demo persona rows (Savings vs Spending) without changing Account contract.
+    /// Role label for demo persona rows (Dedicated / Savings / Spending) — PIP-99.
     func roleLabel(for account: Account) -> String {
-        if account.bankName == "HDFC" {
-            return "Savings"
-        }
-        if account.bankName == "SBI" {
-            return "Spending"
-        }
-        return "Account"
+        AccountsService.roleLabel(for: account)
     }
 
     /// Exclusive dedicated toggle (BR-1): ON on one turns others OFF.

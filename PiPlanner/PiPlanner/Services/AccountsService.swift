@@ -58,4 +58,36 @@ enum AccountsService {
     static func displayTitle(for account: Account) -> String {
         "\(account.bankName) \(account.maskedNumber)"
     }
+
+    // MARK: - Roles / spending visibility (PIP-99)
+
+    /// Row role on Accounts (frame 2). Dedicated wins; else demo Savings / Spending.
+    static func roleLabel(for account: Account) -> String {
+        if account.isDedicated {
+            return "Dedicated savings"
+        }
+        switch account.bankName {
+        case "HDFC":
+            return "Savings"
+        case "SBI":
+            return "Spending"
+        default:
+            return "Account"
+        }
+    }
+
+    /// Non-dedicated accounts are spending (R21 / R25) — unretracked for credits.
+    static func isSpendingAccount(_ account: Account) -> Bool {
+        !account.isDedicated
+    }
+
+    /// Goals / Sync / History use dedicated only. Spending balances stay on Accounts.
+    static func tracksBalanceOutsideAccounts(_ account: Account) -> Bool {
+        account.isDedicated
+    }
+
+    /// Balances that may appear outside Accounts (dedicated savings only).
+    static func balancesTrackedOutsideAccounts(in accounts: [Account]) -> [Account] {
+        accounts.filter(tracksBalanceOutsideAccounts)
+    }
 }

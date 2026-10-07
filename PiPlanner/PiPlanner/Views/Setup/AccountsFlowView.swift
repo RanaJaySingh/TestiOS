@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Hosts Accounts and navigates into Consent + balance entry + Goal chat (PIP-39 / PIP-41).
+/// Hosts Accounts and navigates into Consent sheet + balance entry + Goal chat (PIP-39 / PIP-99).
 /// Prefer `WelcomeFlowView` for the full setup path; this remains for Accounts-only demos.
 struct AccountsFlowView: View {
     @StateObject private var viewModel: AccountsViewModel
@@ -8,6 +8,7 @@ struct AccountsFlowView: View {
     @StateObject private var goalChatViewModel = GoalChatViewModel()
     @State private var openingSplitViewModel: OpeningSplitViewModel?
     @State private var path = NavigationPath()
+    @State private var showConsentSheet = false
 
     private let persistence: any PersistenceServicing
 
@@ -25,19 +26,14 @@ struct AccountsFlowView: View {
     var body: some View {
         NavigationStack(path: $path) {
             AccountsView(viewModel: viewModel) {
-                path.append(AccountsRoute.consent)
+                consentViewModel.updateAccounts(viewModel.accounts)
+                showConsentSheet = true
+            }
+            .sheet(isPresented: $showConsentSheet) {
+                consentSheet
             }
             .navigationDestination(for: AccountsRoute.self) { route in
                 switch route {
-                case .consent:
-                    ConsentSheet(
-                        viewModel: consentViewModel,
-                        onYesFetched: { path.append(AccountsRoute.fetchedBalance) },
-                        onNo: { path.append(AccountsRoute.updateBalance) }
-                    )
-                    .onAppear {
-                        consentViewModel.updateAccounts(viewModel.accounts)
-                    }
                 case .fetchedBalance:
                     FetchedBalanceView(viewModel: consentViewModel) {
                         continueToGoalChat()
@@ -61,7 +57,6 @@ struct AccountsFlowView: View {
                         onWrongPin: { path.append(AccountsRoute.wrongPin) },
                         onCancel: {
                             path = NavigationPath()
-                            path.append(AccountsRoute.consent)
                             path.append(AccountsRoute.updateBalance)
                         },
                         onOtherApp: { path.append(AccountsRoute.otherApp) }
@@ -96,6 +91,24 @@ struct AccountsFlowView: View {
         }
     }
 
+    private var consentSheet: some View {
+        NavigationStack {
+            ConsentSheet(
+                viewModel: consentViewModel,
+                onYesFetched: {
+                    showConsentSheet = false
+                    path.append(AccountsRoute.fetchedBalance)
+                },
+                onNo: {
+                    showConsentSheet = false
+                    path.append(AccountsRoute.updateBalance)
+                }
+            )
+        }
+        .presentationDetents([.medium, .large])
+        .accessibilityIdentifier("setup.consentSheet")
+    }
+
     private func continueToGoalChat() {
         goalChatViewModel.reset()
         path.append(AccountsRoute.goalChat)
@@ -114,8 +127,8 @@ struct AccountsFlowView: View {
 }
 
 /// Navigation targets from Accounts through Goal chat / Opening split.
+/// Consent is a sheet over Accounts — not a path destination (PIP-99).
 enum AccountsRoute: Hashable {
-    case consent
     case fetchedBalance
     case updateBalance
     case manualBalance
