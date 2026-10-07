@@ -41,6 +41,10 @@ Restyle of History credit-entry open / locked / typed treatments to design badge
 
 Started from `b30a048` (visual-parity foundations on main). Touches only `CreditEntryView` + `HistoryDetailView` so parallel PIP-73..95 screen tickets stay rebase-friendly. No ViewModel / Service / History list row changes (list chrome is PIP-91).
 
+## Test results
+
+`cd PiPlanner && swift test` — **206 tests, 0 failures** (includes `CreditEntryServiceTests`; Views excluded from Linux SPM — behaviour unchanged).
+
 ## How to run tests
 
 ```bash
