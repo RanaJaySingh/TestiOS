@@ -9,6 +9,8 @@ enum GoalsRoute: Hashable {
 /// Goals tab — design frames 9 / 9b / 9c (PIP-45); detail via PIP-49; Sync/Update/Credit via PIP-47.
 struct GoalsTabView: View {
     @ObservedObject var viewModel: GoalsViewModel
+    /// Settings → Reset demo → Welcome (PIP-61 / PRD R17).
+    var onDemoReset: (() -> Void)?
 
     var body: some View {
         ScrollView {
@@ -188,7 +190,9 @@ struct GoalsTabView: View {
             SettingsView(
                 goals: viewModel.goals,
                 standingSplits: viewModel.standingSplits,
-                persistence: viewModel.persistence
+                persistence: viewModel.persistence,
+                accounts: viewModel.accounts,
+                onDemoReset: onDemoReset
             )
         }
         .onChange(of: viewModel.showSettings) { isPresented in

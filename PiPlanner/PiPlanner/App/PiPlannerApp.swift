@@ -29,7 +29,12 @@ struct ContentView: View {
                         persistence: persistence
                     )
                 case .goals:
-                    MainTabView(persistence: persistence)
+                    MainTabView(
+                        persistence: persistence,
+                        onDemoReset: {
+                            returnToWelcome(persistence: persistence)
+                        }
+                    )
                 }
             } else {
                 ProgressView("Loading…")
@@ -56,6 +61,15 @@ struct ContentView: View {
                 loadError = error.localizedDescription
             }
         }
+    }
+
+    /// Settings → Reset demo (PRD R17) — clear host and show Welcome (1).
+    private func returnToWelcome(persistence: PersistenceService) {
+        accountsViewModel = AccountsViewModel(
+            accounts: DemoSeed.sampleAccounts,
+            persistence: persistence
+        )
+        destination = .welcome
     }
 }
 

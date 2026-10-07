@@ -3,10 +3,16 @@ import SwiftUI
 /// Post-setup shell — Spec §4.3 Tab Bar: Goals | History | Ask (Settings via gear).
 struct MainTabView: View {
     let persistence: any PersistenceServicing
+    /// Bubbles Settings → Reset demo up to `ContentView` for Welcome (1).
+    var onDemoReset: (() -> Void)?
     @StateObject private var goalsViewModel: GoalsViewModel
 
-    init(persistence: any PersistenceServicing) {
+    init(
+        persistence: any PersistenceServicing,
+        onDemoReset: (() -> Void)? = nil
+    ) {
         self.persistence = persistence
+        self.onDemoReset = onDemoReset
         _goalsViewModel = StateObject(
             wrappedValue: GoalsViewModel(persistence: persistence)
         )
@@ -15,7 +21,10 @@ struct MainTabView: View {
     var body: some View {
         TabView {
             NavigationStack {
-                GoalsTabView(viewModel: goalsViewModel)
+                GoalsTabView(
+                    viewModel: goalsViewModel,
+                    onDemoReset: onDemoReset
+                )
             }
             .tabItem {
                 Label("Goals", systemImage: "target")

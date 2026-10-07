@@ -1,8 +1,12 @@
 import SwiftUI
 
-/// Consent sheet — design frame 3 (PRD R3 / R4).
+/// Consent sheet — design frame 3 (PRD R3 / R4); Settings re-open 20b (PRD R17).
 struct ConsentSheet: View {
     @ObservedObject var viewModel: ConsentViewModel
+    /// Setup shows “Step 2 of 3”; Settings (20b) hides the step label.
+    var showsSetupStep: Bool = true
+    /// Setup Yes fetches opening balance; Settings Yes only grants auto-update.
+    var fetchesBalanceOnYes: Bool = true
     var onYesFetched: () -> Void
     var onNo: () -> Void
 
@@ -33,9 +37,11 @@ struct ConsentSheet: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Step 2 of 3")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+            if showsSetupStep {
+                Text("Step 2 of 3")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
             Text("Allow balance checks?")
                 .font(.title2)
                 .fontWeight(.semibold)
@@ -75,7 +81,12 @@ struct ConsentSheet: View {
         VStack(spacing: 12) {
             Button {
                 Task {
-                    if await viewModel.chooseConsentYes() != nil {
+                    if fetchesBalanceOnYes {
+                        if await viewModel.chooseConsentYes() != nil {
+                            onYesFetched()
+                        }
+                    } else {
+                        // Settings (20b): host persists consent On without re-fetching balance.
                         onYesFetched()
                     }
                 }
@@ -95,7 +106,11 @@ struct ConsentSheet: View {
             .buttonStyle(.borderedProminent)
             .disabled(viewModel.isWorking)
             .accessibilityLabel("Yes, update automatically")
-            .accessibilityHint("Fetches opening balance for the dedicated account")
+            .accessibilityHint(
+                fetchesBalanceOnYes
+                    ? "Fetches opening balance for the dedicated account"
+                    : "Turns on automatic balance updates"
+            )
 
             Button {
                 viewModel.chooseConsentNo()
