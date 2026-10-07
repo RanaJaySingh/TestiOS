@@ -46,11 +46,18 @@ cd PiPlanner
 swift test
 ```
 
+## Round-1 review must-fix
+
+**Issue:** After Complete, `canMove` ignored `didComplete`, so Move stayed enabled on Goals/Detail (no dismiss) and a second tap could transfer again / write another History entry.
+
+**Fix:** `TransferService.canMove(..., isComplete:)` returns false when complete; `TransferViewModel.canMove` passes `didComplete`; `confirmMove()` early-returns when `didComplete`. Regression: `testSuccessfulMoveThenCompleteDisablesSecondMove` + `TransferViewModelTests.testConfirmMoveTwiceDoesNotWriteSecondHistoryEntry`.
+
 ## Assumptions
 
 - History presentation string for transfers is `"{From} → {To} · {₹amount}"` (`TransferService.historyTitle`); type label remains “Transfer”.
 - Ask stub returns a Transfer proposal when the query contains “transfer” or “move”; demo IDs match Car / Emergency Fund seed UUIDs with ₹5,000.
 - Design frames 16 / 16a–16c inferred from PRD R14 + Spec BR-7 (artifact not scraped in-agent).
+- Complete is terminal until the user changes From/To/amount (those intents clear `didComplete`).
 
 ## Out of scope
 

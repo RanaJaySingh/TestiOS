@@ -109,13 +109,16 @@ enum TransferService {
     }
 
     /// Move enabled only for valid preview state.
+    /// Complete is terminal: `isComplete == true` always disables Move (no double-transfer).
     static func canMove(
         fromGoalId: UUID?,
         toGoalId: UUID?,
         amountPaisa: Paisa,
         goals: [Goal],
-        isMoving: Bool = false
+        isMoving: Bool = false,
+        isComplete: Bool = false
     ) -> Bool {
+        guard !isComplete else { return false }
         guard !isMoving else { return false }
         guard let from = goal(id: fromGoalId, in: goals),
               let to = goal(id: toGoalId, in: goals),

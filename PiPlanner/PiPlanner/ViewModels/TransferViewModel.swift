@@ -91,7 +91,8 @@ final class TransferViewModel: ObservableObject {
             toGoalId: toGoalId,
             amountPaisa: amountPaisa,
             goals: goals,
-            isMoving: isMoving
+            isMoving: isMoving,
+            isComplete: didComplete
         )
     }
 
@@ -172,6 +173,8 @@ final class TransferViewModel: ObservableObject {
     }
 
     func confirmMove() async {
+        // Defense in depth: Complete is terminal — never apply twice.
+        guard !didComplete else { return }
         guard canMove,
               let fromID = fromGoalId,
               let toID = toGoalId

@@ -200,6 +200,54 @@ final class TransferServiceTests: XCTestCase {
         )
     }
 
+    /// Round-1 must-fix: after a successful Move, Complete is terminal —
+    /// `canMove` must be false so a second tap cannot apply again / append History.
+    func testSuccessfulMoveThenCompleteDisablesSecondMove() throws {
+        let state = sampleState()
+        let amount: Paisa = 500_000
+
+        XCTAssertTrue(
+            TransferService.canMove(
+                fromGoalId: carID,
+                toGoalId: emergencyID,
+                amountPaisa: amount,
+                goals: state.goals,
+                isComplete: false
+            )
+        )
+
+        let next = try TransferService.applyTransfer(
+            to: state,
+            fromGoalId: carID,
+            toGoalId: emergencyID,
+            amountPaisa: amount,
+            now: createdAt
+        )
+        XCTAssertEqual(next.history.filter { $0.type == .transfer }.count, 1)
+
+        // Amount can still be valid against the reduced From balance — without the
+        // Complete gate a second Move would succeed and write another History row.
+        XCTAssertTrue(
+            TransferService.canMove(
+                fromGoalId: carID,
+                toGoalId: emergencyID,
+                amountPaisa: amount,
+                goals: next.goals,
+                isComplete: false
+            )
+        )
+        XCTAssertFalse(
+            TransferService.canMove(
+                fromGoalId: carID,
+                toGoalId: emergencyID,
+                amountPaisa: amount,
+                goals: next.goals,
+                isComplete: true
+            ),
+            "didComplete / phase .complete must disable Move (no double-transfer)"
+        )
+    }
+
     // MARK: - Prefill (16c)
 
     func testAskTransferProposalMapsToPrefill() {
