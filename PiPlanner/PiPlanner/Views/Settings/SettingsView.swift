@@ -273,7 +273,7 @@ struct SettingsView: View {
         }
     }
 
-    /// On / Off chip — frames 20 / 20a visual state (navy when On, muted when Off).
+    /// On / Off chip — frames 20 / 20a (light-blue when On, muted when Off).
     private var consentStateChip: some View {
         Text(viewModel.consentAutoUpdate ? "On" : "Off")
             .font(PiTypography.caption())
@@ -284,7 +284,7 @@ struct SettingsView: View {
                     : Color.secondary
             )
             .padding(.horizontal, DesignTokens.Space.s8)
-            .padding(.vertical, 4)
+            .padding(.vertical, DesignTokens.Space.s8 / 2)
             .background(
                 viewModel.consentAutoUpdate
                     ? PiColors.chipLightBlue
@@ -324,6 +324,7 @@ struct SettingsView: View {
                             .foregroundStyle(.secondary)
                     }
                 }
+                .buttonStyle(.plain)
                 .accessibilityIdentifier("settings.standingSplit")
             }
         }
@@ -331,7 +332,7 @@ struct SettingsView: View {
 
     private var resetSection: some View {
         settingsGroup(title: "Demo") {
-            Button {
+            Button(role: .destructive) {
                 viewModel.requestResetDemo()
             } label: {
                 VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
