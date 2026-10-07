@@ -5,6 +5,8 @@ struct PiPlannerApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                // PIP-67: light appearance + navy AccentColor / primary tint (no screen restyles).
+                .piPlannerTheme()
         }
     }
 }
