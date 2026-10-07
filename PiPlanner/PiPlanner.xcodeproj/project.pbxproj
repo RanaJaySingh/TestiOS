@@ -140,6 +140,10 @@
 		F1020001BD814941ABD3C921 /* LedgerEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1020002EEA24F56B29EBB6A /* LedgerEngine.swift */; };
 		C98B0001BD814941ABD3C921 /* LedgerEngineCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C98F0001EEA24F56B29EBB6A /* LedgerEngineCore.swift */; };
 		L99B0001BD814941ABD3C921 /* LedgerFacade.swift in Sources */ = {isa = PBXBuildFile; fileRef = L99F0001EEA24F56B29EBB6A /* LedgerFacade.swift */; };
+		GPOB0001BD814941ABD3C921 /* GrokProposalOrchestrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = GPOF0001EEA24F56B29EBB6A /* GrokProposalOrchestrator.swift */; };
+		GPOB0002BD814941ABD3C921 /* GrokProposalOrchestratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = GPOF0002EEA24F56B29EBB6A /* GrokProposalOrchestratorTests.swift */; };
+		HEOB0001BD814941ABD3C921 /* HistoryEntryOpenSaveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = HEOF0001EEA24F56B29EBB6A /* HistoryEntryOpenSaveTests.swift */; };
+		L99B0002BD814941ABD3C921 /* LedgerFacadeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = L99F0002EEA24F56B29EBB6A /* LedgerFacadeTests.swift */; };
 		D47A0012BD814941ABD3C921 /* CreditSyncViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47A0013EEA24F56B29EBB6A /* CreditSyncViewModel.swift */; };
 		D47A0014BD814941ABD3C921 /* CreditUpdateBalanceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47A0015EEA24F56B29EBB6A /* CreditUpdateBalanceViewModel.swift */; };
 		D47A0016BD814941ABD3C921 /* CreditEntryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47A0017EEA24F56B29EBB6A /* CreditEntryViewModel.swift */; };
@@ -186,6 +190,10 @@
 		C98F0001EEA24F56B29EBB6A /* LedgerEngineCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LedgerEngineCore.swift; sourceTree = "<group>"; };
 		C98F0002EEA24F56B29EBB6A /* LedgerEngineCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LedgerEngineCoreTests.swift; sourceTree = "<group>"; };
 		L99F0001EEA24F56B29EBB6A /* LedgerFacade.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LedgerFacade.swift; sourceTree = "<group>"; };
+		GPOF0001EEA24F56B29EBB6A /* GrokProposalOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrokProposalOrchestrator.swift; sourceTree = "<group>"; };
+		GPOF0002EEA24F56B29EBB6A /* GrokProposalOrchestratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrokProposalOrchestratorTests.swift; sourceTree = "<group>"; };
+		HEOF0001EEA24F56B29EBB6A /* HistoryEntryOpenSaveTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryEntryOpenSaveTests.swift; sourceTree = "<group>"; };
+		L99F0002EEA24F56B29EBB6A /* LedgerFacadeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LedgerFacadeTests.swift; sourceTree = "<group>"; };
 		H59F0001EEA24F56B29EBB6A /* HistoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryService.swift; sourceTree = "<group>"; };
 		H59F0002EEA24F56B29EBB6A /* HistoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryViewModel.swift; sourceTree = "<group>"; };
 		H59F0003EEA24F56B29EBB6A /* HistoryEntryRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryEntryRow.swift; sourceTree = "<group>"; };
@@ -417,6 +425,7 @@
 				P1000001EEA24F56B29EBB6A /* UpdateBalanceRoutingService.swift */,
 				C41A1001EEA24F56B29EBB6A /* GrokService.swift */,
 				A63F0001EEA24F56B29EBB6A /* AskService.swift */,
+				GPOF0001EEA24F56B29EBB6A /* GrokProposalOrchestrator.swift */,
 				C41A1003EEA24F56B29EBB6A /* GoalValidationService.swift */,
 				P97A0002EEA24F56B29EBB6A /* GoalInflationFormulas.swift */,
 				A45F0001EEA24F56B29EBB6A /* GoalsTabService.swift */,
@@ -614,11 +623,14 @@
 				B39A001DEEA24F56B29EBB6A /* ConsentViewModelTests.swift */,
 				C41A100DEEA24F56B29EBB6A /* GrokServiceTests.swift */,
 				A63F0004EEA24F56B29EBB6A /* AskServiceTests.swift */,
+				GPOF0002EEA24F56B29EBB6A /* GrokProposalOrchestratorTests.swift */,
 				C41A100FEEA24F56B29EBB6A /* GoalValidationServiceTests.swift */,
 				P97A0004EEA24F56B29EBB6A /* GoalInflationFormulasTests.swift */,
 				C41A1011EEA24F56B29EBB6A /* GoalChatViewModelTests.swift */,
 				A45F000DEEA24F56B29EBB6A /* GoalsTabServiceTests.swift */,
 				A45F000EEEA24F56B29EBB6A /* GoalsViewModelTests.swift */,
+				HEOF0001EEA24F56B29EBB6A /* HistoryEntryOpenSaveTests.swift */,
+				L99F0002EEA24F56B29EBB6A /* LedgerFacadeTests.swift */,
 				B51A0004EEA24F56B29EBB6A /* StandingSplitServiceTests.swift */,
 				B51A0005EEA24F56B29EBB6A /* StandingSplitViewModelTests.swift */,
 				EF49BE600E2449DEAAFDE202 /* AppLaunchRouterTests.swift */,
@@ -849,6 +861,7 @@
 				A45B000ABD814941ABD3C921 /* HistoryTabView.swift in Sources */,
 				A45B000BBD814941ABD3C921 /* AskTabView.swift in Sources */,
 				A63B0001BD814941ABD3C921 /* AskService.swift in Sources */,
+				GPOB0001BD814941ABD3C921 /* GrokProposalOrchestrator.swift in Sources */,
 				A63B0002BD814941ABD3C921 /* AskViewModel.swift in Sources */,
 				A63B0003BD814941ABD3C921 /* ProposalCard.swift in Sources */,
 				A45B000CBD814941ABD3C921 /* SettingsView.swift in Sources */,
@@ -891,6 +904,7 @@
 				B39A001CBD814941ABD3C921 /* ConsentViewModelTests.swift in Sources */,
 				C41A100CBD814941ABD3C921 /* GrokServiceTests.swift in Sources */,
 				A63B0004BD814941ABD3C921 /* AskServiceTests.swift in Sources */,
+				GPOB0002BD814941ABD3C921 /* GrokProposalOrchestratorTests.swift in Sources */,
 				C41A100EBD814941ABD3C921 /* GoalValidationServiceTests.swift in Sources */,
 				P97A0003BD814941ABD3C921 /* GoalInflationFormulasTests.swift in Sources */,
 				463C0C59C104488E8D765E95 /* GoalHeldChangeServiceTests.swift in Sources */,
@@ -903,6 +917,7 @@
 				P1060001BD814941ABD3C921 /* DeleteGoalViewModelTests.swift in Sources */,
 				P1060003BD814941ABD3C921 /* TransferDeleteRedistributionTests.swift in Sources */,
 				H59B0005BD814941ABD3C921 /* HistoryServiceTests.swift in Sources */,
+				HEOB0001BD814941ABD3C921 /* HistoryEntryOpenSaveTests.swift in Sources */,
 				S61B0003BD814941ABD3C921 /* SettingsServiceTests.swift in Sources */,
 				S61B0004BD814941ABD3C921 /* SettingsViewModelTests.swift in Sources */,
 				D65B0002BD814941ABD3C921 /* DemoDataTests.swift in Sources */,
@@ -915,6 +930,7 @@
 				D47A0022BD814941ABD3C921 /* CreditEntryServiceTests.swift in Sources */,
 				F1020003BD814941ABD3C921 /* LedgerEngineTests.swift in Sources */,
 				C98B0002BD814941ABD3C921 /* LedgerEngineCoreTests.swift in Sources */,
+				L99B0002BD814941ABD3C921 /* LedgerFacadeTests.swift in Sources */,
 				B51B0004BD814941ABD3C921 /* StandingSplitServiceTests.swift in Sources */,
 				B51B0005BD814941ABD3C921 /* StandingSplitViewModelTests.swift in Sources */,
 			);

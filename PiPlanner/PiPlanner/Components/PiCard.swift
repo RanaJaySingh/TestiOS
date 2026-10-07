@@ -1,5 +1,13 @@
 import SwiftUI
 
+/// Soft card elevation tokens — held outside `PiCard` because generic types
+/// cannot declare static stored properties (Xcode emit-module).
+private enum PiCardShadow {
+    static let opacity: Double = 0.08
+    static let radius: Double = 8
+    static let y: Double = 4
+}
+
 /// White content card — soft Paytm-like elevation (PRD R2 / Tech Spec §3.5).
 ///
 /// Consumes `DesignTokens.Radius.card` (22) and `PiColors.surfaceCard`.
@@ -23,19 +31,14 @@ struct PiCard<Content: View>: View {
             .background(PiColors.surfaceCard)
             .clipShape(RoundedRectangle(cornerRadius: DesignTokens.Radius.card, style: .continuous))
             .shadow(
-                color: Color.black.opacity(Self.softShadowOpacity),
-                radius: Self.softShadowRadius,
+                color: Color.black.opacity(PiCardShadow.opacity),
+                radius: PiCardShadow.radius,
                 x: 0,
-                y: Self.softShadowY
+                y: PiCardShadow.y
             )
             .accessibilityElement(children: .contain)
             .accessibilityIdentifier("components.piCard")
     }
-
-    /// Soft card elevation — single layer (AC: not heavy multi-layer).
-    static let softShadowOpacity: Double = 0.08
-    static let softShadowRadius: Double = 8
-    static let softShadowY: Double = 4
 }
 
 #Preview("PiCard") {
