@@ -178,6 +178,36 @@ final class WithdrawalServiceTests: XCTestCase {
         )
     }
 
+    // MARK: - Edit-once Done gate (DeleteGoal parity / review must-fix)
+
+    func testFinishEditEvaluationRefusesInvalidTotalWithoutCompletingEditPass() {
+        let goals = sampleGoals()
+        let shortfall: Paisa = 1_500_000
+        var reductions = WithdrawalService.proportionalReductions(goals: goals, shortfall: shortfall)
+        reductions[carID] = (reductions[carID] ?? 0) - 100_000
+
+        let refused = WithdrawalService.evaluateFinishEdit(
+            reductions: reductions,
+            goals: goals,
+            shortfall: shortfall
+        )
+        XCTAssertFalse(refused.shouldCompleteEditPass)
+        XCTAssertEqual(refused.nextPhase, .invalidTotal)
+        XCTAssertNotNil(refused.errorMessage)
+        XCTAssertTrue(refused.errorMessage?.contains("Assign the remaining") == true)
+
+        // Fix to exact shortfall → Done may complete the one edit pass.
+        reductions = WithdrawalService.proportionalReductions(goals: goals, shortfall: shortfall)
+        let accepted = WithdrawalService.evaluateFinishEdit(
+            reductions: reductions,
+            goals: goals,
+            shortfall: shortfall
+        )
+        XCTAssertTrue(accepted.shouldCompleteEditPass)
+        XCTAssertEqual(accepted.nextPhase, .proportionalDefault)
+        XCTAssertNil(accepted.errorMessage)
+    }
+
     // MARK: - Fixtures
 
     private func sampleGoals() -> [Goal] {

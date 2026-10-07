@@ -148,24 +148,47 @@ enum WithdrawalService {
         return allReductionsWithinSaved(reductions: reductions, goals: goals)
     }
 
-    /// Resolves UI phase from current reductions (before complete).
-    static func phase(
+    /// Outcome of Done on the one edit pass (mirrors DeleteGoal `finishEdit` gating).
+    /// Invalid totals must **not** complete the edit pass — caller must not set `hasEditedOnce`.
+    struct FinishEditEvaluation: Equatable, Sendable {
+        /// When true, lock edit-once and leave edit mode so Save can enable.
+        var shouldCompleteEditPass: Bool
+        /// Phase to apply. Refused Done → `.invalidTotal` / `.goalBelowZero` so `canStartEdit` stays true.
+        var nextPhase: Phase
+        var errorMessage: String?
+    }
+
+    /// Pure Done-gate for edit-once (PRD R15 / DeleteGoal parity).
+    static func evaluateFinishEdit(
         reductions: [UUID: Paisa],
         goals: [Goal],
         shortfall: Paisa,
-        isEditing: Bool,
-        hasEditedOnce: Bool,
-        isComplete: Bool
-    ) -> Phase {
-        if isComplete { return .complete }
-        if isEditing { return .edit }
-        if firstGoalBelowZero(reductions: reductions, goals: goals) != nil {
-            return .goalBelowZero
+        formatting: any FormattingServicing = FormattingService()
+    ) -> FinishEditEvaluation {
+        if canSave(reductions: reductions, goals: goals, shortfall: shortfall) {
+            return FinishEditEvaluation(
+                shouldCompleteEditPass: true,
+                nextPhase: .proportionalDefault,
+                errorMessage: nil
+            )
         }
-        if totalReductions(reductions, goals: goals) != shortfall {
-            return .invalidTotal
+        if let bad = firstGoalBelowZero(reductions: reductions, goals: goals) {
+            return FinishEditEvaluation(
+                shouldCompleteEditPass: false,
+                nextPhase: .goalBelowZero,
+                errorMessage: goalBelowZeroMessage(goal: bad)
+            )
         }
-        return hasEditedOnce ? .proportionalDefault : .proportionalDefault
+        let total = totalReductions(reductions, goals: goals)
+        return FinishEditEvaluation(
+            shouldCompleteEditPass: false,
+            nextPhase: .invalidTotal,
+            errorMessage: invalidTotalMessage(
+                totalAssigned: total,
+                shortfall: shortfall,
+                formatting: formatting
+            ) ?? "Reductions must equal the shortfall."
+        )
     }
 
     // MARK: - Allocations / History

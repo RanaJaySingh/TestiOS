@@ -174,8 +174,20 @@ final class WithdrawalViewModel: ObservableObject {
     func finishEdit() {
         guard phase == .edit else { return }
         applyEditDigitsToReductions()
-        refreshPhaseAfterEdit()
+        let evaluation = WithdrawalService.evaluateFinishEdit(
+            reductions: reductions,
+            goals: goals,
+            shortfall: shortfall,
+            formatting: formatting
+        )
+        // DeleteGoal pattern: refuse Done until totals are valid — do not soft-lock edit-once.
+        guard evaluation.shouldCompleteEditPass else {
+            phase = evaluation.nextPhase
+            errorMessage = evaluation.errorMessage
+            return
+        }
         hasEditedOnce = true
+        phase = evaluation.nextPhase
         errorMessage = nil
     }
 
