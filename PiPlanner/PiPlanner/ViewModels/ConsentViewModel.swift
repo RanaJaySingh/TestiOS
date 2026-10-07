@@ -40,7 +40,7 @@ final class ConsentViewModel: ObservableObject {
     private let persistence: any PersistenceServicing
     private let balanceSync: any BalanceSyncServicing
     private let formatting: any FormattingServicing
-    /// Ledger mutations go through `LedgerFacade` until PIP-98 `LedgerEngine` lands.
+    /// Setup ledger mutations go through `LedgerFacade` → `LedgerEngine` source mapping.
 
     var dedicatedAccount: Account? {
         AccountsService.dedicatedAccount(in: accounts)

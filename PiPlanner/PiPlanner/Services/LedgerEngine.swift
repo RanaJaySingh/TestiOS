@@ -1,21 +1,13 @@
 import Foundation
 
-<<<<<<< HEAD
-/// Pure ledger surface used by Goals Sync / Update (PIP-102) and History
-/// open → save (PIP-103).
+/// Goals Sync / Update (PIP-102) + History open → save (PIP-103) ledger surface.
 ///
-/// PIP-98 owns the full engine; until that lands, `StubLedgerEngine` adapts the
-/// existing pure services (`CreditEntryService`, `GoalHeldChangeService`) so
-/// Goals tab + Credit entry call sites stay engine-shaped and swap cleanly later.
-=======
-/// Goals Sync / Update ledger surface (PIP-102).
+/// PIP-98 pure rules live in `LedgerEngineCore`. Call sites inject `any LedgerEngine`
+/// (default `StubLedgerEngine`): pending edits + credit deltas go through Core;
+/// History open→save / create-goal / `customSplit` stay tip PIP-103 (`CreditEntryService`).
 ///
-/// PIP-98 pure rules live in `LedgerEngineCore`. Goals call sites inject
-/// `any LedgerEngine` (default `StubLedgerEngine`), which applies pending goal
-/// edits then delegates credit deltas to `LedgerEngineCore`.
->>>>>>> 79d9f62 (PIP-98: Add pure Swift LedgerEngine + unit tests)
-///
-/// Distinct from PIP-99 `LedgerFacade` (Accounts/Consent opening-balance setup).
+/// Distinct from PIP-99 `LedgerFacade` (Accounts/Consent opening-balance setup) and
+/// PIP-101 `StubLedgerService` (Opening lock).
 protocol LedgerEngine: Sendable {
     /// BR-6 — Sync / Update blocked while an open New credit History entry exists.
     func isSyncOrUpdateBlocked(history: [HistoryEntry]) -> Bool
@@ -88,14 +80,9 @@ extension LedgerEngine {
     }
 }
 
-<<<<<<< HEAD
-/// Adapter ledger used while PIP-98 is unmerged. Delegates to existing services;
-/// owns the PIP-102 rule of applying pending goal edits before an open entry write,
-/// plus PIP-103 Save / create-goal while open.
-=======
-/// Goals Sync/Update adapter (PIP-102). Applies pending edits, then uses
-/// `LedgerEngineCore` for snapshot/typed credit deltas.
->>>>>>> 79d9f62 (PIP-98: Add pure Swift LedgerEngine + unit tests)
+/// Adapter for Goals Sync/Update + History open→save.
+/// Higher-balance path: pending edits then `LedgerEngineCore.applyBalanceDelta`.
+/// Save / create-goal: tip PIP-103 `CreditEntryService` (no duplicate History paths).
 struct StubLedgerEngine: LedgerEngine {
     func isSyncOrUpdateBlocked(history: [HistoryEntry]) -> Bool {
         CreditEntryService.isSyncOrUpdateBlocked(history: history)
@@ -178,8 +165,9 @@ struct StubLedgerEngine: LedgerEngine {
         entryID: UUID,
         percentages: [UUID: Decimal],
         useThisSplitForStanding: Bool,
-        now: Date = Date()
+        now: Date
     ) throws -> PersistedAppState {
+        // Tip PIP-103 owns History open→save / customSplit via CreditEntryService.
         try CreditEntryService.applyCreditLock(
             to: state,
             entryID: entryID,
@@ -193,7 +181,7 @@ struct StubLedgerEngine: LedgerEngine {
         state: PersistedAppState,
         entryID: UUID,
         goal: Goal,
-        now: Date = Date()
+        now: Date
     ) throws -> PersistedAppState {
         try CreditEntryService.addGoalToOpenCredit(
             to: state,

@@ -135,6 +135,7 @@
 		D47A0010BD814941ABD3C921 /* CreditEntryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47A0011EEA24F56B29EBB6A /* CreditEntryService.swift */; };
 		F1020001BD814941ABD3C921 /* LedgerEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1020002EEA24F56B29EBB6A /* LedgerEngine.swift */; };
 		C98B0001BD814941ABD3C921 /* LedgerEngineCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C98F0001EEA24F56B29EBB6A /* LedgerEngineCore.swift */; };
+		L99B0001BD814941ABD3C921 /* LedgerFacade.swift in Sources */ = {isa = PBXBuildFile; fileRef = L99F0001EEA24F56B29EBB6A /* LedgerFacade.swift */; };
 		D47A0012BD814941ABD3C921 /* CreditSyncViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47A0013EEA24F56B29EBB6A /* CreditSyncViewModel.swift */; };
 		D47A0014BD814941ABD3C921 /* CreditUpdateBalanceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47A0015EEA24F56B29EBB6A /* CreditUpdateBalanceViewModel.swift */; };
 		D47A0016BD814941ABD3C921 /* CreditEntryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47A0017EEA24F56B29EBB6A /* CreditEntryViewModel.swift */; };
@@ -410,6 +411,7 @@
 				D47A0011EEA24F56B29EBB6A /* CreditEntryService.swift */,
 				F1020002EEA24F56B29EBB6A /* LedgerEngine.swift */,
 				C98F0001EEA24F56B29EBB6A /* LedgerEngineCore.swift */,
+				L99F0001EEA24F56B29EBB6A /* LedgerFacade.swift */,
 				B51A0001EEA24F56B29EBB6A /* StandingSplitService.swift */,
 				391854E68EAC46CDA39D0B3B /* AppLaunchRouter.swift */,
 			);
@@ -837,6 +839,7 @@
 				D47A0010BD814941ABD3C921 /* CreditEntryService.swift in Sources */,
 				F1020001BD814941ABD3C921 /* LedgerEngine.swift in Sources */,
 				C98B0001BD814941ABD3C921 /* LedgerEngineCore.swift in Sources */,
+				L99B0001BD814941ABD3C921 /* LedgerFacade.swift in Sources */,
 				D47A0012BD814941ABD3C921 /* CreditSyncViewModel.swift in Sources */,
 				D47A0014BD814941ABD3C921 /* CreditUpdateBalanceViewModel.swift in Sources */,
 				D47A0016BD814941ABD3C921 /* CreditEntryViewModel.swift in Sources */,
