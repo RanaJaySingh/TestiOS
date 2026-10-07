@@ -57,11 +57,11 @@ Compare simulator/device to design frames 9 / 9b / 9c / 11:
 
 ## Parallel work / base
 
-Started from `b30a048` (main after PIP-69 #22; includes PIP-71 icons). Touch only Goals home / BalanceCard / GoalCard / banner / header chrome (+ `GoalsTabService` presentation helpers + `MainTabView` History tab callback). Prefer `PiIcons` for header icons; did not redefine icon mapping.
+Started from `b30a048` (main after PIP-69 #22; includes PIP-71 icons). Rebased onto current `main` (includes PIP-85 History entry visual + PIP-91 History list visual @ `52aa08a`, plus later main tip). Keep-both: Goals home visuals preserved; History entry/list / CreditEntryView left unchanged from main. Touch only Goals home / BalanceCard / GoalCard / banner / header chrome (+ `GoalsTabService` presentation helpers + `MainTabView` History tab callback). Prefer `PiIcons` for header icons; did not redefine icon mapping.
 
 ## Test results
 
-`cd PiPlanner && swift test` — **211 tests, 0 failures** (includes new `GoalsTabServiceTests` presentation cases).
+`cd PiPlanner && swift test` — **211 tests, 0 failures** (post-rebase onto main tip including PIP-91; includes new `GoalsTabServiceTests` presentation cases).
 
 ## How to run tests
 
