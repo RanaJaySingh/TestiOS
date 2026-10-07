@@ -100,12 +100,14 @@
 		B39A001CBD814941ABD3C921 /* ConsentViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39A001DEEA24F56B29EBB6A /* ConsentViewModelTests.swift */; };
 		C41A1000BD814941ABD3C921 /* GrokService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41A1001EEA24F56B29EBB6A /* GrokService.swift */; };
 		C41A1002BD814941ABD3C921 /* GoalValidationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41A1003EEA24F56B29EBB6A /* GoalValidationService.swift */; };
+		P97A0001BD814941ABD3C921 /* GoalInflationFormulas.swift in Sources */ = {isa = PBXBuildFile; fileRef = P97A0002EEA24F56B29EBB6A /* GoalInflationFormulas.swift */; };
 		C41A1004BD814941ABD3C921 /* GoalChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41A1005EEA24F56B29EBB6A /* GoalChatViewModel.swift */; };
 		C41A1006BD814941ABD3C921 /* GoalChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41A1007EEA24F56B29EBB6A /* GoalChatView.swift */; };
 		C41A1008BD814941ABD3C921 /* GoalFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41A1009EEA24F56B29EBB6A /* GoalFormView.swift */; };
 		C41A100ABD814941ABD3C921 /* InflationPopup.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41A100BEEA24F56B29EBB6A /* InflationPopup.swift */; };
 		C41A100CBD814941ABD3C921 /* GrokServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41A100DEEA24F56B29EBB6A /* GrokServiceTests.swift */; };
 		C41A100EBD814941ABD3C921 /* GoalValidationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41A100FEEA24F56B29EBB6A /* GoalValidationServiceTests.swift */; };
+		P97A0003BD814941ABD3C921 /* GoalInflationFormulasTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = P97A0004EEA24F56B29EBB6A /* GoalInflationFormulasTests.swift */; };
 		C41A1010BD814941ABD3C921 /* GoalChatViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41A1011EEA24F56B29EBB6A /* GoalChatViewModelTests.swift */; };
 
 		A45B0001BD814941ABD3C921 /* GoalsTabService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45F0001EEA24F56B29EBB6A /* GoalsTabService.swift */; };
@@ -244,12 +246,14 @@
 		B39A001DEEA24F56B29EBB6A /* ConsentViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsentViewModelTests.swift; sourceTree = "<group>"; };
 		C41A1001EEA24F56B29EBB6A /* GrokService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrokService.swift; sourceTree = "<group>"; };
 		C41A1003EEA24F56B29EBB6A /* GoalValidationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalValidationService.swift; sourceTree = "<group>"; };
+		P97A0002EEA24F56B29EBB6A /* GoalInflationFormulas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalInflationFormulas.swift; sourceTree = "<group>"; };
 		C41A1005EEA24F56B29EBB6A /* GoalChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalChatViewModel.swift; sourceTree = "<group>"; };
 		C41A1007EEA24F56B29EBB6A /* GoalChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalChatView.swift; sourceTree = "<group>"; };
 		C41A1009EEA24F56B29EBB6A /* GoalFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalFormView.swift; sourceTree = "<group>"; };
 		C41A100BEEA24F56B29EBB6A /* InflationPopup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InflationPopup.swift; sourceTree = "<group>"; };
 		C41A100DEEA24F56B29EBB6A /* GrokServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrokServiceTests.swift; sourceTree = "<group>"; };
 		C41A100FEEA24F56B29EBB6A /* GoalValidationServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalValidationServiceTests.swift; sourceTree = "<group>"; };
+		P97A0004EEA24F56B29EBB6A /* GoalInflationFormulasTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalInflationFormulasTests.swift; sourceTree = "<group>"; };
 		C41A1011EEA24F56B29EBB6A /* GoalChatViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalChatViewModelTests.swift; sourceTree = "<group>"; };
 
 		A45F0001EEA24F56B29EBB6A /* GoalsTabService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsTabService.swift; sourceTree = "<group>"; };
@@ -394,6 +398,7 @@
 				C41A1001EEA24F56B29EBB6A /* GrokService.swift */,
 				A63F0001EEA24F56B29EBB6A /* AskService.swift */,
 				C41A1003EEA24F56B29EBB6A /* GoalValidationService.swift */,
+				P97A0002EEA24F56B29EBB6A /* GoalInflationFormulas.swift */,
 				A45F0001EEA24F56B29EBB6A /* GoalsTabService.swift */,
 				D47A0011EEA24F56B29EBB6A /* CreditEntryService.swift */,
 				F1020002EEA24F56B29EBB6A /* LedgerEngine.swift */,
@@ -583,6 +588,7 @@
 				C41A100DEEA24F56B29EBB6A /* GrokServiceTests.swift */,
 				A63F0004EEA24F56B29EBB6A /* AskServiceTests.swift */,
 				C41A100FEEA24F56B29EBB6A /* GoalValidationServiceTests.swift */,
+				P97A0004EEA24F56B29EBB6A /* GoalInflationFormulasTests.swift */,
 				C41A1011EEA24F56B29EBB6A /* GoalChatViewModelTests.swift */,
 				A45F000DEEA24F56B29EBB6A /* GoalsTabServiceTests.swift */,
 				A45F000EEEA24F56B29EBB6A /* GoalsViewModelTests.swift */,
@@ -796,6 +802,7 @@
 				E77A0010BD814941ABD3C921 /* UpdateBalanceUPIChrome.swift in Sources */,
 				C41A1000BD814941ABD3C921 /* GrokService.swift in Sources */,
 				C41A1002BD814941ABD3C921 /* GoalValidationService.swift in Sources */,
+				P97A0001BD814941ABD3C921 /* GoalInflationFormulas.swift in Sources */,
 				C41A1004BD814941ABD3C921 /* GoalChatViewModel.swift in Sources */,
 				C41A1006BD814941ABD3C921 /* GoalChatView.swift in Sources */,
 				C41A1008BD814941ABD3C921 /* GoalFormView.swift in Sources */,
@@ -853,6 +860,7 @@
 				C41A100CBD814941ABD3C921 /* GrokServiceTests.swift in Sources */,
 				A63B0004BD814941ABD3C921 /* AskServiceTests.swift in Sources */,
 				C41A100EBD814941ABD3C921 /* GoalValidationServiceTests.swift in Sources */,
+				P97A0003BD814941ABD3C921 /* GoalInflationFormulasTests.swift in Sources */,
 				463C0C59C104488E8D765E95 /* GoalHeldChangeServiceTests.swift in Sources */,
 				D53B0006BD814941ABD3C921 /* DeleteGoalServiceTests.swift in Sources */,
 				A57B0004BD814941ABD3C921 /* WithdrawalServiceTests.swift in Sources */,

@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// Goal edit — design frame 6e (PRD R11 / R24, Spec BR-4).
+/// Goal edit — design frame 6e (PRD R11 / R24, Spec BR-4 / PIP-97).
 /// Saved amount is locked; save shows toast via detail and holds changes to next credit.
+/// Uses DesignTokens / Pi* chrome from the visual wave (aligned with GoalFormView).
 struct GoalEditView: View {
     @StateObject private var viewModel: GoalEditViewModel
     @Environment(\.dismiss) private var dismiss
@@ -31,7 +32,7 @@ struct GoalEditView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 18) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s20) {
                 header
                 nameField
                 targetField
@@ -43,16 +44,18 @@ struct GoalEditView: View {
                 heldHint
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
-                        .font(.footnote)
-                        .foregroundStyle(.red)
+                        .font(PiTypography.caption())
+                        .foregroundStyle(PiColors.behind)
                 }
                 saveButton
             }
-            .padding()
+            .padding(DesignTokens.Space.s20)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .background(PiColors.backgroundApp.ignoresSafeArea())
         .navigationTitle("Edit goal")
         .navigationBarTitleDisplayMode(.inline)
+        .piPlannerTheme()
         .accessibilityIdentifier("goals.edit")
         .sheet(isPresented: $viewModel.showInflationPopup) {
             InflationPopup(
@@ -69,74 +72,85 @@ struct GoalEditView: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
             Text(viewModel.goal.name)
-                .font(.title2)
-                .fontWeight(.semibold)
+                .font(PiTypography.title())
+                .foregroundStyle(PiColors.navyPrimary)
                 .accessibilityAddTraits(.isHeader)
             Text("Edits apply at the next credit. Earlier history is unchanged.")
-                .font(.body)
+                .font(PiTypography.body())
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
     }
 
     private var nameField: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Name")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            TextField("e.g. Car", text: $viewModel.draft.name)
-                .textInputAutocapitalization(.words)
-                .accessibilityLabel("Goal name")
-                .accessibilityIdentifier("goals.edit.name")
+        PiCard(padding: DesignTokens.Space.s16) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
+                Text("Name")
+                    .font(PiTypography.caption())
+                    .foregroundStyle(.secondary)
+                TextField("e.g. Car", text: $viewModel.draft.name)
+                    .font(PiTypography.body())
+                    .textInputAutocapitalization(.words)
+                    .accessibilityLabel("Goal name")
+                    .accessibilityIdentifier("goals.edit.name")
+            }
         }
     }
 
     private var targetField: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Target")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            HStack(alignment: .firstTextBaseline, spacing: 4) {
-                Text("₹")
-                    .font(.title3)
-                    .fontWeight(.semibold)
-                TextField(
-                    "0",
-                    text: Binding(
-                        get: { viewModel.draft.targetRupeeDigits },
-                        set: { viewModel.draft.targetRupeeDigits = $0.filter(\.isNumber) }
+        PiCard(padding: DesignTokens.Space.s16) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
+                Text("Target")
+                    .font(PiTypography.caption())
+                    .foregroundStyle(.secondary)
+                HStack(alignment: .firstTextBaseline, spacing: DesignTokens.Space.s8 / 2) {
+                    Text("₹")
+                        .font(PiTypography.title())
+                        .fontWeight(.semibold)
+                        .foregroundStyle(PiColors.navyPrimary)
+                    TextField(
+                        "0",
+                        text: Binding(
+                            get: { viewModel.draft.targetRupeeDigits },
+                            set: { viewModel.draft.targetRupeeDigits = $0.filter(\.isNumber) }
+                        )
                     )
-                )
-                .keyboardType(.numberPad)
-                .font(.title3)
-                .fontWeight(.semibold)
-                .monospacedDigit()
-                .accessibilityLabel("Target in rupees")
-                .accessibilityIdentifier("goals.edit.target")
+                    .keyboardType(.numberPad)
+                    .font(PiTypography.title())
+                    .fontWeight(.semibold)
+                    .monospacedDigit()
+                    .foregroundStyle(PiColors.navyPrimary)
+                    .accessibilityLabel("Target in rupees")
+                    .accessibilityIdentifier("goals.edit.target")
+                }
+                Text(viewModel.formatINR(paisa: viewModel.draft.targetPaisa))
+                    .font(PiTypography.caption())
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
             }
-            Text(viewModel.formatINR(paisa: viewModel.draft.targetPaisa))
-                .font(.callout)
-                .foregroundStyle(.secondary)
-                .monospacedDigit()
         }
     }
 
     private var dateFields: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            DatePicker(
-                "Start",
-                selection: $viewModel.draft.startDate,
-                displayedComponents: .date
-            )
-            .accessibilityIdentifier("goals.edit.start")
-            DatePicker(
-                "End",
-                selection: $viewModel.draft.endDate,
-                displayedComponents: .date
-            )
-            .accessibilityIdentifier("goals.edit.end")
+        PiCard(padding: DesignTokens.Space.s16) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s12) {
+                DatePicker(
+                    "Start",
+                    selection: $viewModel.draft.startDate,
+                    displayedComponents: .date
+                )
+                .tint(PiColors.navyPrimary)
+                .accessibilityIdentifier("goals.edit.start")
+                DatePicker(
+                    "End",
+                    selection: $viewModel.draft.endDate,
+                    displayedComponents: .date
+                )
+                .tint(PiColors.navyPrimary)
+                .accessibilityIdentifier("goals.edit.end")
+            }
         }
     }
 
@@ -144,70 +158,75 @@ struct GoalEditView: View {
         Button {
             viewModel.showInflationPopup = true
         } label: {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Inflation")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    Text("\(viewModel.draft.inflationPercentDisplay)%")
-                        .font(.body)
+            PiCard(padding: DesignTokens.Space.s16) {
+                HStack {
+                    VStack(alignment: .leading, spacing: DesignTokens.Space.s8 / 2) {
+                        Text("Inflation")
+                            .font(PiTypography.caption())
+                            .foregroundStyle(.secondary)
+                        Text("\(viewModel.draft.inflationPercentDisplay)%")
+                            .font(PiTypography.body())
+                            .fontWeight(.semibold)
+                            .monospacedDigit()
+                            .foregroundStyle(PiColors.navyPrimary)
+                    }
+                    Spacer()
+                    Text("Edit")
+                        .font(PiTypography.body())
                         .fontWeight(.semibold)
-                        .monospacedDigit()
+                        .foregroundStyle(PiColors.navyPrimary)
                 }
-                Spacer()
-                Text("Edit")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
             }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color(.secondarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Inflation \(viewModel.draft.inflationPercentDisplay) percent")
+        .accessibilityHint("Opens inflation popup")
         .accessibilityIdentifier("goals.edit.inflation")
     }
 
     private var shareField: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text("Share of new credits")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                Spacer()
-                Text("\(viewModel.draft.sharePercentDisplay)%")
-                    .font(.body)
-                    .fontWeight(.semibold)
-                    .monospacedDigit()
+        PiCard(padding: DesignTokens.Space.s16) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
+                HStack {
+                    Text("Share of new credits")
+                        .font(PiTypography.caption())
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Text("\(viewModel.draft.sharePercentDisplay)%")
+                        .font(PiTypography.body())
+                        .fontWeight(.semibold)
+                        .monospacedDigit()
+                        .foregroundStyle(PiColors.navyPrimary)
+                }
+                Slider(
+                    value: Binding(
+                        get: {
+                            (viewModel.draft.shareOfNewCredits as NSDecimalNumber).doubleValue * 100
+                        },
+                        set: { viewModel.draft.shareOfNewCredits = Decimal($0) / 100 }
+                    ),
+                    in: 0...100,
+                    step: 1
+                )
+                .tint(PiColors.navyPrimary)
+                .accessibilityLabel("Share of new credits")
+                .accessibilityIdentifier("goals.edit.share")
             }
-            Slider(
-                value: Binding(
-                    get: {
-                        (viewModel.draft.shareOfNewCredits as NSDecimalNumber).doubleValue * 100
-                    },
-                    set: { viewModel.draft.shareOfNewCredits = Decimal($0) / 100 }
-                ),
-                in: 0...100,
-                step: 1
-            )
-            .accessibilityLabel("Share of new credits")
-            .accessibilityIdentifier("goals.edit.share")
         }
     }
 
     private var lockedSavedRow: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s8 / 2) {
             Text("Saved so far")
-                .font(.subheadline)
+                .font(PiTypography.caption())
                 .foregroundStyle(.secondary)
             Text(viewModel.formatINR(paisa: viewModel.lockedSavedAmount))
-                .font(.body)
+                .font(PiTypography.body())
                 .fontWeight(.semibold)
                 .foregroundStyle(.secondary)
                 .monospacedDigit()
             Text("Locked — transfers and credits change saved amount.")
-                .font(.caption)
+                .font(PiTypography.caption())
                 .foregroundStyle(.secondary)
         }
         .accessibilityElement(children: .combine)
@@ -218,61 +237,58 @@ struct GoalEditView: View {
     }
 
     private var metrics: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            metricRow(
-                title: "Inflation-adjusted target",
-                value: viewModel.formatINR(paisa: viewModel.draft.adjustedTargetPaisa)
-            )
-            metricRow(
-                title: "Monthly need",
-                value: viewModel.formatINR(paisa: viewModel.draft.monthlyNeedPaisa)
-            )
+        PiCard(padding: DesignTokens.Space.s16) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s12) {
+                metricRow(
+                    title: "Inflation-adjusted target",
+                    value: viewModel.formatINR(paisa: viewModel.draft.adjustedTargetPaisa)
+                )
+                metricRow(
+                    title: "Required savings / month",
+                    value: viewModel.formatINR(paisa: viewModel.draft.monthlyNeedPaisa)
+                )
+            }
         }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
     private var heldHint: some View {
         Text(GoalHeldChangeService.toastMessage)
-            .font(.footnote)
+            .font(PiTypography.caption())
             .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
             .accessibilityIdentifier("goals.edit.heldHint")
+            .accessibilityLabel(GoalHeldChangeService.toastMessage)
     }
 
     private func metricRow(title: String, value: String) -> some View {
         HStack {
             Text(title)
-                .font(.subheadline)
+                .font(PiTypography.caption())
                 .foregroundStyle(.secondary)
             Spacer()
             Text(value)
-                .font(.body)
+                .font(PiTypography.body())
                 .fontWeight(.semibold)
                 .monospacedDigit()
+                .foregroundStyle(PiColors.navyPrimary)
         }
         .accessibilityElement(children: .combine)
     }
 
     private var saveButton: some View {
-        Button {
+        PrimaryCTA(
+            title: viewModel.isSaving ? "Saving…" : "Save",
+            isEnabled: viewModel.canSave && !viewModel.isSaving,
+            accessibilityIdentifier: "goals.edit.save"
+        ) {
             Task {
                 if let result = await viewModel.save() {
                     onSaved?(result)
                     dismiss()
                 }
             }
-        } label: {
-            Text(viewModel.isSaving ? "Saving…" : "Save")
-                .font(.headline)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
         }
-        .buttonStyle(.borderedProminent)
-        .disabled(!viewModel.canSave)
         .accessibilityLabel("Save goal edits")
-        .accessibilityIdentifier("goals.edit.save")
         .accessibilityHint(
             viewModel.canSave
                 ? "Saves changes for the next credit"

@@ -299,7 +299,7 @@ final class GoalHeldChangeServiceTests: XCTestCase {
     func testToastAndHeldInfoCopy() {
         XCTAssertEqual(
             GoalHeldChangeService.toastMessage,
-            "Change saved. Applies at next credit."
+            "Change saved. Applies at the next credit."
         )
         XCTAssertFalse(GoalHeldChangeService.heldInfoMessage.isEmpty)
         XCTAssertTrue(

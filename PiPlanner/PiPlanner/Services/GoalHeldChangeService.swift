@@ -3,8 +3,8 @@ import Foundation
 /// Pure held-edit logic for Goal detail / edit (PRD R11 / R24, Spec BR-4).
 /// Edits update goal parameters for the next credit and never rewrite locked History.
 enum GoalHeldChangeService {
-    /// Toast copy — design frame 9c / AC (matches ticket wording).
-    static let toastMessage = "Change saved. Applies at next credit."
+    /// Toast copy — PIP-97 / standing-split wording (applies at the next credit).
+    static let toastMessage = "Change saved. Applies at the next credit."
 
     /// Later-view held info — design frame 13g.
     static let heldInfoMessage =
