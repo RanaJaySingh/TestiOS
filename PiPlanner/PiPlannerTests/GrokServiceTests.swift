@@ -73,6 +73,17 @@ final class GrokServiceTests: XCTestCase {
         XCTAssertFalse(text.isEmpty)
     }
 
+    func testAskQuestionHappyPathMentionsCarAndEmergencyFund() {
+        let service = StubGrokService()
+        let result = service.askQuestion(query: "How is my car and emergency fund plan?")
+        guard case .success(.plainAnswer(let text)) = result else {
+            return XCTFail("Expected plain answer, got \(result)")
+        }
+        XCTAssertEqual(text, StubGrokService.happyPathAskAnswer)
+        XCTAssertTrue(text.contains("Car"))
+        XCTAssertTrue(text.contains("Emergency Fund"))
+    }
+
     func testAskQuestionTransferProposalWhenQueryMentionsTransfer() {
         let service = StubGrokService()
         let result = service.askQuestion(query: "Please transfer ₹5,000")
