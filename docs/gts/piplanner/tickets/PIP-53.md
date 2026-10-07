@@ -29,14 +29,14 @@ Delete goal reassignment under `PiPlanner/Views/Goals/DeleteGoalView.swift` (+ `
 - [x] States: Reassign default, Reassign edit, Confirm, Only-goal gate
 - [x] Tests: Unit test for money reassignment and renormalization
 
-## Parallel work / merge order
+## Parallel work / base
 
-**Stacks on PR #12 (PIP-51).** Branch is rebased onto `cursor/pip-51-standing-split-ba09` @ `98297e6`. PR base remains `main`; **merge after #12** so the diff shrinks to PIP-53-only once Standing split lands.
+**No longer stacked.** Rebased onto `main` @ `65a846f` (PIP-51 Standing split + prior Credit* merged). Diff is PIP-53-only.
 
-- Kept PIP-51 `StandingSplitService` as the single source of truth; added Delete helpers (`equalSplits` / `equalFractions` / `renormalize` / `applyShares` / UUID `equalDisplayPercents`).
-- Kept PIP-47 `Credit*` sheets and PIP-51 Settings → Standing split entry in `GoalsTabView` / `SettingsView` (additive only).
+- `StandingSplitService` on main is the single source of truth; this PR adds Delete helpers only (`equalSplits` / `equalFractions` / `renormalize` / `applyShares` / UUID `equalDisplayPercents`).
+- PIP-47 `Credit*` sheets and Settings → Standing split entry left intact (additive Goal detail / Goals tab wiring only).
 - Goal detail Delete destination → `DeleteGoalFlow`; `allGoals` seeded from Goals tab.
-- No second `StandingSplitService` type/file; `project.pbxproj` has one StandingSplitService entry set (PIP-51 IDs).
+- `project.pbxproj`: one StandingSplitService entry set (no duplicates).
 
 ## How to run tests
 
