@@ -1,6 +1,8 @@
 import SwiftUI
 
-/// Consent sheet — design frame 3 (PRD R3 / R4); Settings re-open 20b (PRD R17).
+/// Consent sheet — design frame 3 (PRD R3 / R4 / visual R7); Settings re-open 20b (PRD R17).
+///
+/// Paytm-like sheet chrome via `PiSheet`; behaviour unchanged (Yes fetch / No path / Settings flags).
 struct ConsentSheet: View {
     @ObservedObject var viewModel: ConsentViewModel
     /// Setup shows “Step 2 of 3”; Settings (20b) hides the step label.
@@ -11,17 +13,28 @@ struct ConsentSheet: View {
     var onNo: () -> Void
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                header
-                bullets
-                actions
+        PiSheet(title: "Allow balance checks?", helper: sheetHelper) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: DesignTokens.Space.s24) {
+                    if showsSetupStep {
+                        Text("Step 2 of 3")
+                            .font(PiTypography.caption())
+                            .foregroundStyle(PiColors.navyPrimary)
+                            .accessibilityIdentifier("consent.step")
+                    }
+                    bullets
+                    actions
+                }
+                .padding(.horizontal, DesignTokens.Space.s20)
+                .padding(.bottom, DesignTokens.Space.s28)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .navigationTitle("Consent")
+        .background(PiColors.backgroundApp.ignoresSafeArea())
+        // Keep the nav back chevron on setup push; title lives in PiSheet chrome.
+        .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .piPlannerTheme()
         .alert(
             "Couldn’t update balance",
             isPresented: Binding(
@@ -35,148 +48,137 @@ struct ConsentSheet: View {
         }
     }
 
-    private var header: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if showsSetupStep {
-                Text("Step 2 of 3")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-            Text("Allow balance checks?")
-                .font(.title2)
-                .fontWeight(.semibold)
-                .accessibilityAddTraits(.isHeader)
-            if let title = viewModel.dedicatedAccountTitle {
-                Text("Asked for \(title), where credits arrive.")
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            } else {
-                Text("Asked for the account where credits arrive.")
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+    private var sheetHelper: String {
+        if let title = viewModel.dedicatedAccountTitle {
+            return "Asked for \(title), where credits arrive."
         }
-        .accessibilityElement(children: .combine)
+        return "Asked for the account where credits arrive."
     }
 
     private var bullets: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            ForEach(Array(ConsentService.consentBullets.enumerated()), id: \.offset) { _, bullet in
-                HStack(alignment: .top, spacing: 10) {
-                    Text("•")
-                        .font(.body)
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s16) {
+            ForEach(Array(ConsentService.consentBullets.enumerated()), id: \.offset) { index, bullet in
+                HStack(alignment: .top, spacing: DesignTokens.Space.s12) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: DesignTokens.TypeSize.body, weight: .semibold))
+                        .foregroundStyle(PiColors.navyPrimary)
+                        .accessibilityHidden(true)
                     Text(bullet)
-                        .font(.body)
+                        .font(PiTypography.body())
+                        .foregroundStyle(.primary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
+                .accessibilityIdentifier("consent.bullet.\(index)")
             }
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(ConsentService.consentBullets.joined(separator: ". "))
+        .accessibilityIdentifier("consent.bullets")
     }
 
     private var actions: some View {
-        VStack(spacing: 12) {
-            Button {
-                Task {
-                    if fetchesBalanceOnYes {
-                        if await viewModel.chooseConsentYes() != nil {
+        VStack(spacing: DesignTokens.Space.s12) {
+            if viewModel.isWorking {
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, DesignTokens.Space.s12)
+                    .accessibilityLabel("Yes, update automatically")
+            } else {
+                PrimaryCTA(
+                    title: "Yes, update automatically",
+                    isEnabled: true,
+                    accessibilityIdentifier: "consent.yes"
+                ) {
+                    Task {
+                        if fetchesBalanceOnYes {
+                            if await viewModel.chooseConsentYes() != nil {
+                                onYesFetched()
+                            }
+                        } else {
+                            // Settings (20b): host persists consent On without re-fetching balance.
                             onYesFetched()
                         }
-                    } else {
-                        // Settings (20b): host persists consent On without re-fetching balance.
-                        onYesFetched()
                     }
                 }
-            } label: {
-                Group {
-                    if viewModel.isWorking {
-                        ProgressView()
-                            .frame(maxWidth: .infinity)
-                    } else {
-                        Text("Yes, update automatically")
-                            .font(.headline)
-                            .frame(maxWidth: .infinity)
-                    }
-                }
-                .padding(.vertical, 14)
+                .accessibilityHint(
+                    fetchesBalanceOnYes
+                        ? "Fetches opening balance for the dedicated account"
+                        : "Turns on automatic balance updates"
+                )
             }
-            .buttonStyle(.borderedProminent)
-            .disabled(viewModel.isWorking)
-            .accessibilityLabel("Yes, update automatically")
-            .accessibilityHint(
-                fetchesBalanceOnYes
-                    ? "Fetches opening balance for the dedicated account"
-                    : "Turns on automatic balance updates"
-            )
 
-            Button {
+            SecondaryCTA(
+                title: "No, I’ll update it myself",
+                style: .outline,
+                isEnabled: !viewModel.isWorking,
+                accessibilityIdentifier: "consent.no"
+            ) {
                 viewModel.chooseConsentNo()
                 onNo()
-            } label: {
-                Text("No, I’ll update it myself")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
             }
-            .buttonStyle(.bordered)
-            .disabled(viewModel.isWorking)
-            .accessibilityLabel("No, I’ll update it myself")
             .accessibilityHint("Opens Update balance options")
         }
     }
 }
 
-/// Opening balance fetched — design frame 3a (Consent Yes / PIN success).
+/// Opening balance fetched — design frame 3a (Consent Yes / PIN success); visual R7.
 struct FetchedBalanceView: View {
     @ObservedObject var viewModel: ConsentViewModel
     var onContinue: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            Text("Opening balance")
-                .font(.title2)
-                .fontWeight(.semibold)
-                .accessibilityAddTraits(.isHeader)
-            Text("Fetched from your dedicated savings account.")
-                .font(.body)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s24) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
+                Text("Step 2 of 3")
+                    .font(PiTypography.caption())
+                    .foregroundStyle(PiColors.navyPrimary)
+                    .accessibilityIdentifier("fetchedBalance.step")
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Balance")
-                    .font(.subheadline)
+                Text("Opening balance")
+                    .font(PiTypography.title())
+                    .foregroundStyle(.primary)
+                    .accessibilityAddTraits(.isHeader)
+                    .accessibilityIdentifier("fetchedBalance.title")
+
+                Text("Fetched from your dedicated savings account.")
+                    .font(PiTypography.body())
                     .foregroundStyle(.secondary)
-                Text(viewModel.formattedResolvedBalance)
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .monospacedDigit()
-                    .minimumScaleFactor(0.7)
-                    .lineLimit(1)
-                    .accessibilityLabel("Balance \(viewModel.formattedResolvedBalance)")
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+
+            PiCard(padding: DesignTokens.Space.s20) {
+                VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
+                    Text("Balance")
+                        .font(PiTypography.caption())
+                        .foregroundStyle(.secondary)
+                    Text(viewModel.formattedResolvedBalance)
+                        .font(PiTypography.amountHero())
+                        .foregroundStyle(PiColors.navyPrimary)
+                        .monospacedDigit()
+                        .minimumScaleFactor(0.7)
+                        .lineLimit(1)
+                        .accessibilityLabel("Balance \(viewModel.formattedResolvedBalance)")
+                        .accessibilityIdentifier("fetchedBalance.amount")
+                }
+            }
 
             Spacer(minLength: 0)
 
-            Button {
+            PrimaryCTA(
+                title: "Continue",
+                isEnabled: true,
+                accessibilityIdentifier: "fetchedBalance.continue"
+            ) {
                 onContinue()
-            } label: {
-                Text("Continue")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
             }
-            .buttonStyle(.borderedProminent)
-            .accessibilityLabel("Continue")
             .accessibilityHint("Continues setup with this opening balance")
         }
-        .padding()
+        .padding(DesignTokens.Space.s20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .background(PiColors.backgroundApp.ignoresSafeArea())
         .navigationTitle("Balance")
         .navigationBarTitleDisplayMode(.inline)
+        .piPlannerTheme()
     }
 }
 
@@ -316,7 +318,7 @@ struct WrongPinView: View {
     }
 }
 
-#Preview("Consent") {
+#Preview("Consent · Yes / No") {
     NavigationStack {
         ConsentSheet(
             viewModel: ConsentViewModel(
@@ -330,6 +332,44 @@ struct WrongPinView: View {
             onYesFetched: {},
             onNo: {}
         )
+    }
+}
+
+#Preview("Consent · Settings 20b") {
+    NavigationStack {
+        ConsentSheet(
+            viewModel: ConsentViewModel(
+                accounts: DemoSeed.postSetupAccounts(consentAutoUpdate: false),
+                persistence: PreviewConsentPersistence()
+            ),
+            showsSetupStep: false,
+            fetchesBalanceOnYes: false,
+            onYesFetched: {},
+            onNo: {}
+        )
+    }
+}
+
+#Preview("Fetched balance 3a · ₹1,00,000") {
+    FetchedBalancePreviewHost()
+}
+
+/// Loads demo opening balance for the 3a preview only.
+private struct FetchedBalancePreviewHost: View {
+    @StateObject private var viewModel = ConsentViewModel(
+        accounts: DemoSeed.sampleAccounts.map { account in
+            var copy = account
+            copy.isDedicated = account.bankName == "HDFC"
+            return copy
+        },
+        persistence: PreviewConsentPersistence()
+    )
+
+    var body: some View {
+        NavigationStack {
+            FetchedBalanceView(viewModel: viewModel, onContinue: {})
+                .task { _ = await viewModel.chooseConsentYes() }
+        }
     }
 }
 
