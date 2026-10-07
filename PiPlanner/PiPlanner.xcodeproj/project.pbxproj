@@ -33,6 +33,10 @@
 		H59B0004BD814941ABD3C921 /* HistoryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H59F0004EEA24F56B29EBB6A /* HistoryDetailView.swift */; };
 		H59B0005BD814941ABD3C921 /* HistoryServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = H59F0005EEA24F56B29EBB6A /* HistoryServiceTests.swift */; };
 		H59B0006BD814941ABD3C921 /* HistoryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = H59F0006EEA24F56B29EBB6A /* HistoryUITests.swift */; };
+		S61B0001BD814941ABD3C921 /* SettingsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = S61A0001EEA24F56B29EBB6A /* SettingsService.swift */; };
+		S61B0002BD814941ABD3C921 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = S61A0002EEA24F56B29EBB6A /* SettingsViewModel.swift */; };
+		S61B0003BD814941ABD3C921 /* SettingsServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = S61A0003EEA24F56B29EBB6A /* SettingsServiceTests.swift */; };
+		S61B0004BD814941ABD3C921 /* SettingsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = S61A0004EEA24F56B29EBB6A /* SettingsViewModelTests.swift */; };
 		1318D194AA484098BD165D58 /* PiPlannerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 656B4AAB996D4CB283413E05 /* PiPlannerApp.swift */; };
 		142F0FC7D4894F32A7F74E7B /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = C670521930484E588DEE0188 /* Account.swift */; };
 		1C65A48285EC416D828D2976 /* Goal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 349DD80CB6684362B4613EB4 /* Goal.swift */; };
@@ -144,6 +148,10 @@
 		H59F0004EEA24F56B29EBB6A /* HistoryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryDetailView.swift; sourceTree = "<group>"; };
 		H59F0005EEA24F56B29EBB6A /* HistoryServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryServiceTests.swift; sourceTree = "<group>"; };
 		H59F0006EEA24F56B29EBB6A /* HistoryUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryUITests.swift; sourceTree = "<group>"; };
+		S61A0001EEA24F56B29EBB6A /* SettingsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsService.swift; sourceTree = "<group>"; };
+		S61A0002EEA24F56B29EBB6A /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		S61A0003EEA24F56B29EBB6A /* SettingsServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsServiceTests.swift; sourceTree = "<group>"; };
+		S61A0004EEA24F56B29EBB6A /* SettingsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModelTests.swift; sourceTree = "<group>"; };
 		656B4AAB996D4CB283413E05 /* PiPlannerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiPlannerApp.swift; sourceTree = "<group>"; };
 		C670521930484E588DEE0188 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
 		349DD80CB6684362B4613EB4 /* Goal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Goal.swift; sourceTree = "<group>"; };
@@ -322,6 +330,7 @@
 				A57F0001EEA24F56B29EBB6A /* WithdrawalService.swift */,
 				T55F0001EEA24F56B29EBB6A /* TransferService.swift */,
 				H59F0001EEA24F56B29EBB6A /* HistoryService.swift */,
+				S61A0001EEA24F56B29EBB6A /* SettingsService.swift */,
 				D6A8D1E227234A47AFC6AA76 /* FormattingService.swift */,
 				1631379D5741444D9B38E865 /* PersistenceService.swift */,
 				E356D619EEA24F56B29EBB6A /* OpeningSplitService.swift */,
@@ -346,6 +355,7 @@
 				A57F0002EEA24F56B29EBB6A /* WithdrawalViewModel.swift */,
 				T55F0002EEA24F56B29EBB6A /* TransferViewModel.swift */,
 				H59F0002EEA24F56B29EBB6A /* HistoryViewModel.swift */,
+				S61A0002EEA24F56B29EBB6A /* SettingsViewModel.swift */,
 				E90291FF624F492F96D5DEBB /* OpeningSplitViewModel.swift */,
 				A11C0013EEA24F56B29EBB6A /* AccountsViewModel.swift */,
 				B39A0013EEA24F56B29EBB6A /* ConsentViewModel.swift */,
@@ -473,6 +483,8 @@
 				T55F0004EEA24F56B29EBB6A /* TransferServiceTests.swift */,
 				T55F0005EEA24F56B29EBB6A /* TransferViewModelTests.swift */,
 				H59F0005EEA24F56B29EBB6A /* HistoryServiceTests.swift */,
+				S61A0003EEA24F56B29EBB6A /* SettingsServiceTests.swift */,
+				S61A0004EEA24F56B29EBB6A /* SettingsViewModelTests.swift */,
 				B6E95FBCBC4A41B7993C130A /* FormattingServiceTests.swift */,
 				CB1FF2A2773D47A2A2B2B50D /* ModelSerializationTests.swift */,
 				99B5A5E93DC14F1EB79CF38A /* PersistenceServiceTests.swift */,
@@ -661,7 +673,9 @@
 				A57B0002BD814941ABD3C921 /* WithdrawalViewModel.swift in Sources */,
 				A57B0003BD814941ABD3C921 /* WithdrawalView.swift in Sources */,
 				T55B0001BD814941ABD3C921 /* TransferService.swift in Sources */,
+				S61B0001BD814941ABD3C921 /* SettingsService.swift in Sources */,
 				T55B0002BD814941ABD3C921 /* TransferViewModel.swift in Sources */,
+				S61B0002BD814941ABD3C921 /* SettingsViewModel.swift in Sources */,
 				T55B0003BD814941ABD3C921 /* TransferView.swift in Sources */,
 				H59B0001BD814941ABD3C921 /* HistoryService.swift in Sources */,
 				H59B0002BD814941ABD3C921 /* HistoryViewModel.swift in Sources */,
@@ -739,6 +753,8 @@
 				T55B0004BD814941ABD3C921 /* TransferServiceTests.swift in Sources */,
 				T55B0005BD814941ABD3C921 /* TransferViewModelTests.swift in Sources */,
 				H59B0005BD814941ABD3C921 /* HistoryServiceTests.swift in Sources */,
+				S61B0003BD814941ABD3C921 /* SettingsServiceTests.swift in Sources */,
+				S61B0004BD814941ABD3C921 /* SettingsViewModelTests.swift in Sources */,
 				C41A1010BD814941ABD3C921 /* GoalChatViewModelTests.swift in Sources */,
 				A45B000DBD814941ABD3C921 /* GoalsTabServiceTests.swift in Sources */,
 				A45B000EBD814941ABD3C921 /* GoalsViewModelTests.swift in Sources */,
