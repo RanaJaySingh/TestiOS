@@ -31,7 +31,12 @@ struct MainTabView: View {
             .accessibilityIdentifier("tab.history")
 
             NavigationStack {
-                AskTabView()
+                AskTabView(
+                    persistence: persistence,
+                    goals: goalsViewModel.goals,
+                    standingSplits: goalsViewModel.standingSplits,
+                    formatting: goalsViewModel.formatting
+                )
             }
             .tabItem {
                 Label("Ask", systemImage: "bubble.left.and.bubble.right")

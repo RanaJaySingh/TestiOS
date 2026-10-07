@@ -43,7 +43,8 @@ let package = Package(
                 "GoalChatViewModelTests.swift",
                 "GoalsViewModelTests.swift",
                 "StandingSplitViewModelTests.swift",
-                "WithdrawalViewModelTests.swift"
+                "WithdrawalViewModelTests.swift",
+                "TransferViewModelTests.swift"
             ]
         )
     ]

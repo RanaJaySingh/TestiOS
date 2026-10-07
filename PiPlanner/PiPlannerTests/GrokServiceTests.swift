@@ -73,6 +73,15 @@ final class GrokServiceTests: XCTestCase {
         XCTAssertFalse(text.isEmpty)
     }
 
+    func testAskQuestionTransferProposalWhenQueryMentionsTransfer() {
+        let service = StubGrokService()
+        let result = service.askQuestion(query: "Please transfer ₹5,000")
+        guard case .success(.actionProposal(let action)) = result else {
+            return XCTFail("Expected action proposal, got \(result)")
+        }
+        XCTAssertNotNil(StubGrokService.transferPrefill(from: action))
+    }
+
     func testCheckedByLabelMatchesDesignCopy() {
         XCTAssertEqual(StubGrokService.checkedByLabel, "Checked by PiPlanner. Estimate.")
     }
