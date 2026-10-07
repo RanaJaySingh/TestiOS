@@ -73,6 +73,17 @@ final class GoalValidationServiceTests: XCTestCase {
         )
         XCTAssertEqual(at0, target)
         XCTAssertGreaterThan(at7, at0)
+        // Exact 12-calendar-month path: target × 1.07
+        let calendar = Calendar.gregorianUTC
+        let exactStart = calendar.date(from: DateComponents(year: 2024, month: 1, day: 1))!
+        let exactEnd = calendar.date(byAdding: .month, value: 12, to: exactStart)!
+        let exact = GoalValidationService.adjustedTargetPaisa(
+            targetPaisa: target,
+            inflationRate: Decimal(string: "0.07")!,
+            startDate: exactStart,
+            endDate: exactEnd
+        )
+        XCTAssertEqual(exact, Paisa((Double(target) * 1.07).rounded()))
     }
 
     func testContinueRequiresHundredPercentShares() {

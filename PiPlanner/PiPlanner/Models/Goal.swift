@@ -25,26 +25,30 @@ struct Goal: Codable, Equatable, Identifiable, Sendable {
     var createdAt: Date
     var updatedAt: Date
 
-    // MARK: - Computed (Spec §3.1)
+    // MARK: - Computed (Spec §3.1 / PIP-97)
 
-    /// `targetAmount * (1 + inflationRate)^years`
+    /// `target × (1 + inflation) ^ (monthsStartToEnd / 12)` — see `GoalInflationFormulas`.
     var adjustedTarget: Paisa {
-        let years = max(Self.yearsBetween(start: startDate, end: endDate), 0)
-        let factor = pow(1 + NSDecimalNumber(decimal: inflationRate).doubleValue, years)
-        let adjusted = Double(targetAmount) * factor
-        return Paisa(adjusted.rounded())
+        GoalInflationFormulas.adjustedTargetPaisa(
+            targetPaisa: targetAmount,
+            inflationRate: inflationRate,
+            startDate: startDate,
+            endDate: endDate
+        )
     }
 
-    /// `(adjustedTarget - savedAmount) / monthsRemaining`
+    /// Required monthly savings — see `GoalInflationFormulas.requiredSavingsPaisa`.
     var monthlyNeed: Paisa {
-        let months = max(Self.monthsBetween(start: Date(), end: endDate), 1)
-        let remaining = max(adjustedTarget - savedAmount, 0)
-        return remaining / Paisa(months)
+        GoalInflationFormulas.requiredSavingsPaisa(
+            adjustedTarget: adjustedTarget,
+            currentSaving: savedAmount,
+            endDate: endDate
+        )
     }
 
     /// OnTrack | Behind(shortfall)
     var status: GoalStatus {
-        let months = max(Self.monthsBetween(start: startDate, end: Date()), 0)
+        let months = GoalInflationFormulas.monthsBetween(start: startDate, end: Date())
         let expectedSaved = monthlyNeed * Paisa(months)
         if savedAmount >= expectedSaved {
             return .onTrack
@@ -127,14 +131,4 @@ struct Goal: Codable, Equatable, Identifiable, Sendable {
         )
     }
 
-    private static func yearsBetween(start: Date, end: Date) -> Double {
-        let seconds = end.timeIntervalSince(start)
-        return max(seconds / (365.25 * 24 * 60 * 60), 0)
-    }
-
-    private static func monthsBetween(start: Date, end: Date) -> Int {
-        let calendar = Calendar(identifier: .gregorian)
-        let components = calendar.dateComponents([.month], from: start, to: end)
-        return max(components.month ?? 0, 0)
-    }
 }

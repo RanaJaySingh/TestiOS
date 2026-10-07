@@ -1,9 +1,10 @@
 import Foundation
 
 /// Pure validation + inflation helpers for Goal form / chat (PRD R5, Spec §3.4).
+/// Inflation math delegates to `GoalInflationFormulas` (PIP-97 / PIP-98 shared API).
 enum GoalValidationService {
     /// Default inflation rate — 7% (PRD R5 / frame 7).
-    static let defaultInflationRate = Decimal(string: "0.07")!
+    static let defaultInflationRate = GoalInflationFormulas.defaultInflationRate
 
     /// Proposal / defined-goals footer label (frame 5b).
     static let checkedByLabel = StubGrokService.checkedByLabel
@@ -86,30 +87,51 @@ enum GoalValidationService {
         OpeningSplitService.shortfallMessage(for: goals.map(\.shareOfNewCredits))
     }
 
-    // MARK: - Inflation / targets
+    // MARK: - Inflation / targets (→ GoalInflationFormulas)
 
-    /// `targetAmount * (1 + inflationRate)^years` — same rule as `Goal.adjustedTarget`.
+    /// `target × (1 + inflation) ^ (months / 12)` — same rule as `Goal.adjustedTarget`.
     static func adjustedTargetPaisa(
         targetPaisa: Paisa,
         inflationRate: Decimal,
         startDate: Date,
         endDate: Date
     ) -> Paisa {
-        let years = max(yearsBetween(start: startDate, end: endDate), 0)
-        let factor = pow(1 + NSDecimalNumber(decimal: inflationRate).doubleValue, years)
-        return Paisa((Double(targetPaisa) * factor).rounded())
+        GoalInflationFormulas.adjustedTargetPaisa(
+            targetPaisa: targetPaisa,
+            inflationRate: inflationRate,
+            startDate: startDate,
+            endDate: endDate
+        )
     }
 
-    /// `(adjustedTarget - savedAmount) / monthsRemaining`
+    /// Required savings / monthly need — `(adjusted − saved) / months remaining`.
     static func monthlyNeedPaisa(
         adjustedTarget: Paisa,
         savedAmount: Paisa,
         endDate: Date,
         asOf: Date = Date()
     ) -> Paisa {
-        let months = max(monthsBetween(start: asOf, end: endDate), 1)
-        let remaining = max(adjustedTarget - savedAmount, 0)
-        return remaining / Paisa(months)
+        GoalInflationFormulas.requiredSavingsPaisa(
+            adjustedTarget: adjustedTarget,
+            currentSaving: savedAmount,
+            endDate: endDate,
+            asOf: asOf
+        )
+    }
+
+    /// Ticket name for required savings — alias of `monthlyNeedPaisa`.
+    static func requiredSavingsPaisa(
+        adjustedTarget: Paisa,
+        currentSaving: Paisa,
+        endDate: Date,
+        asOf: Date = Date()
+    ) -> Paisa {
+        GoalInflationFormulas.requiredSavingsPaisa(
+            adjustedTarget: adjustedTarget,
+            currentSaving: currentSaving,
+            endDate: endDate,
+            asOf: asOf
+        )
     }
 
     /// Parses whole-rupee digit string into paisa. Non-digits ignored; empty → 0.
@@ -169,14 +191,4 @@ enum GoalValidationService {
         }
     }
 
-    private static func yearsBetween(start: Date, end: Date) -> Double {
-        let seconds = end.timeIntervalSince(start)
-        return max(seconds / (365.25 * 24 * 60 * 60), 0)
-    }
-
-    private static func monthsBetween(start: Date, end: Date) -> Int {
-        let calendar = Calendar(identifier: .gregorian)
-        let components = calendar.dateComponents([.month], from: start, to: end)
-        return max(components.month ?? 0, 0)
-    }
 }
