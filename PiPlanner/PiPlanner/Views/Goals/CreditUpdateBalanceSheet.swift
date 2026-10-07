@@ -21,6 +21,10 @@ struct CreditUpdateBalanceSheet: View {
                     manualContent
                 case .pin:
                     pinContent
+                case .otherApp:
+                    otherAppContent
+                case .wrongPin:
+                    wrongPinContent
                 }
             }
             .toolbar {
@@ -224,8 +228,7 @@ struct CreditUpdateBalanceSheet: View {
             VStack(spacing: DesignTokens.Space.s20) {
                 VStack(spacing: DesignTokens.Space.s12) {
                     UPIDemoBadge()
-                    /// Design demo masked line (DemoSeed HDFC dedicated) — chrome only.
-                    UPIBankMaskedLine(title: "HDFC ••4821")
+                    UPIBankMaskedLine(title: viewModel.dedicatedBankTitle ?? "HDFC ••4821")
                 }
 
                 UPIPinDots(
@@ -235,8 +238,8 @@ struct CreditUpdateBalanceSheet: View {
                 .frame(maxWidth: .infinity)
                 .padding(.top, DesignTokens.Space.s8)
 
-                if let pinError = viewModel.pinError {
-                    Text(pinError == .wrongPin ? "Incorrect PIN. Try again." : String(describing: pinError))
+                if let pinError = viewModel.pinError, pinError != .wrongPin {
+                    Text(String(describing: pinError))
                         .font(PiTypography.body())
                         .foregroundStyle(PiColors.destructive)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -263,6 +266,14 @@ struct CreditUpdateBalanceSheet: View {
                 }
 
                 SecondaryCTA(
+                    title: "Account on another UPI app",
+                    style: .text,
+                    accessibilityIdentifier: "creditUpdate.otherApp"
+                ) {
+                    viewModel.path = .otherApp
+                }
+
+                SecondaryCTA(
                     title: "Back",
                     style: .outline,
                     accessibilityIdentifier: "creditUpdate.pinBack"
@@ -271,6 +282,76 @@ struct CreditUpdateBalanceSheet: View {
                 }
 
                 Spacer(minLength: 0)
+            }
+            .padding(.horizontal, DesignTokens.Space.s20)
+            .padding(.bottom, DesignTokens.Space.s28)
+        }
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Back") { viewModel.backToChoice() }
+            }
+        }
+    }
+
+    // MARK: - Other UPI app → Manual only
+
+    private var otherAppContent: some View {
+        PiSheet(
+            title: "Account on another UPI app",
+            helper: "This savings account looks linked in another UPI app. Enter the balance manually."
+        ) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s20) {
+                Spacer(minLength: 0)
+                PrimaryCTA(
+                    title: "Enter balance manually",
+                    accessibilityIdentifier: "creditUpdate.otherAppManual"
+                ) {
+                    viewModel.continueFromOtherApp()
+                }
+                SecondaryCTA(
+                    title: "Back",
+                    style: .text,
+                    accessibilityIdentifier: "creditUpdate.otherAppBack"
+                ) {
+                    viewModel.backToChoice()
+                }
+            }
+            .padding(.horizontal, DesignTokens.Space.s20)
+            .padding(.bottom, DesignTokens.Space.s28)
+        }
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Back") { viewModel.backToChoice() }
+            }
+        }
+    }
+
+    // MARK: - Wrong PIN → retry / manual
+
+    private var wrongPinContent: some View {
+        PiSheet(
+            title: "Incorrect PIN",
+            helper: viewModel.errorMessage ?? "Incorrect PIN. Try again or enter the balance manually."
+        ) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s20) {
+                UPIPinDots(filledCount: 4, showsError: true)
+                    .frame(maxWidth: .infinity)
+
+                Spacer(minLength: 0)
+
+                PrimaryCTA(
+                    title: "Try again",
+                    accessibilityIdentifier: "creditUpdate.retryPin"
+                ) {
+                    viewModel.retryPIN()
+                }
+                SecondaryCTA(
+                    title: "Enter manually",
+                    style: .outline,
+                    accessibilityIdentifier: "creditUpdate.wrongPinManual"
+                ) {
+                    viewModel.enterManuallyAfterWrongPin()
+                }
             }
             .padding(.horizontal, DesignTokens.Space.s20)
             .padding(.bottom, DesignTokens.Space.s28)

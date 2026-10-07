@@ -88,6 +88,9 @@
 		5F6188E2699E40068E8AF2D0 /* WelcomeViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D8786C6E2CF42CB842FED32 /* WelcomeViewModelTests.swift */; };
 		0762A7393A06489AA35C9A8F /* WelcomeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648FE7AD42B2471E947DD9DD /* WelcomeUITests.swift */; };
 		B39A0010BD814941ABD3C921 /* BalanceSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39A0011EEA24F56B29EBB6A /* BalanceSyncService.swift */; };
+		P1000000BD814941ABD3C921 /* UpdateBalanceRoutingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = P1000001EEA24F56B29EBB6A /* UpdateBalanceRoutingService.swift */; };
+		P1000002BD814941ABD3C921 /* UpdateBalanceRoutingServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = P1000003EEA24F56B29EBB6A /* UpdateBalanceRoutingServiceTests.swift */; };
+		P1000004BD814941ABD3C921 /* CreditUpdateBalanceViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = P1000005EEA24F56B29EBB6A /* CreditUpdateBalanceViewModelTests.swift */; };
 		B39A0012BD814941ABD3C921 /* ConsentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39A0013EEA24F56B29EBB6A /* ConsentViewModel.swift */; };
 		B39A0014BD814941ABD3C921 /* ConsentSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39A0015EEA24F56B29EBB6A /* ConsentSheet.swift */; };
 		B39A0016BD814941ABD3C921 /* ManualBalanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39A0017EEA24F56B29EBB6A /* ManualBalanceView.swift */; };
@@ -227,6 +230,9 @@
 		648FE7AD42B2471E947DD9DD /* WelcomeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeUITests.swift; sourceTree = "<group>"; };
 		8410F99D1749426EB531CC14 /* PiPlannerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PiPlannerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B39A0011EEA24F56B29EBB6A /* BalanceSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceSyncService.swift; sourceTree = "<group>"; };
+		P1000001EEA24F56B29EBB6A /* UpdateBalanceRoutingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateBalanceRoutingService.swift; sourceTree = "<group>"; };
+		P1000003EEA24F56B29EBB6A /* UpdateBalanceRoutingServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateBalanceRoutingServiceTests.swift; sourceTree = "<group>"; };
+		P1000005EEA24F56B29EBB6A /* CreditUpdateBalanceViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditUpdateBalanceViewModelTests.swift; sourceTree = "<group>"; };
 		B39A0013EEA24F56B29EBB6A /* ConsentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsentViewModel.swift; sourceTree = "<group>"; };
 		B39A0015EEA24F56B29EBB6A /* ConsentSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsentSheet.swift; sourceTree = "<group>"; };
 		B39A0017EEA24F56B29EBB6A /* ManualBalanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualBalanceView.swift; sourceTree = "<group>"; };
@@ -380,6 +386,7 @@
 				E356D619EEA24F56B29EBB6A /* OpeningSplitService.swift */,
 				A11C0011EEA24F56B29EBB6A /* AccountsService.swift */,
 				B39A0011EEA24F56B29EBB6A /* BalanceSyncService.swift */,
+				P1000001EEA24F56B29EBB6A /* UpdateBalanceRoutingService.swift */,
 				C41A1001EEA24F56B29EBB6A /* GrokService.swift */,
 				A63F0001EEA24F56B29EBB6A /* AskService.swift */,
 				C41A1003EEA24F56B29EBB6A /* GoalValidationService.swift */,
@@ -564,6 +571,8 @@
 				A11C001BEEA24F56B29EBB6A /* AccountsServiceTests.swift */,
 				A11C001DEEA24F56B29EBB6A /* AccountsViewModelTests.swift */,
 				B39A001BEEA24F56B29EBB6A /* BalanceSyncServiceTests.swift */,
+				P1000003EEA24F56B29EBB6A /* UpdateBalanceRoutingServiceTests.swift */,
+				P1000005EEA24F56B29EBB6A /* CreditUpdateBalanceViewModelTests.swift */,
 				B39A001DEEA24F56B29EBB6A /* ConsentViewModelTests.swift */,
 				C41A100DEEA24F56B29EBB6A /* GrokServiceTests.swift */,
 				A63F0004EEA24F56B29EBB6A /* AskServiceTests.swift */,
@@ -773,6 +782,7 @@
 				84194582E8D840E6A12F3A0A /* WelcomeView.swift in Sources */,
 				A96DD71BE5B642908C414C87 /* WelcomeFlowView.swift in Sources */,
 				B39A0010BD814941ABD3C921 /* BalanceSyncService.swift in Sources */,
+				P1000000BD814941ABD3C921 /* UpdateBalanceRoutingService.swift in Sources */,
 				B39A0012BD814941ABD3C921 /* ConsentViewModel.swift in Sources */,
 				B39A0014BD814941ABD3C921 /* ConsentSheet.swift in Sources */,
 				B39A0016BD814941ABD3C921 /* ManualBalanceView.swift in Sources */,
@@ -830,6 +840,8 @@
 				F13572D6AE9A4323879B80E5 /* AppLaunchRouterTests.swift in Sources */,
 				5F6188E2699E40068E8AF2D0 /* WelcomeViewModelTests.swift in Sources */,
 				B39A001ABD814941ABD3C921 /* BalanceSyncServiceTests.swift in Sources */,
+				P1000002BD814941ABD3C921 /* UpdateBalanceRoutingServiceTests.swift in Sources */,
+				P1000004BD814941ABD3C921 /* CreditUpdateBalanceViewModelTests.swift in Sources */,
 				B39A001CBD814941ABD3C921 /* ConsentViewModelTests.swift in Sources */,
 				C41A100CBD814941ABD3C921 /* GrokServiceTests.swift in Sources */,
 				A63B0004BD814941ABD3C921 /* AskServiceTests.swift in Sources */,
