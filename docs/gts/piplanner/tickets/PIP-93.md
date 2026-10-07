@@ -65,7 +65,7 @@ Started from `b30a048` (PIP-69 Components on main). **Touch only** `SettingsView
 
 ## Test results
 
-`cd PiPlanner && swift test` — see PR / CI for count; SettingsService tests unchanged (behaviour Out of scope).
+`cd PiPlanner && swift test` — **206 tests, 0 failures** (includes `SettingsServiceTests`; SettingsViewModelTests remain Xcode-host excluded).
 
 ## How to run tests
 
