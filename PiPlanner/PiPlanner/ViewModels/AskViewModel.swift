@@ -38,11 +38,20 @@ final class AskViewModel: ObservableObject {
     let formatting: any FormattingServicing
     private let grok: any GrokServicing
 
-    var suggestionChips: [String] { AskService.suggestionChips }
-    var unavailableTemplates: [String] { AskService.unavailableTemplateSentences }
-    var checkedByLabel: String { AskService.checkedByLabel }
+    var suggestionChips: [String] { GrokProposalOrchestrator.askStarters }
+    var askStarters: [String] { GrokProposalOrchestrator.askStarters }
+    var unavailableTemplates: [String] { GrokProposalOrchestrator.unavailableTemplates }
+    var checkedByLabel: String { GrokProposalOrchestrator.checkedByLabel }
     var headerCaption: String { AskService.headerCaption }
     var inputPlaceholder: String { AskService.inputPlaceholder }
+
+    var ledgerSnapshot: GrokProposalOrchestrator.LedgerSnapshot {
+        GrokProposalOrchestrator.LedgerSnapshot(
+            goals: goals,
+            standingSplits: standingSplits,
+            accounts: accounts
+        )
+    }
 
     var canSubmit: Bool {
         !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -135,30 +144,25 @@ final class AskViewModel: ObservableObject {
         proposedAction = nil
         followUpMessage = nil
 
-        if case .failure(.unavailable) = grok.askQuestion(query: "ping", engine: nil) {
-            phase = .unavailable
-            followUpMessage = AskService.unavailableMessage
-            return
-        }
-
-        switch grok.askQuestion(query: text, engine: engineContext) {
-        case .failure(.unavailable):
+        // PIP-108 — Grok draft → engine validate → confirm card (or fallback).
+        switch GrokProposalOrchestrator.processAsk(
+            query: text,
+            grok: grok,
+            ledger: ledgerSnapshot,
+            formatting: formatting
+        ) {
+        case .unavailable:
             phase = .unavailable
             followUpMessage = AskService.unavailableMessage
             proposedAction = nil
-        case .failure(.invalidDraft), .failure(.rateLimited):
+        case .invalidDraft:
             handleInvalidDraft()
-        case .success(.plainAnswer(let answer)):
+        case .plainAnswer(let answer):
             invalidFollowUpCount = 0
             phase = .plainAnswer
             answerText = answer
             proposedAction = nil
-        case .success(.actionProposal(let action)):
-            // Never surface an invalid draft as a card (19d).
-            guard isPresentable(action) else {
-                handleInvalidDraft()
-                return
-            }
+        case .confirmable(let action):
             invalidFollowUpCount = 0
             phase = .proposal
             proposedAction = action
@@ -211,7 +215,7 @@ final class AskViewModel: ObservableObject {
     }
 
     private func handleInvalidDraft() {
-        // Invalid drafts never shown as cards.
+        // Invalid drafts never shown as cards (engine or Grok).
         proposedAction = nil
         answerText = nil
         if AskService.shouldOpenGoalFormAfterInvalid(followUpCount: invalidFollowUpCount) {
@@ -226,19 +230,12 @@ final class AskViewModel: ObservableObject {
         followUpMessage = AskService.invalidFollowUpPrompt
     }
 
-    private func isPresentable(_ action: ProposedAction) -> Bool {
-        switch action {
-        case .transfer(let from, let to, let amount):
-            return amount > 0 && from != to
-        case .addGoal(let proposal):
-            return !proposal.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                && (proposal.suggestedTarget ?? 0) > 0
-        case .changeSplit(let splits):
-            return !splits.isEmpty
-        }
-    }
-
     private func openSheet(for action: ProposedAction) {
+        // Re-validate before Confirm / Edit opens a sheet (trust boundary).
+        guard case .success = GrokProposalOrchestrator.validate(action, goals: goals) else {
+            handleInvalidDraft()
+            return
+        }
         if let prefill = AskService.transferPrefill(from: action) {
             presentedSheet = .transfer(prefill)
             return

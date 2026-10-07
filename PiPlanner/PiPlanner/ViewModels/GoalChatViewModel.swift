@@ -251,14 +251,20 @@ final class GoalChatViewModel: ObservableObject {
         case .failure:
             presentFollowUpOrForm(preferredQuestion: StubGrokService.followUpQuestions[0])
         case .success(.proposals(let list)):
-            proposals = list
-            phase = .proposal
-            messages.append(
-                GoalChatMessage(
-                    role: .assistant,
-                    text: "Here’s a suggested plan. Edit or Confirm when you’re ready."
+            // PIP-108 — engine-validate goal drafts before proposal card.
+            switch GrokProposalOrchestrator.validateGoalProposals(list) {
+            case .success(let valid):
+                proposals = valid
+                phase = .proposal
+                messages.append(
+                    GoalChatMessage(
+                        role: .assistant,
+                        text: "Here’s a suggested plan. Edit or Confirm when you’re ready."
+                    )
                 )
-            )
+            case .failure:
+                presentFollowUpOrForm(preferredQuestion: StubGrokService.followUpQuestions[0])
+            }
         case .success(.needsClarification(let question)):
             presentFollowUpOrForm(preferredQuestion: question)
         }

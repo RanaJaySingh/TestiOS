@@ -103,7 +103,7 @@ struct AskTabView: View {
             Text("Suggestions")
                 .font(PiTypography.caption())
                 .foregroundStyle(.secondary)
-            AskSuggestionChips(texts: viewModel.suggestionChips) { chip in
+            AskSuggestionChips(texts: viewModel.askStarters) { chip in
                 viewModel.selectChip(chip)
             }
             .accessibilityIdentifier("ask.chips")

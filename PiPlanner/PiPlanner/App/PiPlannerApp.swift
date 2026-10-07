@@ -66,10 +66,11 @@ struct ContentView: View {
         }
     }
 
-    /// Settings → Reset demo (PRD R17 / PIP-61) — clear host and reseed persona accounts for Welcome (1).
+    /// Settings → Reset demo (PRD R17 / PIP-61 / PIP-108) — clear host and reseed Welcome (1).
     private func returnToWelcome(persistence: PersistenceService) {
+        let seed = SettingsService.welcomeStateAfterDemoReset()
         accountsViewModel = AccountsViewModel(
-            accounts: DemoData.sampleAccounts,
+            accounts: seed.accounts,
             persistence: persistence
         )
         destination = .welcome
