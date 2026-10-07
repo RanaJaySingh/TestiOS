@@ -22,11 +22,15 @@ let package = Package(
                 "ViewModels",
                 "Components",
                 "Resources",
-                "Assets.xcassets"
+                "Assets.xcassets",
+                // SwiftUI theme wiring — Xcode app target only; tokens stay in DesignTokens.swift.
+                "Theme/Color+DesignTokens.swift",
+                "Theme/Theme.swift"
             ],
             sources: [
                 "Models",
-                "Services"
+                "Services",
+                "Theme"
             ]
         ),
         .testTarget(
