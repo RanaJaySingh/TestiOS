@@ -66,7 +66,7 @@ Started from `b30a048` (PIP-69 shared components on main). Touches **only** Stan
 
 ## Test results
 
-`cd PiPlanner && swift test` — see PR / CI (service tests for standing/transfer/withdrawal/delete remain green; Views excluded from Linux SPM like other SwiftUI screens).
+`cd PiPlanner && swift test` — **206 tests, 0 failures** (includes StandingSplit / Transfer / Withdrawal / DeleteGoal service suites; Views excluded from Linux SPM like other SwiftUI screens).
 
 ## How to run tests
 
