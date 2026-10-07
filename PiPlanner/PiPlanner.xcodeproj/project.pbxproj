@@ -116,6 +116,10 @@
 		D53F0003EEA24F56B29EBB6A /* DeleteGoalViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteGoalViewModel.swift; sourceTree = "<group>"; };
 		D53F0004EEA24F56B29EBB6A /* DeleteGoalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteGoalView.swift; sourceTree = "<group>"; };
 		D53F0006EEA24F56B29EBB6A /* DeleteGoalServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteGoalServiceTests.swift; sourceTree = "<group>"; };
+		A57F0001EEA24F56B29EBB6A /* WithdrawalService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WithdrawalService.swift; sourceTree = "<group>"; };
+		A57F0002EEA24F56B29EBB6A /* WithdrawalViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WithdrawalViewModel.swift; sourceTree = "<group>"; };
+		A57F0003EEA24F56B29EBB6A /* WithdrawalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WithdrawalView.swift; sourceTree = "<group>"; };
+		A57F0004EEA24F56B29EBB6A /* WithdrawalServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WithdrawalServiceTests.swift; sourceTree = "<group>"; };
 		656B4AAB996D4CB283413E05 /* PiPlannerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiPlannerApp.swift; sourceTree = "<group>"; };
 		C670521930484E588DEE0188 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
 		349DD80CB6684362B4613EB4 /* Goal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Goal.swift; sourceTree = "<group>"; };
@@ -291,6 +295,7 @@
 			children = (
 				EF363595F0454DF3B16C9ED3 /* GoalHeldChangeService.swift */,
 				D53F0002EEA24F56B29EBB6A /* DeleteGoalService.swift */,
+				A57F0001EEA24F56B29EBB6A /* WithdrawalService.swift */,
 				D6A8D1E227234A47AFC6AA76 /* FormattingService.swift */,
 				1631379D5741444D9B38E865 /* PersistenceService.swift */,
 				E356D619EEA24F56B29EBB6A /* OpeningSplitService.swift */,
@@ -312,6 +317,7 @@
 				41600919E4B7471E8C7C04A3 /* GoalEditViewModel.swift */,
 				FC63753FEBA84656A97D790D /* GoalDetailViewModel.swift */,
 				D53F0003EEA24F56B29EBB6A /* DeleteGoalViewModel.swift */,
+				A57F0002EEA24F56B29EBB6A /* WithdrawalViewModel.swift */,
 				E90291FF624F492F96D5DEBB /* OpeningSplitViewModel.swift */,
 				A11C0013EEA24F56B29EBB6A /* AccountsViewModel.swift */,
 				B39A0013EEA24F56B29EBB6A /* ConsentViewModel.swift */,
@@ -400,6 +406,7 @@
 				951D3037C9B340B9AFD53951 /* GoalEditView.swift */,
 				B51A0003EEA24F56B29EBB6A /* StandingSplitView.swift */,
 				D53F0004EEA24F56B29EBB6A /* DeleteGoalView.swift */,
+				A57F0003EEA24F56B29EBB6A /* WithdrawalView.swift */,
 				A45F0008EEA24F56B29EBB6A /* SyncSheet.swift */,
 				A45F0009EEA24F56B29EBB6A /* UpdateBalanceSheet.swift */,
 				D47A0019EEA24F56B29EBB6A /* CreditSyncSheet.swift */,
@@ -430,6 +437,7 @@
 			children = (
 				6B2C1E414EFC4F5081CE1EFF /* GoalHeldChangeServiceTests.swift */,
 				D53F0006EEA24F56B29EBB6A /* DeleteGoalServiceTests.swift */,
+				A57F0004EEA24F56B29EBB6A /* WithdrawalServiceTests.swift */,
 				B6E95FBCBC4A41B7993C130A /* FormattingServiceTests.swift */,
 				CB1FF2A2773D47A2A2B2B50D /* ModelSerializationTests.swift */,
 				99B5A5E93DC14F1EB79CF38A /* PersistenceServiceTests.swift */,
@@ -613,6 +621,9 @@
 				D53B0002BD814941ABD3C921 /* DeleteGoalService.swift in Sources */,
 				D53B0003BD814941ABD3C921 /* DeleteGoalViewModel.swift in Sources */,
 				D53B0004BD814941ABD3C921 /* DeleteGoalView.swift in Sources */,
+				A57B0001BD814941ABD3C921 /* WithdrawalService.swift in Sources */,
+				A57B0002BD814941ABD3C921 /* WithdrawalViewModel.swift in Sources */,
+				A57B0003BD814941ABD3C921 /* WithdrawalView.swift in Sources */,
 				DB116BA205274A9BAC7D9303 /* HeldGoalChange.swift in Sources */,
 				A11C0010BD814941ABD3C921 /* AccountsService.swift in Sources */,
 				A11C0012BD814941ABD3C921 /* AccountsViewModel.swift in Sources */,
@@ -680,6 +691,7 @@
 				C41A100EBD814941ABD3C921 /* GoalValidationServiceTests.swift in Sources */,
 				463C0C59C104488E8D765E95 /* GoalHeldChangeServiceTests.swift in Sources */,
 				D53B0006BD814941ABD3C921 /* DeleteGoalServiceTests.swift in Sources */,
+				A57B0004BD814941ABD3C921 /* WithdrawalServiceTests.swift in Sources */,
 				C41A1010BD814941ABD3C921 /* GoalChatViewModelTests.swift in Sources */,
 				A45B000DBD814941ABD3C921 /* GoalsTabServiceTests.swift in Sources */,
 				A45B000EBD814941ABD3C921 /* GoalsViewModelTests.swift in Sources */,
