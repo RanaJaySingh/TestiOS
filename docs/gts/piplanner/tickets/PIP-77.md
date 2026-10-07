@@ -55,7 +55,7 @@ Started from `b30a048` (main after PIP-69 #22). Touched only Update balance / UP
 
 ## Test results
 
-`cd PiPlanner && swift test` — see PR / CI.
+`cd PiPlanner && swift test` — **206 tests, 0 failures**.
 
 ## How to run tests
 
