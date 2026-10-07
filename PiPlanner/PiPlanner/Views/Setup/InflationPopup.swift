@@ -1,6 +1,7 @@
 import SwiftUI
 
 /// Inflation rate popup — design frame 7. Default 7% with live adjusted target.
+/// Visual parity (PIP-79): PiSheet chrome, stepper, live targets, “Use this rate” CTA.
 struct InflationPopup: View {
     @Binding var inflationRate: Decimal
     let targetPaisa: Paisa
@@ -9,16 +10,8 @@ struct InflationPopup: View {
     var formatting: any FormattingServicing = FormattingService()
     var onDone: () -> Void
 
-    private var percentBinding: Binding<Double> {
-        Binding(
-            get: {
-                (inflationRate as NSDecimalNumber).doubleValue * 100
-            },
-            set: { newValue in
-                let clamped = min(max(newValue, 0), 30)
-                inflationRate = Decimal(clamped) / 100
-            }
-        )
+    private var percentValue: Int {
+        Int(((inflationRate as NSDecimalNumber).doubleValue * 100).rounded())
     }
 
     private var adjustedPaisa: Paisa {
@@ -31,64 +24,81 @@ struct InflationPopup: View {
     }
 
     var body: some View {
-        NavigationStack {
-            VStack(alignment: .leading, spacing: 20) {
-                Text("Inflation")
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                    .accessibilityAddTraits(.isHeader)
-
-                Text("Used to estimate an inflation-adjusted target. Default is 7%.")
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text("Rate")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Text("\(Int(percentBinding.wrappedValue.rounded()))%")
-                            .font(.title3)
-                            .fontWeight(.semibold)
-                            .monospacedDigit()
-                            .accessibilityLabel("Inflation \(Int(percentBinding.wrappedValue.rounded())) percent")
-                    }
-                    Slider(value: percentBinding, in: 0...30, step: 1)
-                        .accessibilityLabel("Inflation rate")
-                }
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Adjusted target")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    Text(formatting.formatINR(paisa: adjustedPaisa))
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .monospacedDigit()
-                        .accessibilityLabel(
-                            "Adjusted target \(formatting.formatINR(paisa: adjustedPaisa))"
-                        )
-                }
-
+        PiSheet(
+            title: "Inflation",
+            helper: "Used to estimate an inflation-adjusted target. Default is 7%."
+        ) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s20) {
+                stepperRow
+                liveTargets
                 Spacer(minLength: 0)
-
-                Button {
-                    onDone()
-                } label: {
-                    Text("Done")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
-                }
-                .buttonStyle(.borderedProminent)
-                .accessibilityLabel("Done")
+                PrimaryCTA(title: "Use this rate", action: onDone)
+                    .accessibilityLabel("Use this rate")
             }
-            .padding()
-            .navigationBarTitleDisplayMode(.inline)
+            .padding(.horizontal, DesignTokens.Space.s20)
+            .padding(.bottom, DesignTokens.Space.s28)
         }
         .presentationDetents([.medium, .large])
+        .piPlannerTheme()
+    }
+
+    private var stepperRow: some View {
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s12) {
+            Text("Rate")
+                .font(PiTypography.caption())
+                .foregroundStyle(.secondary)
+
+            HStack(spacing: DesignTokens.Space.s16) {
+                LightBlueChip(title: "−", isSelected: false) {
+                    adjustPercent(by: -1)
+                }
+                .accessibilityLabel("Decrease inflation")
+
+                Text("\(percentValue)%")
+                    .font(PiTypography.amountHero())
+                    .monospacedDigit()
+                    .foregroundStyle(PiColors.navyPrimary)
+                    .frame(minWidth: 72)
+                    .multilineTextAlignment(.center)
+                    .accessibilityLabel("Inflation \(percentValue) percent")
+
+                LightBlueChip(title: "+", isSelected: false) {
+                    adjustPercent(by: 1)
+                }
+                .accessibilityLabel("Increase inflation")
+
+                Spacer(minLength: 0)
+            }
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier("inflation.stepper")
+        }
+    }
+
+    private var liveTargets: some View {
+        PiCard(padding: DesignTokens.Space.s16) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
+                Text("Adjusted target")
+                    .font(PiTypography.caption())
+                    .foregroundStyle(.secondary)
+                Text(formatting.formatINR(paisa: adjustedPaisa))
+                    .font(PiTypography.amountHero())
+                    .monospacedDigit()
+                    .foregroundStyle(PiColors.navyPrimary)
+                    .minimumScaleFactor(0.7)
+                    .lineLimit(1)
+                    .accessibilityLabel(
+                        "Adjusted target \(formatting.formatINR(paisa: adjustedPaisa))"
+                    )
+                Text("Updates live as you change the rate.")
+                    .font(PiTypography.caption())
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private func adjustPercent(by delta: Int) {
+        let next = min(max(percentValue + delta, 0), 30)
+        inflationRate = Decimal(next) / 100
     }
 }
 

@@ -1,35 +1,38 @@
 import SwiftUI
 
-/// Goal form · create / edit — design frame 6 (PRD R5).
+/// Goal form · create / edit — design frame 6 (PRD R5 / R9).
+/// Visual parity (PIP-79): field stack, inflation row, live targets, valid/invalid chrome.
 struct GoalFormView: View {
     @ObservedObject var viewModel: GoalChatViewModel
     var onSaved: (() -> Void)? = nil
 
+    private var isFormValid: Bool { viewModel.formDraft.canSave }
+
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 18) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s20) {
                 header
-                nameField
-                targetField
-                dateFields
+                fieldStack
                 inflationRow
                 shareField
                 savedRow
                 metrics
                 saveButton
                 if viewModel.phase == .form {
-                    Button("Cancel") {
-                        viewModel.cancelForm()
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.top, 4)
+                    SecondaryCTA(
+                        title: "Cancel",
+                        style: .text,
+                        action: { viewModel.cancelForm() }
+                    )
                 }
             }
-            .padding()
+            .padding(DesignTokens.Space.s20)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .background(PiColors.backgroundApp.ignoresSafeArea())
         .navigationTitle("Goal")
         .navigationBarTitleDisplayMode(.inline)
+        .piPlannerTheme()
         .sheet(isPresented: $viewModel.showInflationPopup) {
             InflationPopup(
                 inflationRate: Binding(
@@ -45,38 +48,71 @@ struct GoalFormView: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
             Text("Define a goal")
-                .font(.title2)
-                .fontWeight(.semibold)
+                .font(PiTypography.title())
                 .accessibilityAddTraits(.isHeader)
             Text("Name, target, dates, and share of new credits. Inflation defaults to 7%.")
-                .font(.body)
+                .font(PiTypography.body())
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
     }
 
+    /// Field stack with valid / invalid chrome (AC state).
+    private var fieldStack: some View {
+        PiCard(padding: DesignTokens.Space.s16) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s16) {
+                nameField
+                targetField
+                dateFields
+                if !isFormValid {
+                    Text("Enter a name, target above ₹0, and an end date after start.")
+                        .font(PiTypography.caption())
+                        .foregroundStyle(PiColors.behind)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityLabel("Form incomplete")
+                }
+            }
+        }
+        .overlay(
+            RoundedRectangle(cornerRadius: DesignTokens.Radius.card, style: .continuous)
+                .strokeBorder(
+                    isFormValid ? Color.clear : PiColors.behind.opacity(0.55),
+                    lineWidth: isFormValid ? 0 : 1.5
+                )
+        )
+        .accessibilityIdentifier(isFormValid ? "goalForm.valid" : "goalForm.invalid")
+    }
+
     private var nameField: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
             Text("Name")
-                .font(.subheadline)
+                .font(PiTypography.caption())
                 .foregroundStyle(.secondary)
             TextField("e.g. Car", text: $viewModel.formDraft.name)
+                .font(PiTypography.body())
                 .textInputAutocapitalization(.words)
+                .padding(.horizontal, DesignTokens.Space.s12)
+                .padding(.vertical, DesignTokens.Space.s8)
+                .background(PiColors.backgroundApp)
+                .clipShape(
+                    RoundedRectangle(cornerRadius: DesignTokens.Radius.chip, style: .continuous)
+                )
                 .accessibilityLabel("Goal name")
         }
     }
 
     private var targetField: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
             Text("Target")
-                .font(.subheadline)
+                .font(PiTypography.caption())
                 .foregroundStyle(.secondary)
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text("₹")
-                    .font(.title3)
+                    .font(PiTypography.title())
                     .fontWeight(.semibold)
+                    .foregroundStyle(PiColors.navyPrimary)
                 TextField(
                     "0",
                     text: Binding(
@@ -85,30 +121,40 @@ struct GoalFormView: View {
                     )
                 )
                 .keyboardType(.numberPad)
-                .font(.title3)
+                .font(PiTypography.title())
                 .fontWeight(.semibold)
                 .monospacedDigit()
                 .accessibilityLabel("Target in rupees")
             }
+            .padding(.horizontal, DesignTokens.Space.s12)
+            .padding(.vertical, DesignTokens.Space.s8)
+            .background(PiColors.backgroundApp)
+            .clipShape(
+                RoundedRectangle(cornerRadius: DesignTokens.Radius.chip, style: .continuous)
+            )
             Text(viewModel.formatINR(paisa: viewModel.formDraft.targetPaisa))
-                .font(.callout)
+                .font(PiTypography.caption())
                 .foregroundStyle(.secondary)
                 .monospacedDigit()
         }
     }
 
     private var dateFields: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s12) {
             DatePicker(
                 "Start",
                 selection: $viewModel.formDraft.startDate,
                 displayedComponents: .date
             )
+            .font(PiTypography.body())
+            .tint(PiColors.navyPrimary)
             DatePicker(
                 "End",
                 selection: $viewModel.formDraft.endDate,
                 displayedComponents: .date
             )
+            .font(PiTypography.body())
+            .tint(PiColors.navyPrimary)
         }
     }
 
@@ -116,25 +162,25 @@ struct GoalFormView: View {
         Button {
             viewModel.showInflationPopup = true
         } label: {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Inflation")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    Text("\(viewModel.formDraft.inflationPercentDisplay)%")
-                        .font(.body)
+            PiCard(padding: DesignTokens.Space.s16) {
+                HStack {
+                    VStack(alignment: .leading, spacing: DesignTokens.Space.s8 / 2) {
+                        Text("Inflation")
+                            .font(PiTypography.caption())
+                            .foregroundStyle(.secondary)
+                        Text("\(viewModel.formDraft.inflationPercentDisplay)%")
+                            .font(PiTypography.body())
+                            .fontWeight(.semibold)
+                            .monospacedDigit()
+                            .foregroundStyle(PiColors.navyPrimary)
+                    }
+                    Spacer()
+                    Text("Edit")
+                        .font(PiTypography.body())
                         .fontWeight(.semibold)
-                        .monospacedDigit()
+                        .foregroundStyle(PiColors.navyPrimary)
                 }
-                Spacer()
-                Text("Edit")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
             }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color(.secondarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Inflation \(viewModel.formDraft.inflationPercentDisplay) percent")
@@ -142,73 +188,75 @@ struct GoalFormView: View {
     }
 
     private var shareField: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text("Share of new credits")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                Spacer()
-                Text("\(viewModel.formDraft.sharePercentDisplay)%")
-                    .font(.body)
-                    .fontWeight(.semibold)
-                    .monospacedDigit()
+        PiCard(padding: DesignTokens.Space.s16) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
+                HStack {
+                    Text("Share of new credits")
+                        .font(PiTypography.caption())
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Text("\(viewModel.formDraft.sharePercentDisplay)%")
+                        .font(PiTypography.body())
+                        .fontWeight(.semibold)
+                        .monospacedDigit()
+                        .foregroundStyle(PiColors.navyPrimary)
+                }
+                Slider(
+                    value: Binding(
+                        get: {
+                            (viewModel.formDraft.shareOfNewCredits as NSDecimalNumber).doubleValue * 100
+                        },
+                        set: { viewModel.formDraft.shareOfNewCredits = Decimal($0) / 100 }
+                    ),
+                    in: 0...100,
+                    step: 1
+                )
+                .tint(PiColors.navyPrimary)
+                .accessibilityLabel("Share of new credits")
             }
-            Slider(
-                value: Binding(
-                    get: {
-                        (viewModel.formDraft.shareOfNewCredits as NSDecimalNumber).doubleValue * 100
-                    },
-                    set: { viewModel.formDraft.shareOfNewCredits = Decimal($0) / 100 }
-                ),
-                in: 0...100,
-                step: 1
-            )
-            .accessibilityLabel("Share of new credits")
         }
     }
 
     private var savedRow: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s8 / 2) {
             Text("Saved so far")
-                .font(.subheadline)
+                .font(PiTypography.caption())
                 .foregroundStyle(.secondary)
             Text(viewModel.formatINR(paisa: viewModel.formDraft.savedAmount))
-                .font(.body)
+                .font(PiTypography.body())
                 .fontWeight(.semibold)
                 .foregroundStyle(.secondary)
                 .monospacedDigit()
             Text("Locked at ₹0 while creating a goal in setup.")
-                .font(.caption)
+                .font(PiTypography.caption())
                 .foregroundStyle(.secondary)
         }
         .accessibilityElement(children: .combine)
     }
 
     private var metrics: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            metricRow(
-                title: "Inflation-adjusted target",
-                value: viewModel.formatINR(paisa: viewModel.formDraft.adjustedTargetPaisa)
-            )
-            metricRow(
-                title: "Monthly need",
-                value: viewModel.formatINR(paisa: viewModel.formDraft.monthlyNeedPaisa)
-            )
+        PiCard(padding: DesignTokens.Space.s16) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s12) {
+                metricRow(
+                    title: "Inflation-adjusted target",
+                    value: viewModel.formatINR(paisa: viewModel.formDraft.adjustedTargetPaisa)
+                )
+                metricRow(
+                    title: "Monthly need",
+                    value: viewModel.formatINR(paisa: viewModel.formDraft.monthlyNeedPaisa)
+                )
+            }
         }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
     private func metricRow(title: String, value: String) -> some View {
         HStack {
             Text(title)
-                .font(.subheadline)
+                .font(PiTypography.caption())
                 .foregroundStyle(.secondary)
             Spacer()
             Text(value)
-                .font(.body)
+                .font(PiTypography.body())
                 .fontWeight(.semibold)
                 .monospacedDigit()
         }
@@ -216,21 +264,18 @@ struct GoalFormView: View {
     }
 
     private var saveButton: some View {
-        Button {
-            if viewModel.saveForm() {
-                onSaved?()
+        PrimaryCTA(
+            title: "Save",
+            isEnabled: isFormValid,
+            action: {
+                if viewModel.saveForm() {
+                    onSaved?()
+                }
             }
-        } label: {
-            Text("Save")
-                .font(.headline)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
-        }
-        .buttonStyle(.borderedProminent)
-        .disabled(!viewModel.formDraft.canSave)
+        )
         .accessibilityLabel("Save goal")
         .accessibilityHint(
-            viewModel.formDraft.canSave
+            isFormValid
                 ? "Saves this goal"
                 : "Disabled until name, target, and dates are valid"
         )
