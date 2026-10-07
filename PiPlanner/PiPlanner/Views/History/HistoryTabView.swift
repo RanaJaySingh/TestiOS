@@ -83,7 +83,7 @@ struct HistoryTabView: View {
 
     private var emptyState: some View {
         VStack(spacing: 12) {
-            Image(systemName: "clock")
+            Image(systemName: PiIcons.historyTab)
                 .font(.largeTitle)
                 .foregroundStyle(.secondary)
                 .accessibilityHidden(true)
