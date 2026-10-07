@@ -87,6 +87,11 @@ final class GoalsViewModel: ObservableObject {
         GoalsTabService.dedicatedAccountSubtitle(accounts: accounts)
     }
 
+    /// Demo persona greeting — "Good evening, Rahul" (PIP-65 / PRD A8).
+    var personaGreeting: String {
+        DemoData.greeting()
+    }
+
     var hasGoals: Bool {
         GoalsTabService.hasGoals(goals)
     }

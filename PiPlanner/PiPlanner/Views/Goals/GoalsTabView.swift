@@ -15,6 +15,12 @@ struct GoalsTabView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
+                Text(viewModel.personaGreeting)
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                    .accessibilityAddTraits(.isHeader)
+                    .accessibilityIdentifier("goals.personaGreeting")
+
                 if let banner = viewModel.openEntryBannerMessage {
                     OpenEntryBanner(message: banner) {
                         viewModel.assignOpenEntryNow()

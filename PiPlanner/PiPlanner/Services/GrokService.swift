@@ -142,12 +142,22 @@ struct StubGrokService: GrokServicing {
                 )
             )
         }
+        // PIP-65 / PIP-63 — additive happy-path Ask copy for Car / Emergency Fund (design).
+        if lowered.contains("car") || lowered.contains("emergency") {
+            return .success(
+                .plainAnswer(text: Self.happyPathAskAnswer)
+            )
+        }
         return .success(
             .plainAnswer(
                 text: "Your plan assigns every rupee to a named goal. Ask again after setup for live numbers."
             )
         )
     }
+
+    /// Design-matched Ask answer for the Car / Emergency Fund demo plan (PIP-65).
+    static let happyPathAskAnswer =
+        "Your plan puts 60% of new credits toward Car and 40% toward Emergency Fund."
 
     /// Maps a Transfer ProposedAction to TransferService.Prefill (Ask → Transfer).
     static func transferPrefill(from action: ProposedAction) -> TransferService.Prefill? {
