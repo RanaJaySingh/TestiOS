@@ -1,11 +1,11 @@
 import SwiftUI
 
-/// In-Goals navigation targets (detail CRUD arrives in later tickets).
+/// In-Goals navigation targets — Goal detail (PIP-49).
 enum GoalsRoute: Hashable {
     case detail(UUID)
 }
 
-/// Goals tab — design frames 9 / 9b / 9c (PIP-45).
+/// Goals tab — design frames 9 / 9b / 9c (PIP-45); detail via PIP-49.
 struct GoalsTabView: View {
     @ObservedObject var viewModel: GoalsViewModel
 
@@ -45,10 +45,19 @@ struct GoalsTabView: View {
                     GoalDetailView(
                         goal: goal,
                         formattedSaved: viewModel.formattedSavedAmount(for: goal),
-                        statusLabel: viewModel.statusLabel(for: goal)
+                        statusLabel: viewModel.statusLabel(for: goal),
+                        history: viewModel.history,
+                        heldChanges: viewModel.heldGoalChanges,
+                        standingSplits: viewModel.standingSplits,
+                        persistence: viewModel.persistence
                     )
                 } else {
-                    GoalDetailView(goal: nil, formattedSaved: "—", statusLabel: "—")
+                    GoalDetailView(
+                        goal: nil,
+                        formattedSaved: "—",
+                        statusLabel: "—",
+                        persistence: viewModel.persistence
+                    )
                 }
             }
         }
@@ -77,6 +86,10 @@ struct GoalsTabView: View {
         }
         .task {
             await viewModel.load()
+        }
+        .onAppear {
+            // Refresh cards after returning from Goal detail / edit (PIP-49).
+            Task { await viewModel.load() }
         }
         .alert(
             "Something went wrong",
