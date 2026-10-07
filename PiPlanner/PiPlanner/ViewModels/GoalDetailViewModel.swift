@@ -35,11 +35,16 @@ final class GoalDetailViewModel: ObservableObject {
         history: [HistoryEntry] = [],
         heldChanges: [HeldGoalChange] = [],
         standingSplits: [StandingSplit] = [],
+        allGoals: [Goal] = [],
         persistence: (any PersistenceServicing)? = nil,
         formatting: any FormattingServicing = FormattingService()
     ) {
         self.goal = goal
-        self.allGoals = goal.map { [$0] } ?? []
+        if allGoals.isEmpty {
+            self.allGoals = goal.map { [$0] } ?? []
+        } else {
+            self.allGoals = allGoals
+        }
         self.fallbackFormattedSaved = formattedSaved
         self.fallbackStatusLabel = statusLabel
         self.history = history

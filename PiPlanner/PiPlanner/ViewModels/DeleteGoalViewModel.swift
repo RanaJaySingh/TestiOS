@@ -218,13 +218,10 @@ final class DeleteGoalViewModel: ObservableObject {
             if state.goals.isEmpty {
                 state.goals = goals
             } else {
-                // Prefer in-flow goals (may include mid-delete creates already saved).
-                let knownIDs = Set(goals.map(\.id))
+                // Mid-delete creates are persisted in createReplacementGoal; merge any missing.
                 for goal in goals where !state.goals.contains(where: { $0.id == goal.id }) {
                     state.goals.append(goal)
                 }
-                // Keep saved amounts from persistence for goals that weren't just added.
-                _ = knownIDs
             }
 
             state = try DeleteGoalService.applyDeletion(

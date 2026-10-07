@@ -15,6 +15,7 @@ struct GoalDetailView: View {
         history: [HistoryEntry] = [],
         heldChanges: [HeldGoalChange] = [],
         standingSplits: [StandingSplit] = [],
+        allGoals: [Goal] = [],
         persistence: (any PersistenceServicing)? = nil,
         formatting: any FormattingServicing = FormattingService()
     ) {
@@ -28,6 +29,7 @@ struct GoalDetailView: View {
                 history: history,
                 heldChanges: heldChanges,
                 standingSplits: standingSplits,
+                allGoals: allGoals,
                 persistence: persistence,
                 formatting: formatting
             )
@@ -53,6 +55,7 @@ struct GoalDetailView: View {
             history: history,
             heldChanges: heldChanges,
             standingSplits: standingSplits,
+            allGoals: goals,
             persistence: persistence,
             formatting: formatting
         )
