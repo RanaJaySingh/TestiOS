@@ -1,10 +1,11 @@
 import SwiftUI
 
-/// Hosts Welcome → Accounts → Consent / balance entry → Opening split.
+/// Hosts Welcome → Accounts → Consent / balance → Goal chat → Opening split.
 struct WelcomeFlowView: View {
     @StateObject private var welcomeViewModel = WelcomeViewModel()
     @StateObject private var accountsViewModel: AccountsViewModel
     @StateObject private var consentViewModel: ConsentViewModel
+    @StateObject private var goalChatViewModel = GoalChatViewModel()
     @State private var openingSplitViewModel: OpeningSplitViewModel?
     @State private var path = NavigationPath()
 
@@ -43,7 +44,7 @@ struct WelcomeFlowView: View {
                     }
                 case .fetchedBalance:
                     FetchedBalanceView(viewModel: consentViewModel) {
-                        continueToOpeningSplit()
+                        continueToGoalChat()
                     }
                 case .updateBalance:
                     UpdateBalanceSheet(
@@ -55,7 +56,7 @@ struct WelcomeFlowView: View {
                     )
                 case .manualBalance:
                     ManualBalanceView(viewModel: consentViewModel) {
-                        continueToOpeningSplit()
+                        continueToGoalChat()
                     }
                 case .upiPin:
                     UPIPinView(
@@ -75,6 +76,10 @@ struct WelcomeFlowView: View {
                         onRetry: { path.append(WelcomeRoute.upiPin) },
                         onManual: { path.append(WelcomeRoute.manualBalance) }
                     )
+                case .goalChat:
+                    GoalChatView(viewModel: goalChatViewModel) {
+                        continueToOpeningSplit(goals: goalChatViewModel.definedGoals)
+                    }
                 case .openingSplit:
                     if let openingSplitViewModel {
                         OpeningSplitView(viewModel: openingSplitViewModel) {
@@ -90,10 +95,16 @@ struct WelcomeFlowView: View {
         }
     }
 
-    private func continueToOpeningSplit() {
+    private func continueToGoalChat() {
+        goalChatViewModel.reset()
+        path.append(WelcomeRoute.goalChat)
+    }
+
+    private func continueToOpeningSplit(goals: [Goal]) {
         let balance = consentViewModel.resolvedBalance ?? DemoSeed.openingBalancePaisa
+        let resolvedGoals = goals.isEmpty ? DemoSeed.sampleGoals : goals
         openingSplitViewModel = OpeningSplitViewModel(
-            goals: DemoSeed.sampleGoals,
+            goals: resolvedGoals,
             openingBalance: balance,
             persistence: persistence
         )
@@ -109,7 +120,7 @@ struct WelcomeFlowView: View {
     }
 }
 
-/// Navigation targets from Welcome through Consent / balance entry (PIP-35 / 37 / 39).
+/// Navigation targets from Welcome through Goal chat / Opening split (PIP-35 / 37 / 39 / 41).
 enum WelcomeRoute: Hashable {
     case accounts
     case consent
@@ -119,6 +130,7 @@ enum WelcomeRoute: Hashable {
     case upiPin
     case otherApp
     case wrongPin
+    case goalChat
     case openingSplit
     case goalsTab
 }

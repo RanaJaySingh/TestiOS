@@ -50,6 +50,15 @@
 		B39A0018BD814941ABD3C921 /* UPIPinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39A0019EEA24F56B29EBB6A /* UPIPinView.swift */; };
 		B39A001ABD814941ABD3C921 /* BalanceSyncServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39A001BEEA24F56B29EBB6A /* BalanceSyncServiceTests.swift */; };
 		B39A001CBD814941ABD3C921 /* ConsentViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39A001DEEA24F56B29EBB6A /* ConsentViewModelTests.swift */; };
+		C41A1000BD814941ABD3C921 /* GrokService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41A1001EEA24F56B29EBB6A /* GrokService.swift */; };
+		C41A1002BD814941ABD3C921 /* GoalValidationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41A1003EEA24F56B29EBB6A /* GoalValidationService.swift */; };
+		C41A1004BD814941ABD3C921 /* GoalChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41A1005EEA24F56B29EBB6A /* GoalChatViewModel.swift */; };
+		C41A1006BD814941ABD3C921 /* GoalChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41A1007EEA24F56B29EBB6A /* GoalChatView.swift */; };
+		C41A1008BD814941ABD3C921 /* GoalFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41A1009EEA24F56B29EBB6A /* GoalFormView.swift */; };
+		C41A100ABD814941ABD3C921 /* InflationPopup.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41A100BEEA24F56B29EBB6A /* InflationPopup.swift */; };
+		C41A100CBD814941ABD3C921 /* GrokServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41A100DEEA24F56B29EBB6A /* GrokServiceTests.swift */; };
+		C41A100EBD814941ABD3C921 /* GoalValidationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41A100FEEA24F56B29EBB6A /* GoalValidationServiceTests.swift */; };
+		C41A1010BD814941ABD3C921 /* GoalChatViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41A1011EEA24F56B29EBB6A /* GoalChatViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -99,6 +108,15 @@
 		B39A0019EEA24F56B29EBB6A /* UPIPinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UPIPinView.swift; sourceTree = "<group>"; };
 		B39A001BEEA24F56B29EBB6A /* BalanceSyncServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceSyncServiceTests.swift; sourceTree = "<group>"; };
 		B39A001DEEA24F56B29EBB6A /* ConsentViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsentViewModelTests.swift; sourceTree = "<group>"; };
+		C41A1001EEA24F56B29EBB6A /* GrokService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrokService.swift; sourceTree = "<group>"; };
+		C41A1003EEA24F56B29EBB6A /* GoalValidationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalValidationService.swift; sourceTree = "<group>"; };
+		C41A1005EEA24F56B29EBB6A /* GoalChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalChatViewModel.swift; sourceTree = "<group>"; };
+		C41A1007EEA24F56B29EBB6A /* GoalChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalChatView.swift; sourceTree = "<group>"; };
+		C41A1009EEA24F56B29EBB6A /* GoalFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalFormView.swift; sourceTree = "<group>"; };
+		C41A100BEEA24F56B29EBB6A /* InflationPopup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InflationPopup.swift; sourceTree = "<group>"; };
+		C41A100DEEA24F56B29EBB6A /* GrokServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrokServiceTests.swift; sourceTree = "<group>"; };
+		C41A100FEEA24F56B29EBB6A /* GoalValidationServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalValidationServiceTests.swift; sourceTree = "<group>"; };
+		C41A1011EEA24F56B29EBB6A /* GoalChatViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalChatViewModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -191,6 +209,8 @@
 				E356D619EEA24F56B29EBB6A /* OpeningSplitService.swift */,
 				A11C0011EEA24F56B29EBB6A /* AccountsService.swift */,
 				B39A0011EEA24F56B29EBB6A /* BalanceSyncService.swift */,
+				C41A1001EEA24F56B29EBB6A /* GrokService.swift */,
+				C41A1003EEA24F56B29EBB6A /* GoalValidationService.swift */,
 				391854E68EAC46CDA39D0B3B /* AppLaunchRouter.swift */,
 			);
 			path = Services;
@@ -202,6 +222,7 @@
 				E90291FF624F492F96D5DEBB /* OpeningSplitViewModel.swift */,
 				A11C0013EEA24F56B29EBB6A /* AccountsViewModel.swift */,
 				B39A0013EEA24F56B29EBB6A /* ConsentViewModel.swift */,
+				C41A1005EEA24F56B29EBB6A /* GoalChatViewModel.swift */,
 				DED0C70FB32642E2B1F5D5B7 /* WelcomeViewModel.swift */,
 			);
 			path = ViewModels;
@@ -226,6 +247,9 @@
 				B39A0015EEA24F56B29EBB6A /* ConsentSheet.swift */,
 				B39A0017EEA24F56B29EBB6A /* ManualBalanceView.swift */,
 				B39A0019EEA24F56B29EBB6A /* UPIPinView.swift */,
+				C41A1007EEA24F56B29EBB6A /* GoalChatView.swift */,
+				C41A1009EEA24F56B29EBB6A /* GoalFormView.swift */,
+				C41A100BEEA24F56B29EBB6A /* InflationPopup.swift */,
 				159C2C5B70024F90A3628219 /* OpeningSplitView.swift */,
 				8D62F79434E5467CABBA0C58 /* OpeningSplitFlowView.swift */,
 			);
@@ -266,6 +290,9 @@
 				A11C001DEEA24F56B29EBB6A /* AccountsViewModelTests.swift */,
 				B39A001BEEA24F56B29EBB6A /* BalanceSyncServiceTests.swift */,
 				B39A001DEEA24F56B29EBB6A /* ConsentViewModelTests.swift */,
+				C41A100DEEA24F56B29EBB6A /* GrokServiceTests.swift */,
+				C41A100FEEA24F56B29EBB6A /* GoalValidationServiceTests.swift */,
+				C41A1011EEA24F56B29EBB6A /* GoalChatViewModelTests.swift */,
 				EF49BE600E2449DEAAFDE202 /* AppLaunchRouterTests.swift */,
 				5D8786C6E2CF42CB842FED32 /* WelcomeViewModelTests.swift */,
 				4AC30C1DBBFF4793A642AE40 /* PiPlannerTests.swift */,
@@ -438,6 +465,12 @@
 				B39A0014BD814941ABD3C921 /* ConsentSheet.swift in Sources */,
 				B39A0016BD814941ABD3C921 /* ManualBalanceView.swift in Sources */,
 				B39A0018BD814941ABD3C921 /* UPIPinView.swift in Sources */,
+				C41A1000BD814941ABD3C921 /* GrokService.swift in Sources */,
+				C41A1002BD814941ABD3C921 /* GoalValidationService.swift in Sources */,
+				C41A1004BD814941ABD3C921 /* GoalChatViewModel.swift in Sources */,
+				C41A1006BD814941ABD3C921 /* GoalChatView.swift in Sources */,
+				C41A1008BD814941ABD3C921 /* GoalFormView.swift in Sources */,
+				C41A100ABD814941ABD3C921 /* InflationPopup.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -457,6 +490,9 @@
 				5F6188E2699E40068E8AF2D0 /* WelcomeViewModelTests.swift in Sources */,
 				B39A001ABD814941ABD3C921 /* BalanceSyncServiceTests.swift in Sources */,
 				B39A001CBD814941ABD3C921 /* ConsentViewModelTests.swift in Sources */,
+				C41A100CBD814941ABD3C921 /* GrokServiceTests.swift in Sources */,
+				C41A100EBD814941ABD3C921 /* GoalValidationServiceTests.swift in Sources */,
+				C41A1010BD814941ABD3C921 /* GoalChatViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -39,7 +39,8 @@ let package = Package(
                 "OpeningSplitViewModelTests.swift",
                 "AccountsViewModelTests.swift",
                 "WelcomeViewModelTests.swift",
-                "ConsentViewModelTests.swift"
+                "ConsentViewModelTests.swift",
+                "GoalChatViewModelTests.swift"
             ]
         )
     ]
