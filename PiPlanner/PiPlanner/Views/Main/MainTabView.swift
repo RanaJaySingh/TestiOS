@@ -44,6 +44,7 @@ struct MainTabView: View {
                     persistence: persistence,
                     goals: goalsViewModel.goals,
                     standingSplits: goalsViewModel.standingSplits,
+                    accounts: goalsViewModel.accounts,
                     formatting: goalsViewModel.formatting
                 )
             }
