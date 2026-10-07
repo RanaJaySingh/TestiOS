@@ -224,7 +224,9 @@ final class DeleteGoalViewModel: ObservableObject {
                 }
             }
 
-            state = try DeleteGoalService.applyDeletion(
+            // PIP-106: Delete redistributes released amount via LedgerEngineCore
+            // (equal split default + last-goal rule enforced in DeleteGoalService).
+            state = try LedgerEngineCore.deleteRedistributing(
                 to: state,
                 deletingGoalID: deletingGoal.id,
                 percentages: fractionMap,
