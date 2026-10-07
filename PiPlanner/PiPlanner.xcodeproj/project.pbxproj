@@ -90,6 +90,11 @@
 		D47A001EBD814941ABD3C921 /* OpenEntryBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47A001FEEA24F56B29EBB6A /* OpenEntryBanner.swift */; };
 		D47A0020BD814941ABD3C921 /* CreditFlowHostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47A0021EEA24F56B29EBB6A /* CreditFlowHostView.swift */; };
 		D47A0022BD814941ABD3C921 /* CreditEntryServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47A0023EEA24F56B29EBB6A /* CreditEntryServiceTests.swift */; };
+		B51B0001BD814941ABD3C921 /* StandingSplitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51A0001EEA24F56B29EBB6A /* StandingSplitService.swift */; };
+		B51B0002BD814941ABD3C921 /* StandingSplitViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51A0002EEA24F56B29EBB6A /* StandingSplitViewModel.swift */; };
+		B51B0003BD814941ABD3C921 /* StandingSplitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51A0003EEA24F56B29EBB6A /* StandingSplitView.swift */; };
+		B51B0004BD814941ABD3C921 /* StandingSplitServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51A0004EEA24F56B29EBB6A /* StandingSplitServiceTests.swift */; };
+		B51B0005BD814941ABD3C921 /* StandingSplitViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51A0005EEA24F56B29EBB6A /* StandingSplitViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -179,6 +184,11 @@
 		D47A001FEEA24F56B29EBB6A /* OpenEntryBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenEntryBanner.swift; sourceTree = "<group>"; };
 		D47A0021EEA24F56B29EBB6A /* CreditFlowHostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditFlowHostView.swift; sourceTree = "<group>"; };
 		D47A0023EEA24F56B29EBB6A /* CreditEntryServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditEntryServiceTests.swift; sourceTree = "<group>"; };
+		B51A0001EEA24F56B29EBB6A /* StandingSplitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandingSplitService.swift; sourceTree = "<group>"; };
+		B51A0002EEA24F56B29EBB6A /* StandingSplitViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandingSplitViewModel.swift; sourceTree = "<group>"; };
+		B51A0003EEA24F56B29EBB6A /* StandingSplitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandingSplitView.swift; sourceTree = "<group>"; };
+		B51A0004EEA24F56B29EBB6A /* StandingSplitServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandingSplitServiceTests.swift; sourceTree = "<group>"; };
+		B51A0005EEA24F56B29EBB6A /* StandingSplitViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandingSplitViewModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -277,6 +287,7 @@
 				C41A1003EEA24F56B29EBB6A /* GoalValidationService.swift */,
 				A45F0001EEA24F56B29EBB6A /* GoalsTabService.swift */,
 				D47A0011EEA24F56B29EBB6A /* CreditEntryService.swift */,
+				B51A0001EEA24F56B29EBB6A /* StandingSplitService.swift */,
 				391854E68EAC46CDA39D0B3B /* AppLaunchRouter.swift */,
 			);
 			path = Services;
@@ -295,6 +306,7 @@
 				D47A0013EEA24F56B29EBB6A /* CreditSyncViewModel.swift */,
 				D47A0015EEA24F56B29EBB6A /* CreditUpdateBalanceViewModel.swift */,
 				D47A0017EEA24F56B29EBB6A /* CreditEntryViewModel.swift */,
+				B51A0002EEA24F56B29EBB6A /* StandingSplitViewModel.swift */,
 				DED0C70FB32642E2B1F5D5B7 /* WelcomeViewModel.swift */,
 			);
 			path = ViewModels;
@@ -372,6 +384,7 @@
 				A45F0006EEA24F56B29EBB6A /* GoalCard.swift */,
 				A45F0007EEA24F56B29EBB6A /* GoalDetailView.swift */,
 				951D3037C9B340B9AFD53951 /* GoalEditView.swift */,
+				B51A0003EEA24F56B29EBB6A /* StandingSplitView.swift */,
 				A45F0008EEA24F56B29EBB6A /* SyncSheet.swift */,
 				A45F0009EEA24F56B29EBB6A /* UpdateBalanceSheet.swift */,
 				D47A0019EEA24F56B29EBB6A /* CreditSyncSheet.swift */,
@@ -416,6 +429,8 @@
 				C41A1011EEA24F56B29EBB6A /* GoalChatViewModelTests.swift */,
 				A45F000DEEA24F56B29EBB6A /* GoalsTabServiceTests.swift */,
 				A45F000EEEA24F56B29EBB6A /* GoalsViewModelTests.swift */,
+				B51A0004EEA24F56B29EBB6A /* StandingSplitServiceTests.swift */,
+				B51A0005EEA24F56B29EBB6A /* StandingSplitViewModelTests.swift */,
 				EF49BE600E2449DEAAFDE202 /* AppLaunchRouterTests.swift */,
 				5D8786C6E2CF42CB842FED32 /* WelcomeViewModelTests.swift */,
 				4AC30C1DBBFF4793A642AE40 /* PiPlannerTests.swift */,
@@ -620,6 +635,9 @@
 				D47A001CBD814941ABD3C921 /* CreditEntryView.swift in Sources */,
 				D47A001EBD814941ABD3C921 /* OpenEntryBanner.swift in Sources */,
 				D47A0020BD814941ABD3C921 /* CreditFlowHostView.swift in Sources */,
+				B51B0001BD814941ABD3C921 /* StandingSplitService.swift in Sources */,
+				B51B0002BD814941ABD3C921 /* StandingSplitViewModel.swift in Sources */,
+				B51B0003BD814941ABD3C921 /* StandingSplitView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -646,6 +664,8 @@
 				A45B000DBD814941ABD3C921 /* GoalsTabServiceTests.swift in Sources */,
 				A45B000EBD814941ABD3C921 /* GoalsViewModelTests.swift in Sources */,
 				D47A0022BD814941ABD3C921 /* CreditEntryServiceTests.swift in Sources */,
+				B51B0004BD814941ABD3C921 /* StandingSplitServiceTests.swift in Sources */,
+				B51B0005BD814941ABD3C921 /* StandingSplitViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

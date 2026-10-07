@@ -130,8 +130,16 @@ struct GoalsTabView: View {
             }
         }
         .sheet(isPresented: $viewModel.showSettings) {
-            NavigationStack {
-                SettingsView()
+            SettingsView(
+                goals: viewModel.goals,
+                standingSplits: viewModel.standingSplits,
+                persistence: viewModel.persistence
+            )
+        }
+        .onChange(of: viewModel.showSettings) { isPresented in
+            // Reload after Settings → Standing split save so shares stay current.
+            if !isPresented {
+                Task { await viewModel.load() }
             }
         }
         .task {
