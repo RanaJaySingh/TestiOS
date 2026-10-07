@@ -54,7 +54,8 @@ final class GoalEditViewModel: ObservableObject {
         formatting.formatINR(paisa: paisa)
     }
 
-    /// Saves held edit: updates goal params for next credit; does not rewrite History.
+    /// Saves held edit via `LedgerEngineCore.updateGoalPending` (PIP-105).
+    /// Updates goal params for the next credit; does not rewrite History.
     @discardableResult
     func save() async -> GoalEditCommitResult? {
         guard draft.canSave else { return nil }
@@ -62,37 +63,39 @@ final class GoalEditViewModel: ObservableObject {
         errorMessage = nil
         defer { isSaving = false }
 
-        let result = GoalHeldChangeService.commitEdit(
-            goal: goal,
-            draft: draft,
-            history: history,
-            heldChanges: heldChanges,
-            standingSplits: standingSplits,
-            now: clock(),
-            changeID: makeID()
-        )
-
-        if let persistence {
-            do {
-                var state = try await persistence.loadState()
-                if let index = state.goals.firstIndex(where: { $0.id == goal.id }) {
-                    state.goals[index] = result.updatedGoal
-                } else {
-                    state.goals.append(result.updatedGoal)
-                }
-                // History must remain byte-identical for locked entries (BR-3 / BR-4).
-                state.history = result.history
-                state.heldGoalChanges = result.heldChanges
-                state.standingSplits = result.updatedStandingSplits
-                try await persistence.saveState(state)
-            } catch {
-                errorMessage = error.localizedDescription
-                return nil
+        do {
+            var state: PersistedAppState
+            if let persistence {
+                state = try await persistence.loadState()
+            } else {
+                // Preview / offline path — seed from local snapshots.
+                state = PersistedAppState(
+                    accounts: [],
+                    goals: [goal],
+                    history: history,
+                    standingSplits: standingSplits,
+                    heldGoalChanges: heldChanges
+                )
             }
-        }
 
-        lastCommit = result
-        didSave = true
-        return result
+            let held = try GoalDetailStandingService.commitHeldEdit(
+                to: state,
+                goalID: goal.id,
+                draft: draft,
+                now: clock(),
+                changeID: makeID()
+            )
+
+            if let persistence {
+                try await persistence.saveState(held.state)
+            }
+
+            lastCommit = held.commit
+            didSave = true
+            return held.commit
+        } catch {
+            errorMessage = error.localizedDescription
+            return nil
+        }
     }
 }

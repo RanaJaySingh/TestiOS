@@ -20,6 +20,8 @@ final class GoalsViewModel: ObservableObject {
     @Published var showWithdrawal = false
     /// Manual shortfall entry before Withdrawal (frame 18c).
     @Published var showRecordWithdrawal = false
+    /// Standing split after adding a second goal (PIP-105 / R12).
+    @Published var showStandingSplit = false
     /// Selected goal for navigation to GoalDetailView.
     @Published var selectedGoalID: UUID?
     /// Open New credit entry pending assignment (frame 9b).
@@ -258,6 +260,46 @@ final class GoalsViewModel: ObservableObject {
 
     /// After Sync/Update sheet closes without navigating to credit entry.
     func sheetDismissed() {
+        Task { await load() }
+    }
+
+    /// Goals → New goal / Goal form create via `LedgerEngineCore.createGoal` (PIP-105).
+    /// Returns whether Standing split should be presented (second+ goal).
+    /// Does not auto-present the sheet — caller dismisses New goal first, then presents.
+    @discardableResult
+    func createGoalFromForm(_ formDraft: GoalFormDraft) async -> Bool {
+        guard formDraft.canSave else { return false }
+        errorMessage = nil
+        do {
+            let state = try await persistence.loadState()
+            // Omit share for 2nd+ goals — Standing split sets percentages (1 goal → 100% in engine).
+            let result = try GoalDetailStandingService.addGoal(
+                to: state,
+                name: formDraft.name,
+                targetPaisa: formDraft.targetPaisa,
+                startDate: formDraft.startDate,
+                endDate: formDraft.endDate,
+                inflationRate: formDraft.inflationRate,
+                shareOfNewCredits: nil
+            )
+            try await persistence.saveState(result.state)
+            apply(result.state)
+            if !result.shouldPresentStandingSplit {
+                infoMessage = "Goal saved. Standing split is 100% for a single goal."
+            }
+            return result.shouldPresentStandingSplit
+        } catch {
+            errorMessage = error.localizedDescription
+            return false
+        }
+    }
+
+    func presentStandingSplit() {
+        showStandingSplit = true
+    }
+
+    func standingSplitFinished() {
+        showStandingSplit = false
         Task { await load() }
     }
 
