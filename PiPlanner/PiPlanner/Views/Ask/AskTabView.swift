@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// Ask tab — chips, Grok stub answers / proposal cards, unavailable & invalid-draft fallbacks (PIP-63).
+/// Ask tab — idle / answer / proposal / unavailable chrome (PIP-63 behaviour, PIP-95 visuals).
+/// Consumes DesignTokens + Components (`LightBlueChip`, `PiCard`, `ProposalCard`, CTAs).
 struct AskTabView: View {
     var persistence: (any PersistenceServicing)? = nil
     var goals: [Goal] = []
@@ -40,7 +41,7 @@ struct AskTabView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s16) {
                 header
                 if viewModel.phase == .unavailable {
                     unavailableSection
@@ -54,13 +55,14 @@ struct AskTabView: View {
                 }
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
-                        .font(.footnote)
-                        .foregroundStyle(.red)
+                        .font(PiTypography.caption())
+                        .foregroundStyle(PiColors.destructive)
                 }
             }
-            .padding()
+            .padding(DesignTokens.Space.s20)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .background(PiColors.backgroundApp.ignoresSafeArea())
         .navigationTitle("Ask")
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier("ask.tab")
@@ -84,24 +86,24 @@ struct AskTabView: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
             Text("Ask")
-                .font(.largeTitle)
-                .fontWeight(.bold)
+                .font(PiTypography.title())
+                .foregroundStyle(.primary)
                 .accessibilityAddTraits(.isHeader)
             Text(viewModel.headerCaption)
-                .font(.body)
+                .font(PiTypography.body())
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
     }
 
     private var chipsRow: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
             Text("Suggestions")
-                .font(.subheadline)
+                .font(PiTypography.caption())
                 .foregroundStyle(.secondary)
-            FlowChips(texts: viewModel.suggestionChips) { chip in
+            AskSuggestionChips(texts: viewModel.suggestionChips) { chip in
                 viewModel.selectChip(chip)
             }
             .accessibilityIdentifier("ask.chips")
@@ -109,21 +111,29 @@ struct AskTabView: View {
     }
 
     private var composer: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s12) {
             TextField(viewModel.inputPlaceholder, text: $viewModel.query)
-                .textFieldStyle(.roundedBorder)
+                .font(PiTypography.body())
+                .padding(.horizontal, DesignTokens.Space.s16)
+                .padding(.vertical, DesignTokens.Space.s12)
+                .background(PiColors.surfaceCard)
+                .clipShape(RoundedRectangle(cornerRadius: DesignTokens.Radius.chip, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: DesignTokens.Radius.chip, style: .continuous)
+                        .strokeBorder(PiColors.navyPrimary.opacity(0.18), lineWidth: 1)
+                )
                 .accessibilityIdentifier("ask.query")
                 .submitLabel(.send)
                 .onSubmit {
                     viewModel.submit()
                 }
 
-            Button("Ask") {
-                viewModel.submit()
-            }
-            .buttonStyle(.borderedProminent)
-            .disabled(!viewModel.canSubmit)
-            .accessibilityIdentifier("ask.submit")
+            PrimaryCTA(
+                title: "Ask",
+                isEnabled: viewModel.canSubmit,
+                accessibilityIdentifier: "ask.submit",
+                action: { viewModel.submit() }
+            )
         }
     }
 
@@ -131,20 +141,20 @@ struct AskTabView: View {
     private var resultSection: some View {
         if let followUp = viewModel.followUpMessage, viewModel.phase != .proposal {
             Text(followUp)
-                .font(.body)
+                .font(PiTypography.body())
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier("ask.followUp")
         }
 
         if viewModel.phase == .plainAnswer, let answerText = viewModel.answerText {
-            Text(answerText)
-                .font(.body)
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color(.secondarySystemBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .accessibilityIdentifier("ask.answer")
+            PiCard(padding: DesignTokens.Space.s16) {
+                Text(answerText)
+                    .font(PiTypography.body())
+                    .foregroundStyle(.primary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .accessibilityIdentifier("ask.answer")
         }
 
         if viewModel.phase == .proposal,
@@ -161,52 +171,52 @@ struct AskTabView: View {
     }
 
     private var unavailableSection: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("Grok unavailable")
-                .font(.headline)
-                .accessibilityAddTraits(.isHeader)
-                .accessibilityIdentifier("ask.unavailable.title")
+        PiCard(padding: DesignTokens.Space.s16) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s12) {
+                Text("Grok unavailable")
+                    .font(PiTypography.title())
+                    .foregroundStyle(.primary)
+                    .accessibilityAddTraits(.isHeader)
+                    .accessibilityIdentifier("ask.unavailable.title")
 
-            Text(AskService.unavailableMessage)
-                .font(.body)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
+                Text(AskService.unavailableMessage)
+                    .font(PiTypography.body())
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
 
-            Text("Template sentences")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            FlowChips(texts: viewModel.unavailableTemplates) { template in
-                viewModel.selectUnavailableTemplate(template)
-            }
-            .accessibilityIdentifier("ask.unavailable.templates")
-
-            HStack(spacing: 12) {
-                Button(AskService.useFormTitle) {
-                    viewModel.openGoalForm(prefill: nil)
+                Text("Template sentences")
+                    .font(PiTypography.caption())
+                    .foregroundStyle(.secondary)
+                AskSuggestionChips(texts: viewModel.unavailableTemplates) { template in
+                    viewModel.selectUnavailableTemplate(template)
                 }
-                .buttonStyle(.borderedProminent)
-                .accessibilityIdentifier("ask.unavailable.form")
+                .accessibilityIdentifier("ask.unavailable.templates")
 
-                Button(AskService.openStandingSplitTitle) {
-                    viewModel.openStandingSplit()
+                VStack(spacing: DesignTokens.Space.s12) {
+                    PrimaryCTA(
+                        title: AskService.useFormTitle,
+                        accessibilityIdentifier: "ask.unavailable.form",
+                        action: { viewModel.openGoalForm(prefill: nil) }
+                    )
+                    SecondaryCTA(
+                        title: AskService.openStandingSplitTitle,
+                        style: .outline,
+                        accessibilityIdentifier: "ask.unavailable.split",
+                        action: { viewModel.openStandingSplit() }
+                    )
                 }
-                .buttonStyle(.bordered)
-                .accessibilityIdentifier("ask.unavailable.split")
             }
         }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 14))
         .accessibilityIdentifier("ask.unavailable")
     }
 
     private var invalidDraftActions: some View {
-        Button(AskService.useFormTitle) {
-            viewModel.openGoalForm(prefill: nil)
-        }
-        .buttonStyle(.bordered)
-        .accessibilityIdentifier("ask.invalid.form")
+        SecondaryCTA(
+            title: AskService.useFormTitle,
+            style: .outline,
+            accessibilityIdentifier: "ask.invalid.form",
+            action: { viewModel.openGoalForm(prefill: nil) }
+        )
     }
 
     @ViewBuilder
@@ -230,7 +240,8 @@ struct AskTabView: View {
                     }
                 } else {
                     Text("Transfer needs a saved plan.")
-                        .padding()
+                        .font(PiTypography.body())
+                        .padding(DesignTokens.Space.s16)
                 }
             case .standingSplit:
                 if let persistence {
@@ -249,7 +260,8 @@ struct AskTabView: View {
                     }
                 } else {
                     Text("Standing split needs a saved plan.")
-                        .padding()
+                        .font(PiTypography.body())
+                        .padding(DesignTokens.Space.s16)
                 }
             case .goalForm(let proposal):
                 GoalFormView(viewModel: goalFormHost) {
@@ -272,35 +284,40 @@ struct AskTabView: View {
     }
 }
 
-/// Simple wrapping chip row (no FlowLayout dependency).
-private struct FlowChips: View {
+/// Suggestion / template chips — light-blue fill via shared `LightBlueChip` (frames 19 / 19c).
+private struct AskSuggestionChips: View {
     let texts: [String]
     var onTap: (String) -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
             ForEach(texts, id: \.self) { text in
-                Button {
-                    onTap(text)
-                } label: {
-                    Text(text)
-                        .font(.subheadline)
-                        .multilineTextAlignment(.leading)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 10)
-                        .background(Color.accentColor.opacity(0.12))
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                }
-                .buttonStyle(.plain)
-                .accessibilityIdentifier("ask.chip.\(text.prefix(24))")
+                LightBlueChip(
+                    title: text,
+                    isSelected: false,
+                    accessibilityIdentifier: "ask.chip.\(text.prefix(24))",
+                    action: { onTap(text) }
+                )
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
     }
 }
 
-#Preview {
+#Preview("Ask · idle") {
     NavigationStack {
         AskTabView(goals: DemoSeed.sampleGoals, accounts: DemoSeed.sampleAccounts)
     }
+    .piPlannerTheme()
+}
+
+#Preview("Ask · unavailable") {
+    NavigationStack {
+        AskTabView(
+            goals: DemoSeed.sampleGoals,
+            accounts: DemoSeed.sampleAccounts,
+            grok: StubGrokService(isUnavailable: true)
+        )
+    }
+    .piPlannerTheme()
 }
