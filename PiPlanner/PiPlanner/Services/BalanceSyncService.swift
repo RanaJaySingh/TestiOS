@@ -14,24 +14,32 @@ struct MockBalanceSyncService: BalanceSyncServicing {
     static let demoPIN = "1234"
     /// Seeded opening balance — ₹1,00,000 (PRD R3 / persona).
     static let demoBalancePaisa: Paisa = 10_000_000
+    /// Demo credit after Sync — ₹1,10,000 (₹10,000 new credit for PIP-47 demos).
+    static let demoHigherBalancePaisa: Paisa = 11_000_000
 
     /// When non-empty, `fetchBalance` fails for unknown IDs with `.accountNotFound`.
     var knownAccountIDs: Set<UUID>
+    /// Optional override for Sync/Update demos and tests (higher / same / lower).
+    var fetchedBalancePaisa: Paisa
 
-    init(knownAccountIDs: Set<UUID> = []) {
+    init(
+        knownAccountIDs: Set<UUID> = [],
+        fetchedBalancePaisa: Paisa = MockBalanceSyncService.demoBalancePaisa
+    ) {
         self.knownAccountIDs = knownAccountIDs
+        self.fetchedBalancePaisa = fetchedBalancePaisa
     }
 
     func fetchBalance(accountId: UUID) async -> Result<Paisa, SyncError> {
         if !knownAccountIDs.isEmpty, !knownAccountIDs.contains(accountId) {
             return .failure(.accountNotFound)
         }
-        return .success(Self.demoBalancePaisa)
+        return .success(fetchedBalancePaisa)
     }
 
     func verifyUPIPin(pin: String) async -> Result<Paisa, PinError> {
         if pin == Self.demoPIN {
-            return .success(Self.demoBalancePaisa)
+            return .success(fetchedBalancePaisa)
         }
         return .failure(.wrongPin)
     }

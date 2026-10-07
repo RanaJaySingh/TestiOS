@@ -5,20 +5,42 @@ enum GoalsRoute: Hashable {
     case detail(UUID)
 }
 
-/// Goals tab — design frames 9 / 9b / 9c (PIP-45); detail via PIP-49.
+/// Goals tab — design frames 9 / 9b / 9c (PIP-45); detail via PIP-49; Sync/Update/Credit via PIP-47.
 struct GoalsTabView: View {
     @ObservedObject var viewModel: GoalsViewModel
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
+                if let banner = viewModel.openEntryBannerMessage {
+                    OpenEntryBanner(message: banner) {
+                        viewModel.assignOpenEntryNow()
+                    }
+                    .accessibilityIdentifier("goals.openEntryBanner")
+                }
+
                 BalanceCard(
                     formattedTotal: viewModel.formattedTotalSavings,
                     accountSubtitle: viewModel.dedicatedAccountSubtitle,
                     actionTitle: viewModel.balanceActionTitle,
+                    actionEnabled: viewModel.canTapBalanceAction,
                     onAction: { viewModel.tapBalanceAction() }
                 )
                 .accessibilityIdentifier("goals.balanceCard")
+
+                if let withdrawal = viewModel.withdrawalStubMessage {
+                    Text(withdrawal)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .accessibilityIdentifier("goals.withdrawalStub")
+                }
+
+                if let info = viewModel.infoMessage {
+                    Text(info)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .accessibilityIdentifier("goals.info")
+                }
 
                 goalsSection
             }
@@ -61,23 +83,51 @@ struct GoalsTabView: View {
                 }
             }
         }
-        .sheet(isPresented: $viewModel.showSyncSheet) {
-            SyncSheet(
-                isSyncing: viewModel.isSyncing,
-                onSync: {
-                    Task { await viewModel.performSync() }
+        .sheet(isPresented: $viewModel.showSyncSheet, onDismiss: {
+            viewModel.sheetDismissed()
+        }) {
+            CreditSyncSheet(
+                viewModel: viewModel.creditSyncViewModel,
+                onOpenCreditEntry: { entry in
+                    viewModel.presentCreditEntry(entry)
+                },
+                onWithdrawal: { shortfall in
+                    viewModel.handleWithdrawalStub(shortfall: shortfall)
                 },
                 onDismiss: { viewModel.showSyncSheet = false }
             )
         }
-        .sheet(isPresented: $viewModel.showUpdateBalanceSheet) {
-            GoalsUpdateBalanceSheet(
-                currentFormatted: viewModel.formattedTotalSavings,
-                onApply: { paisa in
-                    Task { await viewModel.applyManualBalance(paisa) }
+        .sheet(isPresented: $viewModel.showUpdateBalanceSheet, onDismiss: {
+            viewModel.sheetDismissed()
+        }) {
+            CreditUpdateBalanceSheet(
+                viewModel: viewModel.creditUpdateViewModel,
+                onOpenCreditEntry: { entry in
+                    viewModel.presentCreditEntry(entry)
+                },
+                onWithdrawal: { shortfall in
+                    viewModel.handleWithdrawalStub(shortfall: shortfall)
                 },
                 onDismiss: { viewModel.showUpdateBalanceSheet = false }
             )
+        }
+        .sheet(isPresented: $viewModel.showCreditEntry, onDismiss: {
+            viewModel.creditEntryFinished()
+        }) {
+            NavigationStack {
+                if let entry = viewModel.activeCreditEntry {
+                    CreditEntryView(
+                        viewModel: CreditEntryViewModel(
+                            entry: entry,
+                            goals: viewModel.goals,
+                            persistence: viewModel.persistence,
+                            formatting: viewModel.formatting
+                        )
+                    ) {
+                        viewModel.showCreditEntry = false
+                    }
+                }
+            }
         }
         .sheet(isPresented: $viewModel.showSettings) {
             NavigationStack {
