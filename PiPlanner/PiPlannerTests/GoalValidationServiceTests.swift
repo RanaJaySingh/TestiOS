@@ -53,8 +53,8 @@ final class GoalValidationServiceTests: XCTestCase {
         XCTAssertEqual(codes, [.emptyName, .zeroTarget, .endNotAfterStart])
     }
 
-    func testDefaultInflationIsSevenPercent() {
-        XCTAssertEqual(GoalValidationService.defaultInflationRate, Decimal(string: "0.07")!)
+    func testDefaultInflationIsFivePercent() {
+        XCTAssertEqual(GoalValidationService.defaultInflationRate, Decimal(string: "0.05")!)
     }
 
     func testAdjustedTargetUpdatesWithInflation() {

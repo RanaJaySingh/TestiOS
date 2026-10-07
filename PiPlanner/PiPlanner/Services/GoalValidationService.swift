@@ -3,7 +3,7 @@ import Foundation
 /// Pure validation + inflation helpers for Goal form / chat (PRD R5, Spec §3.4).
 /// Inflation math delegates to `GoalInflationFormulas` (PIP-97 / PIP-98 shared API).
 enum GoalValidationService {
-    /// Default inflation rate — 7% (PRD R5 / frame 7).
+    /// Default inflation rate — 5% (PIP-109).
     static let defaultInflationRate = GoalInflationFormulas.defaultInflationRate
 
     /// Proposal / defined-goals footer label (frame 5b).

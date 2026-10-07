@@ -16,7 +16,7 @@ struct Goal: Codable, Equatable, Identifiable, Sendable {
     var targetAmount: Paisa
     var startDate: Date
     var endDate: Date
-    /// Default 7% (0.07)
+    /// Default 5% (0.05)
     var inflationRate: Decimal
     /// Locked amount in paisa
     var savedAmount: Paisa
