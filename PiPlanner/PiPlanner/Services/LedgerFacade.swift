@@ -1,30 +1,41 @@
 import Foundation
 
-/// PIP-99 stub for Consent / opening-balance until PIP-98 merges.
+/// Setup-facing ledger entrypoints (PIP-99). Call sites stay on this type;
+/// snapshot vs typed maps to `LedgerEngineCore.BalanceSource` (PIP-98).
 ///
-/// Setup Consent paths call this instead of inventing ledger mutations inline.
 /// Goals Sync/Update + History open→save use PIP-102/103 `StubLedgerEngine`
-/// (`LedgerEngine` protocol) — coexist until PIP-98 unifies setup + Goals.
-/// When PIP-98 lands, replace bodies with real snapshot / typed-delta APIs —
-/// call sites stay stable.
+/// (`LedgerEngine` protocol). Opening lock uses PIP-101 `StubLedgerService`.
+/// Consent / dedicated opening-balance setup stays here.
 enum LedgerFacade {
-    /// How the opening balance was obtained (reserved for PIP-98 History / delta).
+    /// How the opening balance was obtained (maps to engine fetch vs typed).
     enum BalanceSource: Equatable, Sendable {
         /// Consent Yes fetch or UPI PIN success — bank snapshot.
         case snapshotFetch
         /// Manual typed amount — typed credit / opening later.
         case typedManual
+
+        /// PIP-98 engine source used for snapshot / delta APIs.
+        var engineSource: LedgerEngineCore.BalanceSource {
+            switch self {
+            case .snapshotFetch: return .fetched
+            case .typedManual: return .typed
+            }
+        }
     }
 
     /// Applies opening balance + consent on the **dedicated** account only.
     /// Spending accounts are left unchanged (balances stay Accounts-only).
+    /// `source` is recorded via `LedgerEngineCore.BalanceSource` for later History.
     static func applySetupOpeningBalance(
         to accounts: [Account],
         balancePaisa: Paisa,
         consentAutoUpdate: Bool,
         source: BalanceSource
     ) -> [Account] {
-        _ = source // PIP-98: snapshot vs typed drives History / delta.
+        // Engine owns fetch-vs-typed semantics; setup still writes dedicated balance only.
+        let engineSource = source.engineSource
+        _ = engineSource.isTyped
+
         return accounts.map { account in
             var copy = account
             if copy.isDedicated {

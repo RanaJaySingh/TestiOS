@@ -1,10 +1,11 @@
 import Foundation
 
-/// PIP-101 Opening-lock stub alongside PIP-99 `LedgerFacade` until PIP-98 merges.
+/// PIP-101 Opening-lock path (keep-both with PIP-98 `LedgerEngineCore`).
 ///
 /// Consent / account balance setup stays on `LedgerFacade`. Opening History + standing
 /// splits go through tip `UpdateBalanceRoutingService.makeOpeningHistoryEntry` (isTyped
-/// shape from PIP-100) then `OpeningSplitService.applyOpeningLock`.
+/// shape from PIP-100) then `OpeningSplitService.applyOpeningLock`. Credit/history
+/// mutations after setup live on `LedgerEngineCore` — do not duplicate Opening here.
 enum StubLedgerService {
     /// Locks opening balance: History entry + standing splits + goal saved amounts.
     static func lockOpeningBalance(

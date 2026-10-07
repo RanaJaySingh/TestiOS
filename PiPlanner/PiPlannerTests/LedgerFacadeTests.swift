@@ -52,6 +52,13 @@ final class LedgerFacadeTests: XCTestCase {
         XCTAssertEqual(updated[1].balance, 7_200_000)
     }
 
+    func testFacadeBalanceSourceMapsToLedgerEngine() {
+        XCTAssertEqual(LedgerFacade.BalanceSource.snapshotFetch.engineSource, .fetched)
+        XCTAssertEqual(LedgerFacade.BalanceSource.typedManual.engineSource, .typed)
+        XCTAssertFalse(LedgerFacade.BalanceSource.snapshotFetch.engineSource.isTyped)
+        XCTAssertTrue(LedgerFacade.BalanceSource.typedManual.engineSource.isTyped)
+    }
+
     private func sampleHDFC(isDedicated: Bool, balance: Paisa, consent: Bool) -> Account {
         Account(
             id: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!,
