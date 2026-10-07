@@ -34,9 +34,18 @@ Inflation on goals: shared Swift formulas, inflation popup on create/edit, pendi
 
 PIP-98 ledger engine, PIP-99…108 screens, food-delivery, Android.
 
+## Rebase
+
+| Tip | Notes |
+|-----|--------|
+| `main@fc7ba907` (PIP-99 #35) | Clean rebase; Consent / `LedgerFacade` retained |
+| `main@ec682782` (PIP-100 #38) | Clean rebase; Update balance Manual / PIN / Other-app routes + History shape retained via tip; PIP-97 inflation formulas / popup / pending-edit copy retained |
+
+Keep-both: no overlapping file conflicts. Tip owns Consent / Update-balance APIs (`LedgerFacade`, `UpdateBalanceRoutingService`); this PR owns `GoalInflationFormulas` + edit toast copy for PIP-98 alignment.
+
 ## Test results
 
-`cd PiPlanner && swift test` — **223 tests, 0 failures** (includes `GoalInflationFormulasTests`).
+`cd PiPlanner && swift test` — **236 tests, 0 failures** (after rebase onto `ec682782`; includes `GoalInflationFormulasTests`, PIP-99 `LedgerFacade`, PIP-100 `UpdateBalanceRoutingService`).
 
 ## How to run tests
 
