@@ -1,7 +1,11 @@
 import Combine
 import Foundation
 
-/// View model for History tab (frames 12 / 12a) — PIP-59.
+/// View model for History tab (frames 12 / 12a) — PIP-59 / PIP-104.
+///
+/// Loads tip ledger history; open Assign-now → editable credit; saved/locked →
+/// read-only detail. Open-credit discovery uses injected `LedgerEngine`
+/// (default `StubLedgerEngine`) — keep-both with Goals Sync/Update (PIP-102).
 @MainActor
 final class HistoryViewModel: ObservableObject {
     @Published private(set) var entries: [HistoryEntry] = []
@@ -11,9 +15,12 @@ final class HistoryViewModel: ObservableObject {
     /// Open credit presented for assignment from History.
     @Published private(set) var activeCreditEntry: HistoryEntry?
     @Published var showCreditEntry = false
+    /// Tip ledger open New credit (if any), for banner/tests — same source as Goals.
+    @Published private(set) var openCreditEntry: HistoryEntry?
 
     let persistence: any PersistenceServicing
     let formatting: any FormattingServicing
+    let ledger: any LedgerEngine
 
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -26,10 +33,12 @@ final class HistoryViewModel: ObservableObject {
     init(
         persistence: any PersistenceServicing,
         formatting: any FormattingServicing = FormattingService(),
+        ledger: any LedgerEngine = StubLedgerEngine(),
         initialState: PersistedAppState? = nil
     ) {
         self.persistence = persistence
         self.formatting = formatting
+        self.ledger = ledger
         if let initialState {
             apply(initialState)
         }
@@ -74,7 +83,7 @@ final class HistoryViewModel: ObservableObject {
     }
 
     func typeLabel(for entry: HistoryEntry) -> String {
-        HistoryService.typeLabel(for: entry)
+        HistoryService.listTypeLabel(for: entry)
     }
 
     func systemImageName(for entry: HistoryEntry) -> String {
@@ -83,6 +92,10 @@ final class HistoryViewModel: ObservableObject {
 
     func showsLockIcon(for entry: HistoryEntry) -> Bool {
         HistoryService.showsLockIcon(entry)
+    }
+
+    func rowBadgeTitles(for entry: HistoryEntry) -> [String] {
+        HistoryService.rowBadgeTitles(for: entry)
     }
 
     func amountLabel(for entry: HistoryEntry) -> String {
@@ -107,5 +120,6 @@ final class HistoryViewModel: ObservableObject {
     private func apply(_ state: PersistedAppState) {
         goals = state.goals
         entries = HistoryService.sortedNewestFirst(state.history)
+        openCreditEntry = ledger.openCreditEntry(in: state.history)
     }
 }

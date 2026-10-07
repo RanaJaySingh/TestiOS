@@ -157,6 +157,52 @@ final class HistoryServiceTests: XCTestCase {
         XCTAssertTrue(HistoryService.emptyStateMessage.lowercased().contains("history"))
     }
 
+    // MARK: - PIP-104 list labels / open vs saved
+
+    func testListTypeLabelDistinguishesTypedAndCustomSplit() {
+        let open = makeEntry(id: UUID(), type: .newCredit, locked: false, createdAt: Date())
+        XCTAssertEqual(HistoryService.listTypeLabel(for: open), "New credit")
+
+        var typed = makeEntry(id: UUID(), type: .newCredit, locked: true, createdAt: Date())
+        typed.isTyped = true
+        XCTAssertEqual(HistoryService.listTypeLabel(for: typed), "Typed")
+        XCTAssertEqual(HistoryService.rowBadges(for: typed), [.typed])
+        XCTAssertEqual(HistoryService.rowBadgeTitles(for: typed), [])
+
+        var custom = makeEntry(id: UUID(), type: .newCredit, locked: true, createdAt: Date())
+        custom.customSplit = true
+        XCTAssertEqual(HistoryService.listTypeLabel(for: custom), "Custom split")
+        XCTAssertEqual(HistoryService.rowBadgeTitles(for: custom), [])
+
+        var typedCustom = makeEntry(id: UUID(), type: .newCredit, locked: true, createdAt: Date())
+        typedCustom.isTyped = true
+        typedCustom.customSplit = true
+        XCTAssertEqual(HistoryService.listTypeLabel(for: typedCustom), "Custom split")
+        XCTAssertEqual(HistoryService.rowBadgeTitles(for: typedCustom), ["Typed"])
+    }
+
+    func testSavedEntriesExcludesOpenAssignNowCredit() {
+        let opening = makeEntry(id: UUID(), type: .openingBalance, locked: true, createdAt: Date(timeIntervalSince1970: 100))
+        let open = makeEntry(id: UUID(), type: .newCredit, locked: false, createdAt: Date(timeIntervalSince1970: 200))
+        let locked = makeEntry(id: UUID(), type: .newCredit, locked: true, createdAt: Date(timeIntervalSince1970: 300))
+
+        let saved = HistoryService.savedEntries(in: [opening, open, locked])
+        XCTAssertEqual(saved.map(\.id), [locked.id, opening.id])
+        XCTAssertEqual(HistoryService.openCreditEntry(in: [opening, open, locked])?.id, open.id)
+        XCTAssertEqual(HistoryService.destination(for: open), .editableCredit)
+        XCTAssertEqual(HistoryService.destination(for: locked), .readOnlyDetail)
+        XCTAssertEqual(HistoryService.destination(for: opening), .readOnlyDetail)
+    }
+
+    func testOpenCreditDiscoveryMatchesLedgerEngine() {
+        let ledger: any LedgerEngine = StubLedgerEngine()
+        let open = makeEntry(id: UUID(), type: .newCredit, locked: false, createdAt: Date())
+        let locked = makeEntry(id: UUID(), type: .transfer, locked: true, createdAt: Date())
+        let history = [locked, open]
+        XCTAssertEqual(HistoryService.openCreditEntry(in: history)?.id, open.id)
+        XCTAssertEqual(ledger.openCreditEntry(in: history)?.id, open.id)
+    }
+
     // MARK: - Helpers
 
     private func makeEntry(
