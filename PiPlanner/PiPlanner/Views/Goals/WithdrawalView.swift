@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// Withdrawal flow — design frames 18 / 18a / 18b / 18c (PRD R15, Spec BR-8).
+/// Withdrawal flow — design frames 18 / 18a / 18b / 18c (PRD R14 / R15, Spec BR-8 / §4.2 J5).
+/// Visual: PiSheet chrome, PiCard summary/rows, negative-amount treatment, PrimaryCTA Save and lock.
 struct WithdrawalView: View {
     @StateObject private var viewModel: WithdrawalViewModel
     @Environment(\.dismiss) private var dismiss
@@ -35,19 +36,26 @@ struct WithdrawalView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                header
-                balanceSummary
-                reductionsSection
-                statusFooter
-                actionButtons
+        PiSheet(
+            title: "Withdrawal",
+            helper: viewModel.caption
+        ) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: DesignTokens.Space.s20) {
+                    balanceSummary
+                    reductionsSection
+                    statusFooter
+                    actionButtons
+                }
+                .padding(.horizontal, DesignTokens.Space.s20)
+                .padding(.bottom, DesignTokens.Space.s28)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(PiColors.backgroundApp)
+            .accessibilityIdentifier("goals.withdrawal.header")
         }
-        .navigationTitle("Withdrawal")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(PiColors.backgroundApp, for: .navigationBar)
         .accessibilityIdentifier("goals.withdrawal")
         .onChange(of: viewModel.didSave) { saved in
             if saved { dismiss() }
@@ -65,56 +73,54 @@ struct WithdrawalView: View {
         }
     }
 
-    private var header: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Withdrawal")
-                .font(.title2)
-                .fontWeight(.semibold)
-                .accessibilityAddTraits(.isHeader)
-            Text(viewModel.caption)
-                .font(.body)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .accessibilityIdentifier("goals.withdrawal.header")
-    }
-
     private var balanceSummary: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            labeledRow("Previous", viewModel.formattedPrevious)
-            labeledRow("Now", viewModel.formattedNewBalance)
-            labeledRow("Shortfall", viewModel.formattedShortfall)
+        PiCard {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
+                labeledRow("Previous", viewModel.formattedPrevious)
+                labeledRow("Now", viewModel.formattedNewBalance)
+                labeledRow("Shortfall", viewModel.formattedShortfall, emphasizeNegative: true)
+            }
         }
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("goals.withdrawal.summary")
     }
 
-    private func labeledRow(_ title: String, _ value: String) -> some View {
+    private func labeledRow(_ title: String, _ value: String, emphasizeNegative: Bool = false) -> some View {
         HStack {
             Text(title)
+                .font(PiTypography.body())
                 .foregroundStyle(.secondary)
             Spacer()
-            Text(value)
+            Text(emphasizeNegative ? Self.asNegativeAmount(value) : value)
+                .font(PiTypography.body())
                 .fontWeight(.semibold)
+                .foregroundStyle(emphasizeNegative ? PiColors.destructive : Color.primary)
                 .monospacedDigit()
         }
     }
 
     private var reductionsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s12) {
             HStack {
                 Text("Reduce from")
-                    .font(.headline)
+                    .font(PiTypography.body())
+                    .fontWeight(.semibold)
                 Spacer()
                 if viewModel.canStartEdit {
                     Button("Edit") {
                         viewModel.beginEdit()
                     }
+                    .font(PiTypography.body())
+                    .foregroundStyle(PiColors.navyPrimary)
+                    .buttonStyle(.plain)
                     .accessibilityIdentifier("goals.withdrawal.edit")
                 } else if viewModel.isEditing {
                     Button("Done") {
                         viewModel.finishEdit()
                     }
+                    .font(PiTypography.body())
+                    .foregroundStyle(PiColors.navyPrimary)
+                    .buttonStyle(.plain)
                     .accessibilityIdentifier("goals.withdrawal.editDone")
                 }
             }
@@ -128,37 +134,46 @@ struct WithdrawalView: View {
 
     @ViewBuilder
     private func goalRow(_ goal: Goal) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text(goal.name)
-                    .font(.headline)
-                Spacer()
-                Text(viewModel.formattedReduction(for: goal.id, previewing: viewModel.isEditing))
-                    .font(.body)
-                    .fontWeight(.semibold)
-                    .monospacedDigit()
-            }
-
-            Text(
-                "Saved \(viewModel.formattedSaved(for: goal)) → \(viewModel.afterWithdrawalSaved(for: goal, previewing: viewModel.isEditing))"
-            )
-            .font(.caption)
-            .foregroundStyle(.secondary)
-
-            if viewModel.isEditing {
+        PiCard {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
                 HStack {
-                    Text("₹")
-                    TextField(
-                        "0",
-                        text: Binding(
-                            get: { viewModel.editRupeeDigits[goal.id] ?? "0" },
-                            set: { viewModel.setEditRupeeDigits(goalID: goal.id, digits: $0) }
+                    Text(goal.name)
+                        .font(PiTypography.body())
+                        .fontWeight(.semibold)
+                    Spacer()
+                    Text(
+                        Self.asNegativeAmount(
+                            viewModel.formattedReduction(for: goal.id, previewing: viewModel.isEditing)
                         )
                     )
-                    .keyboardType(.numberPad)
-                    .accessibilityIdentifier("goals.withdrawal.amount.\(goal.id.uuidString)")
+                    .font(PiTypography.body())
+                    .fontWeight(.semibold)
+                    .foregroundStyle(PiColors.destructive)
+                    .monospacedDigit()
                 }
-                .font(.body)
+
+                Text(
+                    "Saved \(viewModel.formattedSaved(for: goal)) → \(viewModel.afterWithdrawalSaved(for: goal, previewing: viewModel.isEditing))"
+                )
+                .font(PiTypography.caption())
+                .foregroundStyle(.secondary)
+
+                if viewModel.isEditing {
+                    HStack {
+                        Text("₹")
+                            .foregroundStyle(PiColors.navyPrimary)
+                        TextField(
+                            "0",
+                            text: Binding(
+                                get: { viewModel.editRupeeDigits[goal.id] ?? "0" },
+                                set: { viewModel.setEditRupeeDigits(goalID: goal.id, digits: $0) }
+                            )
+                        )
+                        .keyboardType(.numberPad)
+                        .accessibilityIdentifier("goals.withdrawal.amount.\(goal.id.uuidString)")
+                    }
+                    .font(PiTypography.body())
+                }
             }
         }
         .accessibilityElement(children: .contain)
@@ -166,25 +181,34 @@ struct WithdrawalView: View {
 
     private var statusFooter: some View {
         Text(viewModel.statusMessage)
-            .font(.subheadline)
+            .font(PiTypography.caption())
             .foregroundStyle(
                 viewModel.phase == .invalidTotal || viewModel.phase == .goalBelowZero
-                    ? Color.red.opacity(0.9)
+                    ? PiColors.destructive
                     : Color.secondary
             )
             .accessibilityIdentifier("goals.withdrawal.status")
     }
 
     private var actionButtons: some View {
-        Button {
+        PrimaryCTA(
+            title: viewModel.isSaving ? "Saving…" : "Save and lock",
+            isEnabled: viewModel.canSave,
+            accessibilityIdentifier: "goals.withdrawal.save"
+        ) {
             Task { await viewModel.saveAndLock() }
-        } label: {
-            Text(viewModel.isSaving ? "Saving…" : "Save and lock")
-                .frame(maxWidth: .infinity)
         }
-        .buttonStyle(.borderedProminent)
-        .disabled(!viewModel.canSave)
-        .accessibilityIdentifier("goals.withdrawal.save")
+    }
+
+    /// Design frames 18 / 18a — reductions shown as −₹ amounts (visual only; VM stays positive).
+    private static func asNegativeAmount(_ formatted: String) -> String {
+        if formatted.hasPrefix("-") || formatted.hasPrefix("−") {
+            return formatted.replacingOccurrences(of: "-", with: "−")
+        }
+        if formatted == "₹0" || formatted == "0" {
+            return formatted
+        }
+        return "−\(formatted)"
     }
 }
 
@@ -234,40 +258,54 @@ struct RecordWithdrawalSheet: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section {
-                    Text("Current: \(formatting.formatINR(paisa: previousBalance))")
-                        .foregroundStyle(.secondary)
-                    HStack {
-                        Text("₹")
-                        TextField("Amount withdrawn", text: $rupeeDigits)
-                            .keyboardType(.numberPad)
-                            .accessibilityIdentifier("goals.recordWithdrawal.digits")
+            PiSheet(
+                title: "Record a withdrawal",
+                helper: WithdrawalService.manualRecordCaption
+            ) {
+                VStack(alignment: .leading, spacing: DesignTokens.Space.s20) {
+                    PiCard {
+                        VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
+                            Text("Current: \(formatting.formatINR(paisa: previousBalance))")
+                                .font(PiTypography.caption())
+                                .foregroundStyle(.secondary)
+                            HStack {
+                                Text("₹")
+                                    .font(PiTypography.title())
+                                    .foregroundStyle(PiColors.navyPrimary)
+                                TextField("Amount withdrawn", text: $rupeeDigits)
+                                    .keyboardType(.numberPad)
+                                    .font(PiTypography.amountHero())
+                                    .foregroundStyle(PiColors.navyPrimary)
+                                    .accessibilityIdentifier("goals.recordWithdrawal.digits")
+                            }
+                        }
                     }
-                } footer: {
-                    Text(WithdrawalService.manualRecordCaption)
-                }
 
-                if shortfallPaisa > previousBalance {
-                    Section {
+                    if shortfallPaisa > previousBalance {
                         Text("Amount can’t exceed the current balance.")
-                            .foregroundStyle(.red)
-                            .font(.footnote)
+                            .font(PiTypography.caption())
+                            .foregroundStyle(PiColors.destructive)
                     }
+
+                    PrimaryCTA(
+                        title: "Continue",
+                        isEnabled: canContinue,
+                        accessibilityIdentifier: "goals.recordWithdrawal.continue"
+                    ) {
+                        onContinue(shortfallPaisa, previousBalance - shortfallPaisa)
+                    }
+
+                    SecondaryCTA(title: "Cancel", style: .text, action: onDismiss)
+
+                    Spacer(minLength: 0)
                 }
+                .padding(.horizontal, DesignTokens.Space.s20)
+                .padding(.bottom, DesignTokens.Space.s28)
+                .background(PiColors.backgroundApp)
             }
-            .navigationTitle("Record a withdrawal")
-            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel", action: onDismiss)
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Continue") {
-                        onContinue(shortfallPaisa, previousBalance - shortfallPaisa)
-                    }
-                    .disabled(!canContinue)
-                    .accessibilityIdentifier("goals.recordWithdrawal.continue")
                 }
             }
         }
