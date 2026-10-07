@@ -71,6 +71,7 @@ struct GoalsTabView: View {
                         history: viewModel.history,
                         heldChanges: viewModel.heldGoalChanges,
                         standingSplits: viewModel.standingSplits,
+                        allGoals: viewModel.goals,
                         persistence: viewModel.persistence
                     )
                 } else {

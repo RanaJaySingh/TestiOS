@@ -12,6 +12,8 @@ enum GoalDetailRoute: Hashable, Sendable {
 @MainActor
 final class GoalDetailViewModel: ObservableObject {
     @Published private(set) var goal: Goal?
+    /// Full goal list for Delete reassignment (PIP-53). Seeded from `goal` until refresh.
+    @Published private(set) var allGoals: [Goal]
     @Published private(set) var history: [HistoryEntry]
     @Published private(set) var heldChanges: [HeldGoalChange]
     @Published private(set) var standingSplits: [StandingSplit]
@@ -33,10 +35,16 @@ final class GoalDetailViewModel: ObservableObject {
         history: [HistoryEntry] = [],
         heldChanges: [HeldGoalChange] = [],
         standingSplits: [StandingSplit] = [],
+        allGoals: [Goal] = [],
         persistence: (any PersistenceServicing)? = nil,
         formatting: any FormattingServicing = FormattingService()
     ) {
         self.goal = goal
+        if allGoals.isEmpty {
+            self.allGoals = goal.map { [$0] } ?? []
+        } else {
+            self.allGoals = allGoals
+        }
         self.fallbackFormattedSaved = formattedSaved
         self.fallbackStatusLabel = statusLabel
         self.history = history
@@ -145,6 +153,7 @@ final class GoalDetailViewModel: ObservableObject {
             history = state.history
             heldChanges = state.heldGoalChanges
             standingSplits = state.standingSplits
+            allGoals = state.goals
             if let goalID = goal?.id {
                 goal = state.goals.first { $0.id == goalID } ?? goal
             }
