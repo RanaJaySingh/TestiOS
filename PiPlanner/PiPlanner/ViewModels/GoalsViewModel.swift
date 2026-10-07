@@ -25,7 +25,7 @@ final class GoalsViewModel: ObservableObject {
     /// Entry presented in CreditEntryView after Sync/Update Continue or Assign now.
     @Published private(set) var activeCreditEntry: HistoryEntry?
 
-    /// Shared persistence for Goal detail / edit (PIP-49) and credit sheets (PIP-47).
+    /// Shared persistence for Goal detail / edit (PIP-49), credit sheets (PIP-47), and Standing split (PIP-51).
     let persistence: any PersistenceServicing
     let formatting: any FormattingServicing
     let balanceSync: any BalanceSyncServicing

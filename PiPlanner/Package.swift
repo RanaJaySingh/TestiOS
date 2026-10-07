@@ -41,7 +41,8 @@ let package = Package(
                 "WelcomeViewModelTests.swift",
                 "ConsentViewModelTests.swift",
                 "GoalChatViewModelTests.swift",
-                "GoalsViewModelTests.swift"
+                "GoalsViewModelTests.swift",
+                "StandingSplitViewModelTests.swift"
             ]
         )
     ]
