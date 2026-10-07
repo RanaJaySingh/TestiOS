@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// Goal detail — design frame 14 (PRD R10 / R11).
-/// Init matches PIP-45 call site: `GoalDetailView(goal:formattedSaved:statusLabel:)`.
+/// Goal detail — design frame 14 (PRD R13 / R10 / R11).
+/// Visual parity via DesignTokens / Components / PiIcons. Init matches PIP-45 call site.
+/// Product behaviour (CRUD / transfer / delete / held edits) unchanged — chrome only.
 struct GoalDetailView: View {
     @StateObject private var viewModel: GoalDetailViewModel
     private let persistence: (any PersistenceServicing)?
@@ -63,20 +64,25 @@ struct GoalDetailView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s20) {
                 if viewModel.hasHeldChange {
                     heldBanner
                 }
-                metricsSection
-                datesSection
+                VStack(alignment: .leading, spacing: DesignTokens.Space.s16) {
+                    heroSection
+                    metricsSection
+                }
+                .accessibilityIdentifier("goals.detail.metrics")
                 actionsRow
                 fromHistorySection
             }
-            .padding()
+            .padding(DesignTokens.Space.s20)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .background(PiColors.backgroundApp.ignoresSafeArea())
         .navigationTitle(viewModel.navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
+        .piPlannerTheme()
         .accessibilityIdentifier("goals.detail")
         .navigationDestination(for: GoalDetailRoute.self) { route in
             switch route {
@@ -147,7 +153,7 @@ struct GoalDetailView: View {
             if viewModel.showToast {
                 toastBanner
                     .transition(.move(edge: .bottom).combined(with: .opacity))
-                    .padding()
+                    .padding(DesignTokens.Space.s16)
             }
         }
         .animation(.easeInOut(duration: 0.25), value: viewModel.showToast)
@@ -163,127 +169,262 @@ struct GoalDetailView: View {
         }
     }
 
+    // MARK: - Held info (13g)
+
     private var heldBanner: some View {
         Text(viewModel.heldInfoMessage)
-            .font(.subheadline)
-            .foregroundStyle(.primary)
-            .padding()
+            .font(PiTypography.body())
+            .foregroundStyle(PiColors.chipLightBlueLabel)
+            .padding(DesignTokens.Space.s16)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color(.secondarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .background(PiColors.chipLightBlue.opacity(0.72))
+            .clipShape(RoundedRectangle(cornerRadius: DesignTokens.Radius.card, style: .continuous))
             .accessibilityIdentifier("goals.detail.heldInfo")
             .accessibilityLabel(viewModel.heldInfoMessage)
     }
 
-    private var metricsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            metricRow(title: "Saved", value: viewModel.formattedSaved)
-            metricRow(title: "Status", value: viewModel.statusLabel)
-            metricRow(title: "Target", value: viewModel.formattedTarget)
-            metricRow(title: "Adjusted target", value: viewModel.formattedAdjustedTarget)
-            metricRow(title: "Monthly need", value: viewModel.formattedMonthlyNeed)
-            metricRow(title: "Inflation", value: viewModel.inflationLabel)
-            metricRow(title: "Share of new credits", value: viewModel.shareLabel)
+    // MARK: - Hero (large saved + status)
+
+    private var heroSection: some View {
+        PiCard(padding: DesignTokens.Space.s20) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s12) {
+                Text("Saved")
+                    .font(PiTypography.caption())
+                    .foregroundStyle(.secondary)
+                    .accessibilityAddTraits(.isHeader)
+
+                Text(viewModel.formattedSaved)
+                    .font(PiTypography.amountHero())
+                    .monospacedDigit()
+                    .foregroundStyle(PiColors.navyPrimary)
+                    .accessibilityLabel("Saved \(viewModel.formattedSaved)")
+
+                statusChip
+            }
         }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .accessibilityIdentifier("goals.detail.metrics")
     }
 
-    private var datesSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            metricRow(title: "Start", value: viewModel.startDateLabel)
-            metricRow(title: "End", value: viewModel.endDateLabel)
-        }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .accessibilityIdentifier("goals.detail.dates")
+    private var statusChip: some View {
+        Text(viewModel.statusLabel)
+            .font(PiTypography.caption())
+            .fontWeight(.semibold)
+            .foregroundStyle(statusForeground)
+            .padding(.horizontal, DesignTokens.Space.s12)
+            .padding(.vertical, DesignTokens.Space.s8)
+            .background(statusForeground.opacity(0.12))
+            .clipShape(RoundedRectangle(cornerRadius: DesignTokens.Radius.chip, style: .continuous))
+            .accessibilityLabel("Status \(viewModel.statusLabel)")
+            .accessibilityIdentifier(statusAccessibilityID)
     }
+
+    private var statusForeground: Color {
+        switch viewModel.statusLabel {
+        case "On track":
+            return PiColors.positiveGreen
+        case "Behind":
+            return PiColors.behind
+        default:
+            return .secondary
+        }
+    }
+
+    private var statusAccessibilityID: String {
+        switch viewModel.statusLabel {
+        case "On track":
+            return "goals.detail.status.onTrack"
+        case "Behind":
+            return "goals.detail.status.behind"
+        default:
+            return "goals.detail.status"
+        }
+    }
+
+    // MARK: - Metrics (adjusted target, % reached, monthly need, dates, inflation, share)
+
+    private var metricsSection: some View {
+        PiCard {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s12) {
+                metricRow(title: "Target", value: viewModel.formattedTarget)
+                metricRow(title: "Adjusted target", value: viewModel.formattedAdjustedTarget)
+                metricRow(title: "% reached", value: percentReachedLabel)
+                metricRow(title: "Monthly need", value: viewModel.formattedMonthlyNeed)
+
+                Divider()
+                    .padding(.vertical, DesignTokens.Space.s8)
+
+                VStack(alignment: .leading, spacing: DesignTokens.Space.s12) {
+                    metricRow(title: "Start", value: viewModel.startDateLabel)
+                    metricRow(title: "End", value: viewModel.endDateLabel)
+                }
+                .accessibilityIdentifier("goals.detail.dates")
+
+                Divider()
+                    .padding(.vertical, DesignTokens.Space.s8)
+
+                metricRow(title: "Inflation", value: viewModel.inflationLabel)
+                metricRow(title: "Share of new credits", value: viewModel.shareLabel)
+            }
+        }
+    }
+
+    /// Presentation-only % of adjusted target reached (saved ÷ adjusted). No ViewModel change.
+    private var percentReachedLabel: String {
+        guard let goal = viewModel.goal, goal.adjustedTarget > 0 else { return "—" }
+        let fraction = Decimal(goal.savedAmount) / Decimal(goal.adjustedTarget)
+        let percent = GoalValidationService.displayPercent(fromFraction: fraction)
+        return "\(percent)%"
+    }
+
+    // MARK: - Actions (Transfer / Edit / Delete)
 
     private var actionsRow: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: DesignTokens.Space.s12) {
             NavigationLink(value: GoalDetailRoute.transfer) {
-                actionLabel("Transfer")
+                actionLabel(
+                    title: "Transfer",
+                    systemImage: PiIcons.transfer,
+                    emphasis: .secondary
+                )
             }
             .accessibilityIdentifier("goals.detail.transfer")
 
             NavigationLink(value: GoalDetailRoute.edit) {
-                actionLabel("Edit")
+                actionLabel(
+                    title: "Edit",
+                    systemImage: "pencil",
+                    emphasis: .secondary
+                )
             }
             .accessibilityIdentifier("goals.detail.edit")
             .disabled(viewModel.goal == nil)
 
             NavigationLink(value: GoalDetailRoute.delete) {
-                actionLabel("Delete")
+                actionLabel(
+                    title: "Delete",
+                    systemImage: "trash",
+                    emphasis: .destructive
+                )
             }
             .accessibilityIdentifier("goals.detail.delete")
         }
     }
 
-    private func actionLabel(_ title: String) -> some View {
-        Text(title)
-            .font(.subheadline)
-            .fontWeight(.semibold)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
-            .background(Color(.tertiarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+    private enum ActionEmphasis {
+        case secondary
+        case destructive
     }
 
+    private func actionLabel(
+        title: String,
+        systemImage: String,
+        emphasis: ActionEmphasis
+    ) -> some View {
+        let foreground: Color = {
+            switch emphasis {
+            case .secondary:
+                return PiColors.navyPrimary
+            case .destructive:
+                return PiColors.destructive
+            }
+        }()
+
+        return VStack(spacing: DesignTokens.Space.s8) {
+            Image(systemName: systemImage)
+                .font(.body.weight(.semibold))
+            Text(title)
+                .font(PiTypography.caption())
+                .fontWeight(.semibold)
+        }
+        .foregroundStyle(foreground)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, DesignTokens.Space.s12)
+        .background(PiColors.surfaceCard)
+        .clipShape(RoundedRectangle(cornerRadius: DesignTokens.Radius.chip, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: DesignTokens.Radius.chip, style: .continuous)
+                .strokeBorder(foreground.opacity(0.55), lineWidth: 1.5)
+        )
+        .shadow(
+            color: Color.black.opacity(0.04),
+            radius: 4,
+            x: 0,
+            y: 2
+        )
+    }
+
+    // MARK: - From History
+
     private var fromHistorySection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s12) {
             Text("From History")
-                .font(.headline)
+                .font(PiTypography.title())
+                .foregroundStyle(PiColors.navyPrimary)
                 .accessibilityAddTraits(.isHeader)
 
             if viewModel.relatedHistory.isEmpty {
-                Text("No history for this goal yet.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                PiCard {
+                    Text("No history for this goal yet.")
+                        .font(PiTypography.body())
+                        .foregroundStyle(.secondary)
+                }
             } else {
-                ForEach(viewModel.relatedHistory) { entry in
-                    HStack(alignment: .top) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(viewModel.historyTitle(for: entry))
-                                .font(.body)
-                                .fontWeight(.semibold)
-                            Text(viewModel.historyDateLabel(for: entry))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                            if entry.isLocked {
-                                Text("Locked")
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
+                PiCard(padding: DesignTokens.Space.s12) {
+                    VStack(spacing: 0) {
+                        ForEach(Array(viewModel.relatedHistory.enumerated()), id: \.element.id) { index, entry in
+                            if index > 0 {
+                                Divider()
+                                    .padding(.vertical, DesignTokens.Space.s8)
                             }
+                            historyRow(entry)
                         }
-                        Spacer()
-                        Text(viewModel.historyAmountLabel(for: entry))
-                            .font(.body)
-                            .fontWeight(.semibold)
-                            .monospacedDigit()
                     }
-                    .padding(.vertical, 6)
-                    .accessibilityElement(children: .combine)
                 }
             }
         }
         .accessibilityIdentifier("goals.detail.history")
     }
 
-    private func metricRow(title: String, value: String) -> some View {
-        HStack {
-            Text(title)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            Spacer()
-            Text(value)
-                .font(.body)
+    private func historyRow(_ entry: HistoryEntry) -> some View {
+        HStack(alignment: .top, spacing: DesignTokens.Space.s12) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
+                HStack(spacing: DesignTokens.Space.s8) {
+                    Text(viewModel.historyTitle(for: entry))
+                        .font(PiTypography.body())
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.primary)
+                    if entry.isLocked {
+                        Image(systemName: PiIcons.lock)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .accessibilityLabel("Locked")
+                    }
+                }
+                Text(viewModel.historyDateLabel(for: entry))
+                    .font(PiTypography.caption())
+                    .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: DesignTokens.Space.s8)
+            Text(viewModel.historyAmountLabel(for: entry))
+                .font(PiTypography.body())
                 .fontWeight(.semibold)
                 .monospacedDigit()
+                .foregroundStyle(PiColors.navyPrimary)
+        }
+        .padding(.vertical, DesignTokens.Space.s8)
+        .accessibilityElement(children: .combine)
+    }
+
+    private func metricRow(title: String, value: String) -> some View {
+        HStack(alignment: .firstTextBaseline) {
+            Text(title)
+                .font(PiTypography.body())
+                .foregroundStyle(.secondary)
+            Spacer(minLength: DesignTokens.Space.s12)
+            Text(value)
+                .font(PiTypography.body())
+                .fontWeight(.semibold)
+                .monospacedDigit()
+                .foregroundStyle(.primary)
                 .multilineTextAlignment(.trailing)
         }
         .accessibilityElement(children: .combine)
@@ -291,18 +432,19 @@ struct GoalDetailView: View {
 
     private var toastBanner: some View {
         Text(viewModel.toastMessage)
-            .font(.subheadline)
+            .font(PiTypography.body())
             .fontWeight(.semibold)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-            .background(.ultraThinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .foregroundStyle(Color.white)
+            .padding(.horizontal, DesignTokens.Space.s16)
+            .padding(.vertical, DesignTokens.Space.s12)
+            .background(PiColors.navyPrimary)
+            .clipShape(RoundedRectangle(cornerRadius: DesignTokens.Radius.card, style: .continuous))
             .accessibilityIdentifier("goals.detail.toast")
             .accessibilityLabel(viewModel.toastMessage)
     }
 }
 
-#Preview("Detail") {
+#Preview("On track") {
     NavigationStack {
         GoalDetailView(
             goal: DemoSeed.sampleGoals[0],
@@ -334,6 +476,17 @@ struct GoalDetailView: View {
                     ]
                 )
             ]
+        )
+    }
+}
+
+#Preview("Behind") {
+    NavigationStack {
+        GoalDetailView(
+            goal: DemoSeed.sampleGoals.count > 1 ? DemoSeed.sampleGoals[1] : DemoSeed.sampleGoals[0],
+            formattedSaved: "₹40,000",
+            statusLabel: "Behind",
+            history: []
         )
     }
 }
