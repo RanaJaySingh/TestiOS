@@ -86,15 +86,15 @@ final class GoalValidationServiceTests: XCTestCase {
         XCTAssertEqual(exact, Paisa((Double(target) * 1.07).rounded()))
     }
 
-    /// PIP-97 / PIP-101: adjusted = target × (1 + inflation) ^ (months / 12).
+    /// PIP-101 coexistence: validation + Goal share tip `GoalInflationFormulas` (no duplicate module).
     func testAdjustedTargetUsesMonthsOverTwelve() {
-        let calendar = Calendar(identifier: .gregorian)
-        let startDate = Date(timeIntervalSince1970: 1_700_000_000)
+        let calendar = Calendar.gregorianUTC
+        let startDate = calendar.date(from: DateComponents(year: 2024, month: 1, day: 1))!
         let endDate = calendar.date(byAdding: .month, value: 24, to: startDate)!
         let target: Paisa = 10_000_000
         let rate = Decimal(string: "0.07")!
 
-        let months = GoalValidationService.monthsBetween(start: startDate, end: endDate)
+        let months = GoalInflationFormulas.monthsBetween(start: startDate, end: endDate, calendar: calendar)
         XCTAssertEqual(months, 24)
 
         let expectedFactor = pow(1.07, 24.0 / 12.0)
@@ -106,8 +106,18 @@ final class GoalValidationServiceTests: XCTestCase {
             endDate: endDate
         )
         XCTAssertEqual(actual, expected)
+        XCTAssertEqual(
+            GoalInflationFormulas.adjustedTargetPaisa(
+                targetPaisa: target,
+                inflationRate: rate,
+                startDate: startDate,
+                endDate: endDate,
+                calendar: calendar
+            ),
+            expected
+        )
 
-        // Goal.adjustedTarget shares the same formula.
+        // Goal.adjustedTarget shares tip GoalInflationFormulas.
         let goal = GoalValidationService.makeGoal(
             name: "Car",
             targetPaisa: target,
