@@ -129,6 +129,7 @@
 		A45B000EBD814941ABD3C921 /* GoalsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45F000EEEA24F56B29EBB6A /* GoalsViewModelTests.swift */; };
 		A45B000FBD814941ABD3C921 /* GoalsTabUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45F000FEEA24F56B29EBB6A /* GoalsTabUITests.swift */; };
 		D47A0010BD814941ABD3C921 /* CreditEntryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47A0011EEA24F56B29EBB6A /* CreditEntryService.swift */; };
+		F1020001BD814941ABD3C921 /* LedgerEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1020002EEA24F56B29EBB6A /* LedgerEngine.swift */; };
 		D47A0012BD814941ABD3C921 /* CreditSyncViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47A0013EEA24F56B29EBB6A /* CreditSyncViewModel.swift */; };
 		D47A0014BD814941ABD3C921 /* CreditUpdateBalanceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47A0015EEA24F56B29EBB6A /* CreditUpdateBalanceViewModel.swift */; };
 		D47A0016BD814941ABD3C921 /* CreditEntryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47A0017EEA24F56B29EBB6A /* CreditEntryViewModel.swift */; };
@@ -138,6 +139,7 @@
 		D47A001EBD814941ABD3C921 /* OpenEntryBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47A001FEEA24F56B29EBB6A /* OpenEntryBanner.swift */; };
 		D47A0020BD814941ABD3C921 /* CreditFlowHostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47A0021EEA24F56B29EBB6A /* CreditFlowHostView.swift */; };
 		D47A0022BD814941ABD3C921 /* CreditEntryServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47A0023EEA24F56B29EBB6A /* CreditEntryServiceTests.swift */; };
+		F1020003BD814941ABD3C921 /* LedgerEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1020004EEA24F56B29EBB6A /* LedgerEngineTests.swift */; };
 		B51B0001BD814941ABD3C921 /* StandingSplitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51A0001EEA24F56B29EBB6A /* StandingSplitService.swift */; };
 		B51B0002BD814941ABD3C921 /* StandingSplitViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51A0002EEA24F56B29EBB6A /* StandingSplitViewModel.swift */; };
 		B51B0003BD814941ABD3C921 /* StandingSplitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51A0003EEA24F56B29EBB6A /* StandingSplitView.swift */; };
@@ -271,6 +273,7 @@
 		A45F000EEEA24F56B29EBB6A /* GoalsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsViewModelTests.swift; sourceTree = "<group>"; };
 		A45F000FEEA24F56B29EBB6A /* GoalsTabUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsTabUITests.swift; sourceTree = "<group>"; };
 		D47A0011EEA24F56B29EBB6A /* CreditEntryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditEntryService.swift; sourceTree = "<group>"; };
+		F1020002EEA24F56B29EBB6A /* LedgerEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LedgerEngine.swift; sourceTree = "<group>"; };
 		D47A0013EEA24F56B29EBB6A /* CreditSyncViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditSyncViewModel.swift; sourceTree = "<group>"; };
 		D47A0015EEA24F56B29EBB6A /* CreditUpdateBalanceViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditUpdateBalanceViewModel.swift; sourceTree = "<group>"; };
 		D47A0017EEA24F56B29EBB6A /* CreditEntryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditEntryViewModel.swift; sourceTree = "<group>"; };
@@ -280,6 +283,7 @@
 		D47A001FEEA24F56B29EBB6A /* OpenEntryBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenEntryBanner.swift; sourceTree = "<group>"; };
 		D47A0021EEA24F56B29EBB6A /* CreditFlowHostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditFlowHostView.swift; sourceTree = "<group>"; };
 		D47A0023EEA24F56B29EBB6A /* CreditEntryServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditEntryServiceTests.swift; sourceTree = "<group>"; };
+		F1020004EEA24F56B29EBB6A /* LedgerEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LedgerEngineTests.swift; sourceTree = "<group>"; };
 		B51A0001EEA24F56B29EBB6A /* StandingSplitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandingSplitService.swift; sourceTree = "<group>"; };
 		B51A0002EEA24F56B29EBB6A /* StandingSplitViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandingSplitViewModel.swift; sourceTree = "<group>"; };
 		B51A0003EEA24F56B29EBB6A /* StandingSplitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandingSplitView.swift; sourceTree = "<group>"; };
@@ -392,6 +396,7 @@
 				C41A1003EEA24F56B29EBB6A /* GoalValidationService.swift */,
 				A45F0001EEA24F56B29EBB6A /* GoalsTabService.swift */,
 				D47A0011EEA24F56B29EBB6A /* CreditEntryService.swift */,
+				F1020002EEA24F56B29EBB6A /* LedgerEngine.swift */,
 				B51A0001EEA24F56B29EBB6A /* StandingSplitService.swift */,
 				391854E68EAC46CDA39D0B3B /* AppLaunchRouter.swift */,
 			);
@@ -566,6 +571,7 @@
 				CB1FF2A2773D47A2A2B2B50D /* ModelSerializationTests.swift */,
 				99B5A5E93DC14F1EB79CF38A /* PersistenceServiceTests.swift */,
 				D47A0023EEA24F56B29EBB6A /* CreditEntryServiceTests.swift */,
+				F1020004EEA24F56B29EBB6A /* LedgerEngineTests.swift */,
 				40BC3302B98D49298CC4A151 /* OpeningSplitServiceTests.swift */,
 				442B1016E1AC4C9BB48B1357 /* OpeningSplitViewModelTests.swift */,
 				A11C001BEEA24F56B29EBB6A /* AccountsServiceTests.swift */,
@@ -811,6 +817,7 @@
 				A63B0003BD814941ABD3C921 /* ProposalCard.swift in Sources */,
 				A45B000CBD814941ABD3C921 /* SettingsView.swift in Sources */,
 				D47A0010BD814941ABD3C921 /* CreditEntryService.swift in Sources */,
+				F1020001BD814941ABD3C921 /* LedgerEngine.swift in Sources */,
 				D47A0012BD814941ABD3C921 /* CreditSyncViewModel.swift in Sources */,
 				D47A0014BD814941ABD3C921 /* CreditUpdateBalanceViewModel.swift in Sources */,
 				D47A0016BD814941ABD3C921 /* CreditEntryViewModel.swift in Sources */,
@@ -863,6 +870,7 @@
 				A45B000DBD814941ABD3C921 /* GoalsTabServiceTests.swift in Sources */,
 				A45B000EBD814941ABD3C921 /* GoalsViewModelTests.swift in Sources */,
 				D47A0022BD814941ABD3C921 /* CreditEntryServiceTests.swift in Sources */,
+				F1020003BD814941ABD3C921 /* LedgerEngineTests.swift in Sources */,
 				B51B0004BD814941ABD3C921 /* StandingSplitServiceTests.swift in Sources */,
 				B51B0005BD814941ABD3C921 /* StandingSplitViewModelTests.swift in Sources */,
 			);

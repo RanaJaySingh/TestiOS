@@ -24,6 +24,7 @@ final class CreditSyncViewModel: ObservableObject {
     private let persistence: any PersistenceServicing
     private let balanceSync: any BalanceSyncServicing
     private let formatting: any FormattingServicing
+    private let ledger: any LedgerEngine
     private let clock: () -> Date
     private let makeID: () -> UUID
 
@@ -33,12 +34,14 @@ final class CreditSyncViewModel: ObservableObject {
             fetchedBalancePaisa: MockBalanceSyncService.demoHigherBalancePaisa
         ),
         formatting: any FormattingServicing = FormattingService(),
+        ledger: any LedgerEngine = StubLedgerEngine(),
         clock: @escaping () -> Date = Date.init,
         makeID: @escaping () -> UUID = UUID.init
     ) {
         self.persistence = persistence
         self.balanceSync = balanceSync
         self.formatting = formatting
+        self.ledger = ledger
         self.clock = clock
         self.makeID = makeID
     }
@@ -71,7 +74,7 @@ final class CreditSyncViewModel: ObservableObject {
 
     func prepare(previousBalance: Paisa, history: [HistoryEntry]) {
         self.previousBalance = previousBalance
-        isBlockedByOpenEntry = CreditEntryService.isSyncOrUpdateBlocked(history: history)
+        isBlockedByOpenEntry = ledger.isSyncOrUpdateBlocked(history: history)
         fetchedBalance = nil
         infoMessage = nil
         errorMessage = nil
@@ -109,7 +112,7 @@ final class CreditSyncViewModel: ObservableObject {
         }
 
         do {
-            var state = try await persistence.loadState()
+            let state = try await persistence.loadState()
             guard let dedicated = AccountsService.dedicatedAccount(in: state.accounts) else {
                 errorMessage = "No dedicated savings account."
                 phase = .showingResult
@@ -124,9 +127,9 @@ final class CreditSyncViewModel: ObservableObject {
                 phase = .showingResult
             case .success(let fetched):
                 fetchedBalance = fetched
-                let outcome = try CreditEntryService.processFetchedBalance(
+                let outcome = try ledger.processBalanceUpdate(
                     state: state,
-                    fetchedBalance: fetched,
+                    newBalance: fetched,
                     dedicatedAccountID: dedicated.id,
                     isTyped: false,
                     id: makeID(),

@@ -6,7 +6,7 @@ enum GoalsRoute: Hashable {
     case transfer
 }
 
-/// Goals tab — design frames 9 / 9b / 9c (PIP-45); visual parity PIP-81; detail via PIP-49; Sync/Update/Credit via PIP-47.
+/// Goals tab shell — frames 9 / 9b / 9c (PIP-45); Pi* visuals (PIP-81); Sync/Update via ledger (PIP-102).
 struct GoalsTabView: View {
     @ObservedObject var viewModel: GoalsViewModel
     /// Settings → Reset demo → Welcome (PIP-61 / PRD R17).

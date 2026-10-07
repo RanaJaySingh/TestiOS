@@ -30,6 +30,7 @@ final class CreditUpdateBalanceViewModel: ObservableObject {
     private let persistence: any PersistenceServicing
     private let balanceSync: any BalanceSyncServicing
     private let formatting: any FormattingServicing
+    private let ledger: any LedgerEngine
     private let clock: () -> Date
     private let makeID: () -> UUID
 
@@ -39,12 +40,14 @@ final class CreditUpdateBalanceViewModel: ObservableObject {
             fetchedBalancePaisa: MockBalanceSyncService.demoHigherBalancePaisa
         ),
         formatting: any FormattingServicing = FormattingService(),
+        ledger: any LedgerEngine = StubLedgerEngine(),
         clock: @escaping () -> Date = Date.init,
         makeID: @escaping () -> UUID = UUID.init
     ) {
         self.persistence = persistence
         self.balanceSync = balanceSync
         self.formatting = formatting
+        self.ledger = ledger
         self.clock = clock
         self.makeID = makeID
     }
@@ -72,7 +75,7 @@ final class CreditUpdateBalanceViewModel: ObservableObject {
             previousBalance = dedicated?.balance ?? 0
             dedicatedIsPaytmLinked = dedicated?.isPaytmLinked ?? false
             dedicatedBankTitle = dedicated.map { AccountsService.displayTitle(for: $0) }
-            isBlockedByOpenEntry = CreditEntryService.isSyncOrUpdateBlocked(history: state.history)
+            isBlockedByOpenEntry = ledger.isSyncOrUpdateBlocked(history: state.history)
             if isBlockedByOpenEntry {
                 infoMessage = "Assign the open credit before Update."
             }
@@ -188,9 +191,9 @@ final class CreditUpdateBalanceViewModel: ObservableObject {
             }
             previousBalance = dedicated.balance
 
-            let outcome = try CreditEntryService.processFetchedBalance(
+            let outcome = try ledger.processBalanceUpdate(
                 state: state,
-                fetchedBalance: newBalance,
+                newBalance: newBalance,
                 dedicatedAccountID: dedicated.id,
                 isTyped: isTyped,
                 id: makeID(),

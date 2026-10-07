@@ -92,12 +92,65 @@ enum GoalHeldChangeService {
         changes.first { $0.goalId == goalId }
     }
 
-    /// Cleared when the next credit applies (PIP-47).
+    /// Cleared when the next credit applies (PIP-47 / PIP-102).
     static func clear(goalId: UUID, in changes: [HeldGoalChange]) -> [HeldGoalChange] {
         changes.filter { $0.goalId != goalId }
     }
 
     static func clearAll() -> [HeldGoalChange] { [] }
+
+    /// Applies every pending goal edit onto goals + standing shares, then clears
+    /// `heldGoalChanges`. Called by Goals Sync / Update **before** writing an open
+    /// History entry so suggested split uses post-edit percentages (PIP-102).
+    /// Idempotent when goals were already mutated at edit time (PIP-49).
+    static func applyPendingEdits(
+        to state: PersistedAppState,
+        now: Date = Date()
+    ) -> PersistedAppState {
+        guard !state.heldGoalChanges.isEmpty else { return state }
+
+        var next = state
+        var goalsByID = Dictionary(uniqueKeysWithValues: next.goals.map { ($0.id, $0) })
+
+        for change in next.heldGoalChanges {
+            guard var goal = goalsByID[change.goalId] else { continue }
+            goal = Goal(
+                id: goal.id,
+                name: change.pendingName,
+                targetAmount: change.pendingTargetAmount,
+                startDate: change.pendingStartDate,
+                endDate: change.pendingEndDate,
+                inflationRate: change.pendingInflationRate,
+                savedAmount: goal.savedAmount,
+                shareOfNewCredits: change.pendingShareOfNewCredits,
+                createdAt: goal.createdAt,
+                updatedAt: now
+            )
+            goalsByID[change.goalId] = goal
+            next.standingSplits = updatedStandingSplits(
+                next.standingSplits,
+                goalId: change.goalId,
+                share: change.pendingShareOfNewCredits
+            )
+        }
+
+        next.goals = next.goals.map { goalsByID[$0.id] ?? $0 }
+
+        // When every goal has a pending or live share, rebuild standing from goal
+        // shares if they still sum to 100% — keeps suggested split coherent.
+        let shareMap = Dictionary(uniqueKeysWithValues: next.goals.map {
+            ($0.id, $0.shareOfNewCredits)
+        })
+        let orderedShares = next.goals.map { shareMap[$0.id] ?? 0 }
+        if !next.goals.isEmpty, OpeningSplitService.isValidHundredPercent(orderedShares) {
+            next.standingSplits = next.goals.map {
+                StandingSplit(goalId: $0.id, percentage: $0.shareOfNewCredits)
+            }
+        }
+
+        next.heldGoalChanges = clearAll()
+        return next
+    }
 
     // MARK: - History
 
