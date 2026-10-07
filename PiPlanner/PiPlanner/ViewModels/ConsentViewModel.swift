@@ -40,7 +40,7 @@ final class ConsentViewModel: ObservableObject {
     private let persistence: any PersistenceServicing
     private let balanceSync: any BalanceSyncServicing
     private let formatting: any FormattingServicing
-    /// Setup ledger mutations go through `LedgerFacade` → `LedgerEngine` source mapping.
+    /// Setup ledger mutations go through `LedgerFacade` → `LedgerEngineCore` source mapping.
 
     var dedicatedAccount: Account? {
         AccountsService.dedicatedAccount(in: accounts)
@@ -216,7 +216,7 @@ final class ConsentViewModel: ObservableObject {
         clearPIN()
     }
 
-    // MARK: - Persistence (LedgerFacade stub until PIP-98)
+    // MARK: - Persistence (LedgerFacade → LedgerEngineCore.BalanceSource)
 
     private func persistConsentFlag(autoUpdate: Bool) async {
         // Setup path: only Consent No uses this (autoUpdate false). Settings On uses confirmConsentOn.
@@ -237,7 +237,7 @@ final class ConsentViewModel: ObservableObject {
     private func persistConsentAndBalance(paisa: Paisa, autoUpdate: Bool, isTyped: Bool) async {
         // PIP-100: track typed vs fetch for Opening History shape.
         resolvedIsTyped = isTyped
-        // PIP-99: LedgerFacade BalanceSource (snapshot vs typed) until PIP-98 engine.
+        // PIP-99/100 → PIP-98: facade BalanceSource maps to LedgerEngineCore (fetched/typed).
         let source = UpdateBalanceRoutingService.balanceSource(isTyped: isTyped)
         do {
             var state = try await persistence.loadState()

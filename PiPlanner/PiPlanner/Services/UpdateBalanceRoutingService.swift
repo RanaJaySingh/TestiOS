@@ -24,13 +24,13 @@ enum UpdateBalanceRoute: Equatable, Sendable {
 /// - Other UPI app (not Paytm-linked, or explicit other-app) → Manual amount only
 ///
 /// Setup Consent persists balances via PIP-99 `LedgerFacade` (snapshot vs typed).
-/// Goals Sync / Update open-credit goes through PIP-102/103 `StubLedgerEngine`
-/// (`processBalanceUpdate`). Shape helpers / Opening writers reuse
-/// `CreditEntryService` / `OpeningSplitService` (PIP-47 / PIP-43).
-/// When PIP-98 lands a dedicated ledger engine, redirect these helpers there — do not
-/// invent a parallel entry writer here.
+/// `LedgerFacade.BalanceSource` maps to PIP-98 `LedgerEngineCore.BalanceSource`.
+/// Goals Sync / Update + History open→save go through PIP-102/103 `StubLedgerEngine`
+/// (`processBalanceUpdate` / Save). Shape helpers / Opening writers reuse
+/// `CreditEntryService` / `OpeningSplitService` / `StubLedgerService` — do not invent
+/// a parallel entry writer; pure mutations live on `LedgerEngineCore`.
 enum UpdateBalanceRoutingService {
-    /// Maps PIP-100 typed flag ↔ PIP-99 `LedgerFacade.BalanceSource`.
+    /// Maps PIP-100 typed flag ↔ `LedgerFacade.BalanceSource` → engine fetch/typed.
     static func balanceSource(isTyped: Bool) -> LedgerFacade.BalanceSource {
         isTyped ? .typedManual : .snapshotFetch
     }
@@ -108,7 +108,7 @@ enum UpdateBalanceRoutingService {
             && !entry.allocations.isEmpty
     }
 
-    /// Open New credit via existing CreditEntryService (stub surface until PIP-98 ledger).
+    /// Open New credit via existing CreditEntryService (PIP-98 `LedgerEngineCore` owns full credit/history rules).
     static func makeOpenCreditEntry(
         goals: [Goal],
         standingSplits: [StandingSplit],
@@ -131,7 +131,7 @@ enum UpdateBalanceRoutingService {
         )
     }
 
-    /// Locked Opening balance via existing OpeningSplitService (stub surface until PIP-98).
+    /// Locked Opening balance via existing OpeningSplitService (PIP-98 `LedgerEngineCore` for ledger formulas).
     static func makeOpeningHistoryEntry(
         goals: [Goal],
         openingBalance: Paisa,
