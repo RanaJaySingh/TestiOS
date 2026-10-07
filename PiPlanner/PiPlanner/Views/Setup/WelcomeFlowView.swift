@@ -127,8 +127,12 @@ struct WelcomeFlowView: View {
 
     private func continueToOpeningSplit(goals: [Goal]) {
         let balance = consentViewModel.resolvedBalance ?? DemoSeed.openingBalancePaisa
-        let resolvedGoals = goals.isEmpty ? DemoSeed.sampleGoals : goals
-        // Manual / Other→Manual → typed; PIN / Consent Yes fetch → not typed (same History shape).
+        var resolvedGoals = goals.isEmpty ? DemoSeed.sampleGoals : goals
+        // One goal → 100% default before Opening lock / skip (PIP-101).
+        if resolvedGoals.count == 1 {
+            resolvedGoals[0].shareOfNewCredits = 1
+        }
+        // Manual / Other→Manual → typed; PIN / Consent Yes fetch → not typed (PIP-100 History shape).
         let isTyped = consentViewModel.resolvedIsTyped
             ?? UpdateBalanceRoutingService.isTypedBalance(resolvedFrom: .manualAmount)
         openingSplitViewModel = OpeningSplitViewModel(
@@ -137,6 +141,7 @@ struct WelcomeFlowView: View {
             openingBalanceIsTyped: isTyped,
             persistence: persistence
         )
+        // Single-goal still routes here; OpeningSplitView skips the editor and auto-locks.
         path.append(WelcomeRoute.openingSplit)
     }
 

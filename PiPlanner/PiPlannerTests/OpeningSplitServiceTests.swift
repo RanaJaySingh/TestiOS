@@ -50,6 +50,13 @@ final class OpeningSplitServiceTests: XCTestCase {
         XCTAssertTrue(OpeningSplitService.isValidHundredPercent(Array(map.values)))
     }
 
+    func testShouldPresentEditorOnlyForTwoOrMoreGoals() {
+        XCTAssertFalse(OpeningSplitService.shouldPresentEditor(goalCount: 0))
+        XCTAssertFalse(OpeningSplitService.shouldPresentEditor(goalCount: 1))
+        XCTAssertTrue(OpeningSplitService.shouldPresentEditor(goalCount: 2))
+        XCTAssertTrue(OpeningSplitService.shouldPresentEditor(goalCount: 3))
+    }
+
     // MARK: - History entry creation (R6 / BR-3)
 
     func testCreateLockedOpeningEntryAllocationsAndLock() throws {

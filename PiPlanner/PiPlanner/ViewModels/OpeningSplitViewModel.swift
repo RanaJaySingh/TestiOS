@@ -13,6 +13,8 @@ final class OpeningSplitViewModel: ObservableObject {
     @Published private(set) var shouldNavigateToGoals = false
     /// When non-nil, screen is viewing a locked opening entry (read-only).
     @Published private(set) var lockedEntry: HistoryEntry?
+    /// One-goal skip path: Opening split UI skipped; 100% locked automatically.
+    @Published private(set) var didAutoSkip = false
 
     let goals: [Goal]
     let openingBalance: Paisa
@@ -24,6 +26,8 @@ final class OpeningSplitViewModel: ObservableObject {
     private let makeID: () -> UUID
 
     var isSingleGoal: Bool { goals.count == 1 }
+    /// Multi-goal editor only; single-goal skips Opening split screens (PIP-101).
+    var shouldPresentEditor: Bool { OpeningSplitService.shouldPresentEditor(goalCount: goals.count) }
     var isReadOnly: Bool { lockedEntry != nil }
 
     var formattedOpeningBalance: String {
@@ -49,7 +53,10 @@ final class OpeningSplitViewModel: ObservableObject {
     }
 
     var canLock: Bool {
-        !isReadOnly && !isLocking && OpeningSplitService.isValidHundredPercent(orderedFractions)
+        !isReadOnly
+            && !isLocking
+            && shouldPresentEditor
+            && OpeningSplitService.isValidHundredPercent(orderedFractions)
     }
 
     var statusMessage: String {
@@ -57,7 +64,7 @@ final class OpeningSplitViewModel: ObservableObject {
             return OpeningSplitService.lockedAmountsCaption
         }
         if isSingleGoal {
-            return "100% assigned to \(goals.first?.name ?? "your goal")."
+            return "One goal — opening split is 100% automatic."
         }
         return OpeningSplitService.shortfallMessage(for: orderedFractions)
             ?? "Total 100%. Ready to lock."
@@ -168,7 +175,37 @@ final class OpeningSplitViewModel: ObservableObject {
         showConfirmLock = true
     }
 
-    /// Confirms lock: writes Opening balance History entry and signals navigation to Goals (9).
+    /// One-goal skip: lock Opening at 100% + standing split, then navigate to Goals (PIP-101).
+    /// History `isTyped` from tip PIP-100; write path via `StubLedgerService` + `LedgerFacade` ancestry.
+    func applySingleGoalSkipIfNeeded() async {
+        guard isSingleGoal, !didAutoSkip, !isReadOnly else { return }
+        isLocking = true
+        errorMessage = nil
+        defer { isLocking = false }
+
+        do {
+            let state = try await persistence.loadState()
+            let (next, entry) = try StubLedgerService.lockSingleGoalOpening(
+                to: state,
+                goals: goals,
+                openingBalance: openingBalance,
+                isTyped: openingBalanceIsTyped,
+                entryID: makeID(),
+                createdAt: clock(),
+                now: clock()
+            )
+            try await persistence.saveState(next)
+            lockedEntry = entry
+            didAutoSkip = true
+            shouldNavigateToGoals = true
+        } catch let error as AppError {
+            errorMessage = error.localizedDescription
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    /// Confirms lock: tip History shape (`isTyped`) + standing splits, then Goals (9).
     func confirmLock() async {
         guard canLock else { return }
         isLocking = true
@@ -176,21 +213,18 @@ final class OpeningSplitViewModel: ObservableObject {
         defer { isLocking = false }
 
         do {
-            let entry = try UpdateBalanceRoutingService.makeOpeningHistoryEntry(
+            let state = try await persistence.loadState()
+            let (next, entry) = try StubLedgerService.lockOpeningBalance(
+                to: state,
                 goals: goals,
                 openingBalance: openingBalance,
                 percentages: fractionMap,
                 isTyped: openingBalanceIsTyped,
-                id: makeID(),
-                createdAt: clock()
+                entryID: makeID(),
+                createdAt: clock(),
+                now: clock()
             )
-            var state = try await persistence.loadState()
-            // Ensure goals used for this screen are present in persisted state.
-            if state.goals.isEmpty {
-                state.goals = goals
-            }
-            state = try OpeningSplitService.applyOpeningLock(to: state, entry: entry, now: clock())
-            try await persistence.saveState(state)
+            try await persistence.saveState(next)
             lockedEntry = entry
             shouldNavigateToGoals = true
         } catch let error as AppError {

@@ -225,6 +225,10 @@ final class GoalChatViewModel: ObservableObject {
 
     func continueToOpeningSplit() {
         guard canContinue else { return }
+        // One goal → standing / opening share is always 100% (PIP-101).
+        if definedGoals.count == 1 {
+            definedGoals[0].shareOfNewCredits = 1
+        }
         shouldNavigateToOpeningSplit = true
     }
 
