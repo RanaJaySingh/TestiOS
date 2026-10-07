@@ -25,7 +25,8 @@ struct MainTabView: View {
             NavigationStack {
                 GoalsTabView(
                     viewModel: goalsViewModel,
-                    onDemoReset: onDemoReset
+                    onDemoReset: onDemoReset,
+                    onOpenHistory: { selectedTab = .history }
                 )
             }
             .tabItem {

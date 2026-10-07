@@ -6,18 +6,22 @@ enum GoalsRoute: Hashable {
     case transfer
 }
 
-/// Goals tab — design frames 9 / 9b / 9c (PIP-45); detail via PIP-49; Sync/Update/Credit via PIP-47.
+/// Goals tab — design frames 9 / 9b / 9c (PIP-45); visual parity PIP-81; detail via PIP-49; Sync/Update/Credit via PIP-47.
 struct GoalsTabView: View {
     @ObservedObject var viewModel: GoalsViewModel
     /// Settings → Reset demo → Welcome (PIP-61 / PRD R17).
     var onDemoReset: (() -> Void)?
+    /// Quick action → History tab (existing shell destination).
+    var onOpenHistory: (() -> Void)?
+
+    @State private var showNewGoalSheet = false
+    @StateObject private var newGoalHost = GoalChatViewModel()
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s20) {
                 Text(viewModel.personaGreeting)
-                    .font(.title2)
-                    .fontWeight(.semibold)
+                    .font(PiTypography.title())
                     .accessibilityAddTraits(.isHeader)
                     .accessibilityIdentifier("goals.personaGreeting")
 
@@ -31,15 +35,36 @@ struct GoalsTabView: View {
                 BalanceCard(
                     formattedTotal: viewModel.formattedTotalSavings,
                     accountSubtitle: viewModel.dedicatedAccountSubtitle,
+                    lastActivityLine: lastActivityLine,
                     actionTitle: viewModel.balanceActionTitle,
                     actionEnabled: viewModel.canTapBalanceAction,
                     onAction: { viewModel.tapBalanceAction() }
                 )
                 .accessibilityIdentifier("goals.balanceCard")
 
+                QuickActionRow(
+                    balanceActionTitle: GoalsTabService.quickBalanceActionTitle(for: viewModel.balanceAction),
+                    balanceActionEnabled: viewModel.canTapBalanceAction,
+                    onBalanceAction: { viewModel.tapBalanceAction() },
+                    onNewGoal: { showNewGoalSheet = true },
+                    onHistory: { onOpenHistory?() }
+                ) {
+                    NavigationLink(value: GoalsRoute.transfer) {
+                        QuickActionCell(
+                            title: "Transfer",
+                            systemImage: PiIcons.transfer,
+                            enabled: viewModel.goals.count >= 2,
+                            accessibilityIdentifier: "goals.quickAction.transfer"
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(viewModel.goals.count < 2)
+                    .accessibilityIdentifier("goals.transfer.entry")
+                }
+
                 if let info = viewModel.infoMessage {
                     Text(info)
-                        .font(.footnote)
+                        .font(PiTypography.caption())
                         .foregroundStyle(.secondary)
                         .accessibilityIdentifier("goals.info")
                 }
@@ -47,25 +72,23 @@ struct GoalsTabView: View {
                 Button("Record a withdrawal") {
                     viewModel.openRecordWithdrawal()
                 }
-                .font(.subheadline)
+                .font(PiTypography.caption())
+                .foregroundStyle(PiColors.navyPrimary)
                 .accessibilityIdentifier("goals.recordWithdrawal")
 
                 goalsSection
             }
-            .padding()
+            .padding(DesignTokens.Space.s16)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .background(PiColors.backgroundApp.ignoresSafeArea())
         .navigationTitle("Goals")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                NavigationLink(value: GoalsRoute.transfer) {
-                    Text("Transfer")
-                }
-                .disabled(viewModel.goals.count < 2)
-                .accessibilityIdentifier("goals.transfer.entry")
-            }
-            ToolbarItem(placement: .navigationBarTrailing) {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                headerChromeIcon(systemName: PiIcons.headerSearch, label: "Search")
+                headerChromeIcon(systemName: PiIcons.headerNotifications, label: "Notifications")
+                headerChromeIcon(systemName: PiIcons.headerChart, label: "Chart")
                 Button {
                     viewModel.openSettings()
                 } label: {
@@ -201,6 +224,23 @@ struct GoalsTabView: View {
                 onDemoReset: onDemoReset
             )
         }
+        .sheet(isPresented: $showNewGoalSheet) {
+            NavigationStack {
+                GoalFormView(viewModel: newGoalHost) {
+                    showNewGoalSheet = false
+                    Task { await viewModel.load() }
+                }
+                .onAppear {
+                    newGoalHost.reset()
+                    newGoalHost.useFormPath()
+                }
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Close") { showNewGoalSheet = false }
+                    }
+                }
+            }
+        }
         .onChange(of: viewModel.showSettings) { isPresented in
             // Reload after Settings → Standing split save so shares stay current.
             if !isPresented {
@@ -234,6 +274,22 @@ struct GoalsTabView: View {
         )
     }
 
+    private var lastActivityLine: String {
+        GoalsTabService.lastBalanceActivityLine(
+            for: viewModel.balanceAction,
+            referenceDate: GoalsTabService.lastBalanceActivityDate(history: viewModel.history)
+        )
+    }
+
+    /// Chrome-only header icons (A2 / R20) — no new flows.
+    private func headerChromeIcon(systemName: String, label: String) -> some View {
+        Image(systemName: systemName)
+            .foregroundStyle(PiColors.navyPrimary.opacity(0.85))
+            .accessibilityLabel(label)
+            .accessibilityIdentifier("goals.header.\(label.lowercased())")
+            .accessibilityAddTraits(.isImage)
+    }
+
     @ViewBuilder
     private var goalsSection: some View {
         if viewModel.isLoading && !viewModel.hasGoals {
@@ -241,8 +297,7 @@ struct GoalsTabView: View {
                 .frame(maxWidth: .infinity)
         } else if viewModel.hasGoals {
             Text("Your goals")
-                .font(.title3)
-                .fontWeight(.semibold)
+                .font(PiTypography.title())
                 .accessibilityAddTraits(.isHeader)
                 .accessibilityIdentifier("goals.sectionHeader")
 
@@ -250,8 +305,19 @@ struct GoalsTabView: View {
                 NavigationLink(value: GoalsRoute.detail(goal.id)) {
                     GoalCard(
                         name: goal.name,
-                        formattedSaved: viewModel.formattedSavedAmount(for: goal),
-                        statusLabel: viewModel.statusLabel(for: goal)
+                        formattedSavedOfTarget: GoalsTabService.savedOfTargetLabel(
+                            savedPaisa: goal.savedAmount,
+                            targetPaisa: goal.adjustedTarget,
+                            formatting: viewModel.formatting
+                        ),
+                        statusLabel: viewModel.statusLabel(for: goal),
+                        monthlyNeedLabel: GoalsTabService.monthlyNeedLabel(
+                            monthlyNeedPaisa: goal.monthlyNeed,
+                            formatting: viewModel.formatting
+                        ),
+                        creditsPercentLabel: GoalsTabService.creditsPercentLabel(
+                            shareOfNewCredits: goal.shareOfNewCredits
+                        )
                     )
                 }
                 .buttonStyle(.plain)
@@ -259,7 +325,7 @@ struct GoalsTabView: View {
             }
         } else {
             Text("No goals yet")
-                .font(.body)
+                .font(PiTypography.body())
                 .foregroundStyle(.secondary)
                 .accessibilityIdentifier("goals.empty")
         }
