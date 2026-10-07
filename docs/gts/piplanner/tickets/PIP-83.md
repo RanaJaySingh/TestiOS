@@ -53,6 +53,10 @@ Compare simulator/device to design frames 10 / 10a / 10b / 11a:
 
 Started from `b30a048` (main after PIP-69 #22). Touched only `CreditSyncSheet` / `CreditUpdateBalanceSheet` (+ this ticket doc). Avoided Theme/Components/MainTab edits for rebase-friendliness with PIP-73..95.
 
+## Test results
+
+`cd PiPlanner && swift test` — **206 tests, 0 failures** (Linux SPM; includes `CreditEntryServiceTests` sync/update behaviour + PIP-69 component contract smoke).
+
 ## How to run tests
 
 ```bash
