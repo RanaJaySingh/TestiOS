@@ -17,6 +17,10 @@
 		D53B0003BD814941ABD3C921 /* DeleteGoalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D53F0003EEA24F56B29EBB6A /* DeleteGoalViewModel.swift */; };
 		D53B0004BD814941ABD3C921 /* DeleteGoalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D53F0004EEA24F56B29EBB6A /* DeleteGoalView.swift */; };
 		D53B0006BD814941ABD3C921 /* DeleteGoalServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D53F0006EEA24F56B29EBB6A /* DeleteGoalServiceTests.swift */; };
+		A57B0001BD814941ABD3C921 /* WithdrawalService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A57F0001EEA24F56B29EBB6A /* WithdrawalService.swift */; };
+		A57B0002BD814941ABD3C921 /* WithdrawalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A57F0002EEA24F56B29EBB6A /* WithdrawalViewModel.swift */; };
+		A57B0003BD814941ABD3C921 /* WithdrawalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A57F0003EEA24F56B29EBB6A /* WithdrawalView.swift */; };
+		A57B0004BD814941ABD3C921 /* WithdrawalServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A57F0004EEA24F56B29EBB6A /* WithdrawalServiceTests.swift */; };
 		1318D194AA484098BD165D58 /* PiPlannerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 656B4AAB996D4CB283413E05 /* PiPlannerApp.swift */; };
 		142F0FC7D4894F32A7F74E7B /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = C670521930484E588DEE0188 /* Account.swift */; };
 		1C65A48285EC416D828D2976 /* Goal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 349DD80CB6684362B4613EB4 /* Goal.swift */; };
