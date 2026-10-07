@@ -89,7 +89,8 @@ struct WelcomeFlowView: View {
                         ProgressView("Loading…")
                     }
                 case .goalsTab:
-                    GoalsTabPlaceholderView()
+                    MainTabView(persistence: persistence)
+                        .navigationBarBackButtonHidden(true)
                 }
             }
         }

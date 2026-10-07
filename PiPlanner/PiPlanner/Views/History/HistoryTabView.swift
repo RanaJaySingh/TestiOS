@@ -1,14 +1,14 @@
 import SwiftUI
 
-/// Placeholder Goals tab (screen 9) until PIP-45. Navigation target after Opening split lock.
-struct GoalsTabPlaceholderView: View {
+/// History tab stub — full list arrives in a later ticket (PIP History).
+struct HistoryTabView: View {
     var body: some View {
         VStack(spacing: 12) {
-            Text("Goals")
+            Text("History")
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .accessibilityAddTraits(.isHeader)
-            Text("Your opening balance is locked. Full Goals tab arrives in PIP-45.")
+            Text("Opening balance and credit history will appear here.")
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -16,15 +16,14 @@ struct GoalsTabPlaceholderView: View {
         }
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .navigationTitle("Goals")
+        .navigationTitle("History")
         .navigationBarTitleDisplayMode(.inline)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Goals tab placeholder. Opening balance locked.")
+        .accessibilityIdentifier("history.tab")
     }
 }
 
 #Preview {
     NavigationStack {
-        GoalsTabPlaceholderView()
+        HistoryTabView()
     }
 }
