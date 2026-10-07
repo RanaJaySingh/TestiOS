@@ -4,7 +4,7 @@ import Foundation
 enum AppLaunchDestination: Equatable, Sendable {
     /// First-run or post–Reset demo — Welcome (frame 1).
     case welcome
-    /// Setup completed (locked Opening balance) — Goals tab (or placeholder).
+    /// Setup completed (locked Opening balance) — Goals tab / main tabs (PIP-45).
     case goals
 }
 
