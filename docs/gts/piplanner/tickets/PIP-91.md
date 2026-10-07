@@ -54,7 +54,7 @@ Started from `b30a048` (main after PIP-69 #22 / PIP-71 icons). Touches **only** 
 
 ## Test results
 
-`cd PiPlanner && swift test` — see PR / CI; HistoryServiceTests unchanged (behaviour preserved).
+`cd PiPlanner && swift test` — **206 tests, 0 failures** (HistoryServiceTests unchanged; behaviour preserved).
 
 ## How to run tests
 
