@@ -29,6 +29,8 @@ struct HistoryTabView: View {
                 entriesList
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(PiColors.backgroundApp.ignoresSafeArea())
         .navigationTitle("History")
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(for: HistoryRoute.self) { route in
@@ -82,22 +84,27 @@ struct HistoryTabView: View {
     }
 
     private var emptyState: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: DesignTokens.Space.s16) {
             Image(systemName: PiIcons.historyTab)
-                .font(.largeTitle)
-                .foregroundStyle(.secondary)
+                .font(.system(size: DesignTokens.TypeSize.amountHero, weight: .regular))
+                .foregroundStyle(PiColors.navyPrimary.opacity(0.55))
+                .frame(width: 72, height: 72)
+                .background(
+                    Circle()
+                        .fill(PiColors.chipLightBlue.opacity(0.85))
+                )
                 .accessibilityHidden(true)
             Text("History")
-                .font(.title2)
-                .fontWeight(.semibold)
+                .font(PiTypography.title())
+                .foregroundStyle(Color.primary)
                 .accessibilityAddTraits(.isHeader)
             Text(viewModel.emptyStateMessage)
-                .font(.body)
+                .font(PiTypography.body())
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
         }
-        .padding()
+        .padding(DesignTokens.Space.s24)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .accessibilityIdentifier("history.empty")
     }
@@ -106,10 +113,21 @@ struct HistoryTabView: View {
         List {
             ForEach(viewModel.entries) { entry in
                 row(for: entry)
+                    .listRowInsets(
+                        EdgeInsets(
+                            top: DesignTokens.Space.s8,
+                            leading: DesignTokens.Space.s16,
+                            bottom: DesignTokens.Space.s8,
+                            trailing: DesignTokens.Space.s16
+                        )
+                    )
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
                     .accessibilityIdentifier("history.row.\(entry.id.uuidString)")
             }
         }
         .listStyle(.plain)
+        .scrollContentBackground(.hidden)
         .accessibilityIdentifier("history.list")
     }
 
@@ -163,6 +181,7 @@ struct HistoryTabView: View {
             )
         )
     }
+    .piPlannerTheme()
 }
 
 #Preview("Empty") {
@@ -173,6 +192,7 @@ struct HistoryTabView: View {
             )
         )
     }
+    .piPlannerTheme()
 }
 
 /// In-memory persistence for History SwiftUI previews.
