@@ -1,16 +1,20 @@
 import SwiftUI
 
-/// Open / locked New credit History entry (frames 13 / 13a–13g / 13t).
+/// Open / locked New credit History entry (frames 13 / 13a–13g / 13t) — PIP-85 visual parity.
+///
+/// Visual / layout / token / component only. Lock / assign behaviour stays in
+/// `CreditEntryViewModel` / `CreditEntryService` (unchanged).
 struct CreditEntryView: View {
     @ObservedObject var viewModel: CreditEntryViewModel
     var onDone: () -> Void
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s20) {
                 header
                 amountCard
-                goalsSection
+                alreadySavedBlock
+                thisCreditBlock
                 if !viewModel.isLocked && !viewModel.isSingleGoal {
                     standingCheckbox
                 }
@@ -18,16 +22,19 @@ struct CreditEntryView: View {
                 if !viewModel.isLocked {
                     saveButton
                 } else {
-                    Button("Done", action: onDone)
-                        .buttonStyle(.borderedProminent)
-                        .frame(maxWidth: .infinity)
-                        .accessibilityIdentifier("creditEntry.done")
+                    PrimaryCTA(
+                        title: "Done",
+                        accessibilityIdentifier: "creditEntry.done",
+                        action: onDone
+                    )
                 }
             }
-            .padding()
+            .padding(DesignTokens.Space.s16)
         }
+        .background(PiColors.backgroundApp.ignoresSafeArea())
         .navigationTitle(viewModel.isLocked ? "Credit locked" : "New credit")
         .navigationBarTitleDisplayMode(.inline)
+        .piPlannerTheme()
         .alert(
             "Couldn’t save",
             isPresented: Binding(
@@ -39,110 +46,209 @@ struct CreditEntryView: View {
         } message: {
             Text(viewModel.errorMessage ?? "")
         }
+        .accessibilityIdentifier("creditEntry.root")
     }
 
+    // MARK: - Header (Assign now / Saved and locked + badges)
+
     private var header: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text(viewModel.isLocked ? "Saved credit" : "Assign this credit")
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                    .accessibilityAddTraits(.isHeader)
-                if viewModel.isTyped {
-                    Text("Typed")
-                        .font(.caption)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color.secondary.opacity(0.15))
-                        .accessibilityIdentifier("creditEntry.typedBadge")
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s12) {
+            Text("New credit")
+                .font(PiTypography.caption())
+                .foregroundStyle(PiColors.navyPrimary.opacity(0.72))
+                .accessibilityAddTraits(.isHeader)
+
+            HStack(alignment: .center, spacing: DesignTokens.Space.s8) {
+                if viewModel.isLocked {
+                    lockedStatusLabel
+                } else {
+                    assignNowStatusLabel
                 }
+                Spacer(minLength: DesignTokens.Space.s8)
+                badges
             }
+
             Text(
                 viewModel.isLocked
                     ? OpeningSplitService.lockedAmountsCaption
                     : CreditEntryService.lockedOnceCaption
             )
-            .font(.body)
+            .font(PiTypography.body())
             .foregroundStyle(.secondary)
             .fixedSize(horizontal: false, vertical: true)
         }
+        .accessibilityElement(children: .contain)
     }
 
-    private var amountCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if !viewModel.isTyped, let previous = viewModel.formattedPrevious {
-                labeledRow("Previous", previous)
-            }
-            if !viewModel.isTyped, let now = viewModel.formattedNewBalance {
-                labeledRow("Balance now", now)
-            }
-            labeledRow("New amount", viewModel.formattedCreditAmount)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .accessibilityElement(children: .combine)
+    private var assignNowStatusLabel: some View {
+        Text(CreditEntryService.assignNowTitle)
+            .font(PiTypography.title())
+            .foregroundStyle(PiColors.navyPrimary)
+            .accessibilityIdentifier("creditEntry.assignNow")
     }
 
-    private func labeledRow(_ title: String, _ value: String) -> some View {
-        HStack {
-            Text(title)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            Spacer()
-            Text(value)
-                .fontWeight(.semibold)
-                .monospacedDigit()
-        }
-    }
-
-    private var goalsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Already saved (unchanged)")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-
-            ForEach(viewModel.goals) { goal in
-                goalRow(goal)
-            }
+    private var lockedStatusLabel: some View {
+        HStack(spacing: DesignTokens.Space.s8) {
+            Image(systemName: PiIcons.lock)
+                .font(.title3)
+                .foregroundStyle(PiColors.navyPrimary)
+                .accessibilityLabel("Locked")
+                .accessibilityIdentifier("creditEntry.lockIcon")
+            Text("Saved and locked")
+                .font(PiTypography.title())
+                .foregroundStyle(PiColors.navyPrimary)
+                .accessibilityIdentifier("creditEntry.savedAndLocked")
         }
     }
 
     @ViewBuilder
-    private func goalRow(_ goal: Goal) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+    private var badges: some View {
+        HStack(spacing: DesignTokens.Space.s8) {
+            if viewModel.isTyped {
+                entryBadge(title: "Typed", accessibilityIdentifier: "creditEntry.typedBadge")
+            }
+            if showsCustomBadge {
+                entryBadge(title: "Custom", accessibilityIdentifier: "creditEntry.customBadge")
+            }
+        }
+    }
+
+    /// Locked non-typed credits show the design “Custom” badge (13d / History · Custom split).
+    private var showsCustomBadge: Bool {
+        viewModel.isLocked && !viewModel.isTyped
+    }
+
+    private func entryBadge(title: String, accessibilityIdentifier: String) -> some View {
+        Text(title)
+            .font(PiTypography.caption())
+            .fontWeight(.semibold)
+            .foregroundStyle(PiColors.chipLightBlueLabel)
+            .padding(.horizontal, DesignTokens.Space.s12)
+            .padding(.vertical, DesignTokens.Space.s8)
+            .background(PiColors.chipLightBlue)
+            .clipShape(RoundedRectangle(cornerRadius: DesignTokens.Radius.chip, style: .continuous))
+            .accessibilityIdentifier(accessibilityIdentifier)
+    }
+
+    // MARK: - Amount summary card
+
+    private var amountCard: some View {
+        PiCard {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
+                if !viewModel.isTyped, let previous = viewModel.formattedPrevious {
+                    labeledRow("Previous", previous)
+                }
+                if !viewModel.isTyped, let now = viewModel.formattedNewBalance {
+                    labeledRow("Balance now", now)
+                }
+                labeledRow("New amount", viewModel.formattedCreditAmount, emphasize: true)
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("creditEntry.amountCard")
+    }
+
+    private func labeledRow(_ title: String, _ value: String, emphasize: Bool = false) -> some View {
+        HStack {
+            Text(title)
+                .font(PiTypography.caption())
+                .foregroundStyle(.secondary)
+            Spacer()
+            Text(value)
+                .font(emphasize ? PiTypography.title() : PiTypography.body())
+                .fontWeight(.semibold)
+                .foregroundStyle(emphasize ? PiColors.navyPrimary : .primary)
+                .monospacedDigit()
+        }
+    }
+
+    // MARK: - Already saved block (unchanged totals)
+
+    private var alreadySavedBlock: some View {
+        PiCard {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s12) {
+                Text("Already saved, not changing")
+                    .font(PiTypography.caption())
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.secondary)
+                    .accessibilityAddTraits(.isHeader)
+                    .accessibilityIdentifier("creditEntry.alreadySavedHeader")
+
+                ForEach(viewModel.goals) { goal in
+                    HStack {
+                        Text(goal.name)
+                            .font(PiTypography.body())
+                            .fontWeight(.medium)
+                        Spacer()
+                        Text(viewModel.formattedSavedSoFar(for: goal))
+                            .font(PiTypography.body())
+                            .foregroundStyle(.secondary)
+                            .monospacedDigit()
+                    }
+                    .accessibilityElement(children: .combine)
+                }
+            }
+        }
+        .accessibilityIdentifier("creditEntry.alreadySavedBlock")
+    }
+
+    // MARK: - This-credit split block
+
+    private var thisCreditBlock: some View {
+        PiCard {
+            VStack(alignment: .leading, spacing: DesignTokens.Space.s16) {
+                VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
+                    Text("Split \(viewModel.formattedCreditAmount) · This credit only")
+                        .font(PiTypography.body())
+                        .fontWeight(.semibold)
+                        .foregroundStyle(PiColors.navyPrimary)
+                        .accessibilityAddTraits(.isHeader)
+                        .accessibilityIdentifier("creditEntry.thisCreditHeader")
+
+                    if !viewModel.isLocked {
+                        Text("Update percentages for this amount")
+                            .font(PiTypography.caption())
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                ForEach(viewModel.goals) { goal in
+                    thisCreditGoalRow(goal)
+                }
+            }
+        }
+        .accessibilityIdentifier("creditEntry.thisCreditBlock")
+    }
+
+    @ViewBuilder
+    private func thisCreditGoalRow(_ goal: Goal) -> some View {
+        VStack(alignment: .leading, spacing: DesignTokens.Space.s8) {
             HStack {
                 Text(goal.name)
-                    .font(.headline)
-                Spacer()
-                Text(viewModel.formattedSavedSoFar(for: goal))
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .monospacedDigit()
-            }
-
-            HStack {
-                Text("This credit")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(PiTypography.body())
+                    .fontWeight(.semibold)
                 Spacer()
                 Text(viewModel.formattedAmount(for: goal.id))
+                    .font(PiTypography.body())
                     .fontWeight(.semibold)
+                    .foregroundStyle(PiColors.navyPrimary)
                     .monospacedDigit()
             }
 
             if viewModel.isSingleGoal {
                 Text("100%")
-                    .font(.title3)
-                    .fontWeight(.medium)
+                    .font(PiTypography.title())
+                    .foregroundStyle(PiColors.navyPrimary)
                     .accessibilityLabel("\(goal.name) automatically assigned 100 percent")
             } else if viewModel.isLocked {
                 Text("\(viewModel.displayPercents[goal.id] ?? 0)%")
-                    .font(.title3)
-                    .fontWeight(.medium)
+                    .font(PiTypography.title())
+                    .foregroundStyle(PiColors.navyPrimary)
             } else {
                 HStack {
                     Text("\(viewModel.displayPercents[goal.id] ?? 0)%")
-                        .font(.title3)
-                        .fontWeight(.medium)
+                        .font(PiTypography.title())
+                        .foregroundStyle(PiColors.navyPrimary)
                         .frame(width: 56, alignment: .leading)
                     Slider(
                         value: Binding(
@@ -152,49 +258,54 @@ struct CreditEntryView: View {
                         in: 0...100,
                         step: 1
                     )
+                    .tint(PiColors.navyPrimary)
                     .accessibilityLabel("\(goal.name) percent")
                     .accessibilityIdentifier("creditEntry.percent.\(goal.id.uuidString)")
                 }
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, DesignTokens.Space.s8)
+        .accessibilityElement(children: .contain)
     }
 
     private var standingCheckbox: some View {
         Toggle(isOn: $viewModel.useThisSplitForStanding) {
             Text(CreditEntryService.useThisSplitCheckboxTitle)
-                .font(.body)
+                .font(PiTypography.body())
         }
+        .tint(PiColors.navyPrimary)
         .accessibilityIdentifier("creditEntry.useStanding")
     }
 
     private var statusFooter: some View {
         Text(viewModel.statusMessage)
-            .font(.footnote)
+            .font(PiTypography.caption())
             .foregroundStyle(.secondary)
             .fixedSize(horizontal: false, vertical: true)
             .accessibilityIdentifier("creditEntry.status")
     }
 
     private var saveButton: some View {
-        Button {
-            Task {
-                await viewModel.saveAndLock()
-                if viewModel.isLocked {
-                    onDone()
-                }
-            }
-        } label: {
+        Group {
             if viewModel.isSaving {
                 ProgressView()
                     .frame(maxWidth: .infinity)
+                    .padding(.vertical, DesignTokens.Space.s12)
+                    .accessibilityIdentifier("creditEntry.save")
             } else {
-                Text("Save and lock")
-                    .frame(maxWidth: .infinity)
+                PrimaryCTA(
+                    title: "Save and lock",
+                    isEnabled: viewModel.canSave,
+                    accessibilityIdentifier: "creditEntry.save"
+                ) {
+                    Task {
+                        await viewModel.saveAndLock()
+                        if viewModel.isLocked {
+                            onDone()
+                        }
+                    }
+                }
             }
         }
-        .buttonStyle(.borderedProminent)
-        .disabled(!viewModel.canSave)
-        .accessibilityIdentifier("creditEntry.save")
     }
 }
